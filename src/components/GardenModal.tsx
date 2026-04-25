@@ -21,26 +21,43 @@ if (typeof window !== 'undefined') {
 // Robust Mermaid Component
 const Mermaid = ({ chart }: { chart: string }) => {
   const [svg, setSvg] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const id = useRef(`mermaid-${Math.random().toString(36).substring(2, 11)}`);
 
   useEffect(() => {
     let isMounted = true;
     const renderChart = async () => {
+      if (!chart) return;
       try {
+        // Clear previous error and SVG
+        setError(null);
         const { svg: renderedSvg } = await mermaid.render(id.current, chart);
         if (isMounted) setSvg(renderedSvg);
-      } catch (error) {
-        console.error('Mermaid render error:', error);
+      } catch (err) {
+        console.error('Mermaid render error:', err);
+        if (isMounted) setError('Diagram rendering failed. Check syntax.');
       }
     };
     renderChart();
     return () => { isMounted = false; };
   }, [chart]);
 
+  if (error) {
+    return (
+      <div className="my-8 p-6 bg-red-50 border border-dashed border-red-200 rounded-[2px] font-mono text-[11px] text-red-600">
+        <div className="font-bold mb-2 uppercase tracking-widest">[MERMAID_ERROR]</div>
+        {error}
+        <pre className="mt-4 opacity-70 overflow-x-auto p-4 bg-white/50">{chart}</pre>
+      </div>
+    );
+  }
+
   return (
     <div 
-      className="mermaid-chart my-10 flex justify-center bg-[rgba(0,71,255,0.03)] border border-dashed border-accent/20 p-8 rounded-[2px] transition-all hover:border-accent/40 overflow-x-auto"
-      dangerouslySetInnerHTML={{ __html: svg }}
+      ref={containerRef}
+      className="mermaid-chart my-10 flex justify-center bg-[rgba(0,71,255,0.02)] border border-dashed border-accent/15 p-8 rounded-[2px] transition-all hover:border-accent/30 overflow-x-auto"
+      dangerouslySetInnerHTML={{ __html: svg || '<div class="animate-pulse font-mono text-[10px] text-accent">Compiling Diagram...</div>' }}
     />
   );
 };
@@ -100,12 +117,31 @@ export default function GardenModal({ isOpen, onClose }: GardenModalProps) {
   const nodesRef = useRef<any[]>([]);
   const dragNodeRef = useRef<any | null>(null);
 
-  const categories = {
-    "Systems": ["caps", "k-phd", "floework"],
-    "Security": ["avara", "shield"],
-    "Intelligence": ["agents", "tgnn"],
-    "General": ["design", "pinn"]
-  };
+  const categories = useMemo(() => {
+    const groups: Record<string, string[]> = {
+      "Systems": [],
+      "Security": [],
+      "Intelligence": [],
+      "ML & Physics": [],
+      "General": []
+    };
+    
+    const groupMapping: Record<string, string> = {
+      'systems': 'Systems',
+      'security': 'Security',
+      'ml': 'ML & Physics',
+      'physics': 'ML & Physics',
+      'intelligence': 'Intelligence'
+    };
+
+    researchData.nodes.forEach(node => {
+      const cat = groupMapping[node.group] || 'General';
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(node.id);
+    });
+
+    return groups;
+  }, []);
 
   const activeFile = researchData.files[activeFileId];
 
