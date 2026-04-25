@@ -7,6 +7,7 @@ import SystemsLab from "@/components/SystemsLab";
 import KnowledgeArchive from "@/components/KnowledgeArchive";
 import GardenModal from "@/components/GardenModal";
 import ProjectModal from "@/components/ProjectModal";
+import DraggablePorygon from '@/components/DraggablePorygon';
 
 export default function Home() {
   const [activeModalId, setActiveModalId] = useState<string | null>(null);
@@ -57,11 +58,7 @@ export default function Home() {
                   Atharva<br /><em className="italic text-accent">Mendhulkar.</em>
                 </h1>
                 <div className="relative flex items-center justify-center">
-                  <img 
-                    src="/porygon.svg" 
-                    alt="Porygon Icon" 
-                    className="w-24 h-24 opacity-90 select-none cursor-pointer hover:scale-110 transition-transform duration-500 ease-in-out relative z-10" 
-                  />
+                  <DraggablePorygon />
                 </div>
               </div>
               

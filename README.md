@@ -1,27 +1,26 @@
 # Atharva Mendhulkar — Portfolio & Knowledge Garden
 
-Systems Engineer & AI Researcher. Exploring the intersection of physics-informed machine learning and kernel-level infrastructure.
 
 [mendhu.tech](https://mendhu.tech)
 
 ---
 
-## 🏛️ Project Architecture
+## Project Architecture
 
 This repository contains my personal portfolio and a specialized **Knowledge Garden** interface. The architecture is designed for high-fidelity technical storytelling.
 
-### 🌿 Knowledge Garden
+### Knowledge Garden
 A deterministic, interactive knowledge graph built from raw research notes.
 - **Sync Engine**: A custom Node.js script (`scripts/parse-vault.mjs`) that transforms an Obsidian vault into a high-performance JSON graph.
 - **Rendering**: Real-time rendering of Mermaid diagrams, GFM markdown, and wikilink navigation.
 - **Physics**: Force-directed layout using custom canvas simulation for high-density node interactions.
 
-### 🧪 Systems Lab
+### Systems Lab
 A curated index of research and engineering projects.
 - **Data-Driven**: Projects are defined in `src/data/projects.ts` with real-time performance metrics.
 - **Responsive**: Fully optimized for mobile and desktop exploration.
 
-## 🛠️ Technical Stack
+## Technical Stack
 
 - **Framework**: Next.js 16 (App Router)
 - **Styling**: Vanilla CSS + Tailwind CSS (Wireframe aesthetic)
@@ -29,7 +28,7 @@ A curated index of research and engineering projects.
 - **Typography**: EB Garamond (Serif), JetBrains Mono (Monospace)
 - **Deployment**: Vercel
 
-## ⚙️ Development
+## Development
 
 ### Installation
 ```bash
@@ -47,5 +46,5 @@ node scripts/parse-vault.mjs
 npm run dev
 ```
 
-## 📜 License
+## License
 MIT © [Atharva Mendhulkar](https://github.com/Atharva-Mendhulkar)
