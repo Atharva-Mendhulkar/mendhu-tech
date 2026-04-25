@@ -241,8 +241,8 @@ export default function GardenModal({ isOpen, onClose }: GardenModalProps) {
         const isActive = l.source.id === activeFileIdRef.current || l.target.id === activeFileIdRef.current;
         ctx.beginPath();
         ctx.setLineDash(isActive ? [] : [4, 4]);
-        ctx.strokeStyle = isActive ? 'rgba(0,71,255,0.7)' : 'rgba(26,26,26,0.3)';
-        ctx.lineWidth = isActive ? 2.5 : 1.5;
+        ctx.strokeStyle = isActive ? 'rgba(0,71,255,0.95)' : 'rgba(26,26,26,0.6)';
+        ctx.lineWidth = isActive ? 3 : 2;
         ctx.moveTo(l.source.x, l.source.y);
         ctx.lineTo(l.target.x, l.target.y);
         ctx.stroke();
@@ -259,7 +259,7 @@ export default function GardenModal({ isOpen, onClose }: GardenModalProps) {
         const r = node.radius;
 
         if (isActive || isConnected) {
-          ctx.shadowBlur = isActive ? 30 : 15;
+          ctx.shadowBlur = isActive ? 35 : 18;
           ctx.shadowColor = isActive ? 'rgba(0,71,255,0.6)' : 'rgba(0,71,255,0.3)';
         } else ctx.shadowBlur = 0;
 
@@ -268,8 +268,8 @@ export default function GardenModal({ isOpen, onClose }: GardenModalProps) {
         ctx.beginPath();
         ctx.setLineDash([2, 4]);
         ctx.strokeStyle = col;
-        ctx.lineWidth = 2;
-        ctx.globalAlpha = isActive ? 1.0 : (isConnected ? 0.8 : 0.5);
+        ctx.lineWidth = 2.2;
+        ctx.globalAlpha = isActive ? 1.0 : (isConnected ? 0.9 : 0.6);
         ctx.arc(node.x, node.y, r + 8 + pulse, 0, Math.PI * 2);
         ctx.stroke();
         ctx.globalAlpha = 1.0;
@@ -280,29 +280,29 @@ export default function GardenModal({ isOpen, onClose }: GardenModalProps) {
         if (isActive) { grad.addColorStop(0, col); grad.addColorStop(1, col); }
         else {
           grad.addColorStop(0, '#FFFFFF');
-          grad.addColorStop(0.8, isConnected ? 'rgba(0,71,255,0.2)' : '#F9F9F7');
-          grad.addColorStop(1, isConnected ? 'rgba(0,71,255,0.3)' : '#F3F3F0');
+          grad.addColorStop(0.8, isConnected ? 'rgba(0,71,255,0.25)' : '#F9F9F7');
+          grad.addColorStop(1, isConnected ? 'rgba(0,71,255,0.35)' : '#F3F3F0');
         }
         ctx.fillStyle = grad;
-        ctx.strokeStyle = isActive ? col : (isConnected ? 'rgba(0,71,255,0.7)' : 'rgba(26,26,26,0.4)');
-        ctx.lineWidth = isActive ? 4 : 2;
-        ctx.arc(node.x, node.y, isActive ? 8.5 : 6.5, 0, Math.PI * 2);
+        ctx.strokeStyle = isActive ? col : (isConnected ? 'rgba(0,71,255,0.8)' : 'rgba(26,26,26,0.5)');
+        ctx.lineWidth = isActive ? 4 : 2.2;
+        ctx.arc(node.x, node.y, isActive ? 9 : 7, 0, Math.PI * 2);
         ctx.fill(); ctx.stroke();
 
-        // Labels
+        // Labels (High Visibility Black/Dark)
         ctx.shadowBlur = 0;
-        ctx.font = isActive ? '600 13px var(--font-jetbrains-mono)' : '500 11px var(--font-jetbrains-mono)';
+        ctx.font = isActive ? '700 13px var(--font-jetbrains-mono)' : '600 11px var(--font-jetbrains-mono)';
         const text = node.name;
         const tw = ctx.measureText(text).width;
         if (isActive) {
-          ctx.fillStyle = 'rgba(0,71,255,0.12)';
-          ctx.roundRect(node.x - tw/2 - 10, node.y + r + 12, tw + 20, 22, 4);
+          ctx.fillStyle = 'rgba(0,71,255,0.15)';
+          ctx.roundRect(node.x - tw/2 - 10, node.y + r + 14, tw + 20, 24, 4);
           ctx.fill();
         }
-        ctx.fillStyle = isActive ? 'var(--accent)' : (isConnected ? 'var(--ink)' : 'var(--ink-muted)');
-        ctx.globalAlpha = (isActive || isConnected) ? 1 : 0.85;
+        ctx.fillStyle = isActive ? '#1A1A1A' : (isConnected ? '#333333' : '#555555');
+        ctx.globalAlpha = (isActive || isConnected) ? 1 : 0.9;
         ctx.textAlign = 'center';
-        ctx.fillText(text, node.x, node.y + r + 28);
+        ctx.fillText(text, node.x, node.y + r + 32);
         ctx.globalAlpha = 1;
       });
 
@@ -321,13 +321,27 @@ export default function GardenModal({ isOpen, onClose }: GardenModalProps) {
 
   const renderContent = () => {
     if (!activeFile) return null;
-    const content = activeFile.markdown || activeFile.html;
+    const rawContent = activeFile.markdown || activeFile.html;
+
+    // Process wikilinks: [[ID|Label]] or [[ID]] -> <wiki-link data-id="id">label</wiki-link>
+    const content = rawContent.replace(/\[\[([^|\]]+)(?:\|([^\]]+))?\]\]/g, (match, id, label) => {
+      const targetId = id.toLowerCase().replace(/\s+/g, '_');
+      return `<wiki-link data-id="${targetId}">${label || id}</wiki-link>`;
+    });
 
     return (
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw]}
         components={{
+          'wiki-link': ({ node, ...props }: any) => (
+            <button 
+              onClick={() => setActiveFileId(props['data-id'])}
+              className="text-accent font-bold hover:underline decoration-dashed underline-offset-4 transition-all"
+            >
+              {props.children}
+            </button>
+          ),
           code({ inline, className, children, ...props }: any) {
             const match = /language-(\w+)/.exec(className || '');
             const contentString = String(children).replace(/\n$/, '');
@@ -351,17 +365,17 @@ export default function GardenModal({ isOpen, onClose }: GardenModalProps) {
               </div>
             );
           },
-          h1: ({ children }) => <h1 className="font-serif text-[32px] font-medium mb-8 text-ink mt-12">{children}</h1>,
-          h2: ({ children }) => <h2 className="font-serif text-[24px] font-medium mb-6 text-ink mt-10 border-b border-dashed border-border-strong pb-2">{children}</h2>,
-          h3: ({ children }) => <h3 className="font-serif text-[20px] font-medium mb-4 text-ink mt-8">{children}</h3>,
-          p: ({ children }) => <div className="font-serif text-[16px] leading-[1.8] text-ink-muted mb-6">{children}</div>,
-          ul: ({ children }) => <ul className="list-none space-y-3 mb-8 pl-4">{children}</ul>,
-          li: ({ children }) => (
+          h1: ({ children }: any) => <h1 className="font-serif text-[32px] font-medium mb-8 text-ink mt-12">{children}</h1>,
+          h2: ({ children }: any) => <h2 className="font-serif text-[24px] font-medium mb-6 text-ink mt-10 border-b border-dashed border-border-strong pb-2">{children}</h2>,
+          h3: ({ children }: any) => <h3 className="font-serif text-[20px] font-medium mb-4 text-ink mt-8">{children}</h3>,
+          p: ({ children }: any) => <div className="font-serif text-[16px] leading-[1.8] text-ink-muted mb-6">{children}</div>,
+          ul: ({ children }: any) => <ul className="list-none space-y-3 mb-8 pl-4">{children}</ul>,
+          li: ({ children }: any) => (
             <li className="flex items-start gap-3 text-ink-muted font-serif text-[16px]">
               <span className="text-accent mt-1.5 shrink-0"><ChevronRight size={14} /></span>{children}
             </li>
           ),
-          blockquote: ({ children }) => (
+          blockquote: ({ children }: any) => (
             <blockquote className="border-l-2 border-dashed border-accent bg-[rgba(0,71,255,0.02)] pl-6 py-4 my-8 italic text-ink-muted font-serif text-[17px]">{children}</blockquote>
           ),
           img: ({ src, alt }: any) => (
@@ -370,7 +384,7 @@ export default function GardenModal({ isOpen, onClose }: GardenModalProps) {
               {alt && <div className="text-center font-mono text-[10px] text-ink-faint uppercase">Fig // {alt}</div>}
             </div>
           ),
-        }}
+        } as any}
       >
         {content}
       </ReactMarkdown>

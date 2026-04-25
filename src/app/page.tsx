@@ -25,7 +25,7 @@ export default function Home() {
         OUTER CONTAINER 
         Dashed vertical lines marking the 1000px content boundary.
       */}
-      <div className="max-w-[1000px] mx-auto border-x border-dashed border-border-strong min-h-screen relative shadow-sm">
+      <div className="max-w-[1000px] mx-auto border-x border-dashed border-border-strong min-h-[85vh] relative shadow-sm">
         
         {/* 
           PAPER TEXTURE & HATCH 
@@ -49,7 +49,7 @@ export default function Home() {
         <div className="relative z-10 px-8 lg:px-14 py-12">
           
           {/* Introduction Section with Header and Meta Links */}
-          <section className="flex flex-col md:flex-row justify-between items-center gap-12 mb-16 pb-16 border-b border-dashed border-border-strong">
+          <section className="flex flex-col md:flex-row justify-between items-center gap-12 mb-8 pb-8 border-b border-dashed border-border-strong">
             <div className="flex-1">
               <div className="section-tag">[01_ME]</div>
               <div className="fade-in flex items-center gap-6 mb-6">

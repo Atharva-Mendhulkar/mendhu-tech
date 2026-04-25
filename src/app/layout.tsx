@@ -16,8 +16,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata = {
-  title: "Atharva Mendhulkar — mendhu.tech",
-  description: "Systems Engineer & AI Researcher. Physics-Informed ML, Kernel Systems, SaaS. VIT Vellore.",
+  title: "Atharva Mendhulkar",
+  description: "Atharva Mendhulkar's Portfolio",
   metadataBase: new URL("https://mendhu.tech"),
   icons: {
     icon: "/porygon.svg",

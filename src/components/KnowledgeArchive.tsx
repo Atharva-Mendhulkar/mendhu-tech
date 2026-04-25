@@ -8,7 +8,7 @@ interface KnowledgeArchiveProps {
 
 export default function KnowledgeArchive({ onOpenGarden }: { onOpenGarden: () => void }) {
   return (
-    <section className="py-16 border-b border-dashed border-border-strong relative z-10">
+    <section className="py-10 border-b border-dashed border-border-strong relative z-10">
       <div className="section-tag">[04_DIGITAL_GARDEN]</div>
       
       <div 
