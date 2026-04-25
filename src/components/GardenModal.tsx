@@ -137,10 +137,16 @@ export default function GardenModal({ isOpen, onClose }: GardenModalProps) {
     if (!ctx) return;
 
     const resizeObserver = new ResizeObserver(entries => {
+      const dpr = window.devicePixelRatio || 1;
       for (let entry of entries) {
         const { width, height } = entry.contentRect;
-        canvas.width = width;
-        canvas.height = height;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
+        const ctx = canvas.getContext('2d');
+        if (ctx) ctx.scale(dpr, dpr);
+        
         nodesRef.current.forEach(n => {
           n.x = Math.max(20, Math.min(width - 20, n.x));
           n.y = Math.max(20, Math.min(height - 20, n.y));
@@ -291,19 +297,27 @@ export default function GardenModal({ isOpen, onClose }: GardenModalProps) {
 
         // Labels (High Visibility Black/Dark)
         ctx.shadowBlur = 0;
-        ctx.font = isActive ? '700 13px var(--font-jetbrains-mono)' : '600 11px var(--font-jetbrains-mono)';
+        ctx.font = isActive 
+          ? '700 13px "JetBrains Mono", var(--font-mono), monospace' 
+          : '600 11px "JetBrains Mono", var(--font-mono), monospace';
+        
         const text = node.name;
         const tw = ctx.measureText(text).width;
+        
         if (isActive) {
-          ctx.fillStyle = 'rgba(0,71,255,0.15)';
-          ctx.roundRect(node.x - tw/2 - 10, node.y + r + 14, tw + 20, 24, 4);
+          ctx.fillStyle = 'rgba(0,71,255,0.1)';
+          ctx.beginPath();
+          ctx.roundRect(node.x - tw/2 - 8, node.y + r + 14, tw + 16, 22, 4);
           ctx.fill();
+          ctx.fillStyle = '#000000'; // Pure black for active
+        } else {
+          ctx.fillStyle = isConnected ? '#1A1A1A' : '#333333'; // Deep ink for others
         }
-        ctx.fillStyle = isActive ? '#1A1A1A' : (isConnected ? '#333333' : '#555555');
-        ctx.globalAlpha = (isActive || isConnected) ? 1 : 0.9;
+        
+        ctx.globalAlpha = (isActive || isConnected) ? 1.0 : 0.85;
         ctx.textAlign = 'center';
-        ctx.fillText(text, node.x, node.y + r + 32);
-        ctx.globalAlpha = 1;
+        ctx.fillText(text, node.x, node.y + r + 30);
+        ctx.globalAlpha = 1.0;
       });
 
       simulationRef.current = requestAnimationFrame(tick);
