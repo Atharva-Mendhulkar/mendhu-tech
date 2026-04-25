@@ -30,10 +30,10 @@
     },
     {
       "id": "pinn",
-      "name": "PINN",
-      "group": "general",
-      "color": "#BDBDBD",
-      "description": ""
+      "name": "JointPINN — PM2.5 Source Identification",
+      "group": "ml",
+      "color": "#0047FF",
+      "description": "Dual-network PINN for inverse source identification"
     },
     {
       "id": "shield",
@@ -44,10 +44,10 @@
     },
     {
       "id": "badmosi",
-      "name": "badmosi",
-      "group": "general",
-      "color": "#BDBDBD",
-      "description": ""
+      "name": "Badmos",
+      "group": "ml",
+      "color": "#0047FF",
+      "description": "badmosi"
     }
   ],
   "links": [
@@ -102,10 +102,10 @@
       "html": "<div class=\"font-serif text-[15px] leading-[1.8] text-ink-muted\">\n<div class=\"font-serif text-[24px] font-medium mb-4 text-ink\">K-PHD (Kernel-level Predictive Hang Detector)</div>\n\n<p class=\"mb-3\">K-PHD is a Linux kernel module that embeds into the scheduler hot-path to measure nanosecond-level process wait times.</p>\n\n<div class=\"font-serif text-[20px] font-medium mb-3 mt-6 text-ink\">Mechanics</div>\n<p class=\"mb-3\">By hooking into <code class=\"font-mono text-[12px] bg-accent-light px-1.5 py-0.5 rounded text-accent\">sched_switch</code> and <code class=\"font-mono text-[12px] bg-accent-light px-1.5 py-0.5 rounded text-accent\">sched_wakeup</code> tracepoints, K-PHD computes an Exponential Moving Average (EMA) of wait latencies for every PID.</p>\n\n<div class=\"font-serif text-[20px] font-medium mb-3 mt-6 text-ink\">Prediction</div>\n<p class=\"mb-3\">If the EMA exceeds a threshold (e.g., 5ms), K-PHD signals a <strong>Predictive Hang</strong> via Netlink to userspace before the application actually freezes.</p>\n\n<code class=\"font-mono text-[13px] bg-[rgba(0,71,255,0.04)] border-l-2 border-accent px-4 py-3 my-4 text-ink block whitespace-pre-wrap\">c\n<p class=\"mb-3\">// Example tracepoint hook</p>\n<p class=\"mb-3\">TRACE_EVENT(sched_switch,</p>\n<p class=\"mb-3\">    TP_PROTO(bool preempt, struct task_struct <em>prev, struct task_struct </em>next),</p>\n<p class=\"mb-3\">    ...</p>\n<p class=\"mb-3\">);</p>\n<p class=\"mb-3\"></code></p>\n\n<p class=\"mb-3\">Related: <span class=\"wiki-link\" data-id=\"Floework\">Floework</span> uses similar behavioral signals but at the application layer.</p>\n</div>"
     },
     "pinn": {
-      "title": "PINN",
+      "title": "JointPINN — PM2.5 Source Identification",
       "header": "PINN.md",
-      "markdown": "title: JointPINN — PM2.5 Source Identification \ntags: #ml \ndescription: Dual-network PINN for inverse source identification\n\n",
-      "html": "<div class=\"font-serif text-[15px] leading-[1.8] text-ink-muted\"><p class=\"mb-3\">title: JointPINN — PM2.5 Source Identification </p>\n<p class=\"mb-3\">tags: #ml </p>\n<p class=\"mb-3\">description: Dual-network PINN for inverse source identification</p>\n\n</div>"
+      "markdown": "",
+      "html": "<div class=\"font-serif text-[15px] leading-[1.8] text-ink-muted\"></div>"
     },
     "shield": {
       "title": "SHIELD — Adaptive Fraud Detection",
@@ -114,10 +114,10 @@
       "html": "<div class=\"font-serif text-[15px] leading-[1.8] text-ink-muted\">\n<div class=\"font-serif text-[24px] font-medium mb-4 text-ink\">SHIELD (Adaptive Fraud Detection)</div>\n\n<p class=\"mb-3\">SHIELD is a behavioral biometrics engine that identifies users based on how they interact with their devices, rather than what they know or have.</p>\n\n<div class=\"font-serif text-[20px] font-medium mb-3 mt-6 text-ink\">Key Vectors</div>\n<li class=\"ml-4 mb-1\"><strong>Touch Dynamics</strong>: Pressure, area, and curvature of swipes.</li>\n<li class=\"ml-4 mb-1\"><strong>Sensor Fusion</strong>: Accelerometer and Gyroscope patterns during interaction.</li>\n<li class=\"ml-4 mb-1\"><strong>Sequence Analysis</strong>: The order and timing of menu navigation.</li>\n\n<div class=\"font-serif text-[20px] font-medium mb-3 mt-6 text-ink\">Performance</div>\n<p class=\"mb-3\">SHIELD achieves a <strong>99.2% Accuracy</strong> in identifying unauthorized session takeovers by analyzing the first 5 seconds of interaction.</p>\n\n<code class=\"font-mono text-[13px] bg-[rgba(0,71,255,0.04)] border-l-2 border-accent px-4 py-3 my-4 text-ink block whitespace-pre-wrap\">mermaid\n<p class=\"mb-3\">pie title Feature Importance</p>\n<p class=\"mb-3\">    \"Touch Dynamics\" : 45</p>\n<p class=\"mb-3\">    \"Sensor Fusion\" : 30</p>\n<p class=\"mb-3\">    \"Navigation Sequence\" : 25</p>\n<p class=\"mb-3\"></code></p>\n\n<p class=\"mb-3\">See also: <span class=\"wiki-link\" data-id=\"CAPS\">CAPS</span> uses SHIELD scores to authorize high-value transactions.</p>\n</div>"
     },
     "badmosi": {
-      "title": "badmosi",
+      "title": "Badmos",
       "header": "badmosi.md",
-      "markdown": "\n```python\nprint(\"Hello World\")\n```\n\n[[CAPS]]\n",
-      "html": "<div class=\"font-serif text-[15px] leading-[1.8] text-ink-muted\">\n<code class=\"font-mono text-[13px] bg-[rgba(0,71,255,0.04)] border-l-2 border-accent px-4 py-3 my-4 text-ink block whitespace-pre-wrap\">python\n<p class=\"mb-3\">print(\"Hello World\")</p>\n<p class=\"mb-3\"></code></p>\n\n<p class=\"mb-3\"><span class=\"wiki-link\" data-id=\"CAPS\">CAPS</span></p>\n</div>"
+      "markdown": "\n# Badmosi\n\n```python\nprint(\"Hello World\")\n```\n\n[[CAPS]]\n",
+      "html": "<div class=\"font-serif text-[15px] leading-[1.8] text-ink-muted\">\n<div class=\"font-serif text-[24px] font-medium mb-4 text-ink\">Badmosi</div>\n\n<code class=\"font-mono text-[13px] bg-[rgba(0,71,255,0.04)] border-l-2 border-accent px-4 py-3 my-4 text-ink block whitespace-pre-wrap\">python\n<p class=\"mb-3\">print(\"Hello World\")</p>\n<p class=\"mb-3\"></code></p>\n\n<p class=\"mb-3\"><span class=\"wiki-link\" data-id=\"CAPS\">CAPS</span></p>\n</div>"
     }
   }
 }
