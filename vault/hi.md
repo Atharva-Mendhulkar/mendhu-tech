@@ -4,7 +4,7 @@ tags:
   - ai
   - systems
   - kernel
-desc: hlo
+description: hlo
 ---
 # wassup wassup fambruh
 
