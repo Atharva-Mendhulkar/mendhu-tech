@@ -80,6 +80,7 @@ interface ResearchNode {
   y: number;
   vx: number;
   vy: number;
+  tags?: string[];
 }
 
 interface ResearchLink {
@@ -119,25 +120,46 @@ export default function GardenModal({ isOpen, onClose }: GardenModalProps) {
 
   const categories = useMemo(() => {
     const groups: Record<string, string[]> = {
-      "Systems": [],
-      "Security": [],
-      "Intelligence": [],
-      "ML & Physics": [],
+      "Intelligence & AI": [],
+      "Systems & Infrastructure": [],
+      "Security & Governance": [],
+      "ML & Physics Research": [],
       "General": []
     };
     
     const groupMapping: Record<string, string> = {
-      'systems': 'Systems',
-      'security': 'Security',
-      'ml': 'ML & Physics',
-      'physics': 'ML & Physics',
-      'intelligence': 'Intelligence'
+      'ai': 'Intelligence & AI',
+      'intelligence': 'Intelligence & AI',
+      'agent': 'Intelligence & AI',
+      'systems': 'Systems & Infrastructure',
+      'kernel': 'Systems & Infrastructure',
+      'security': 'Security & Governance',
+      'ml': 'ML & Physics Research',
+      'physics': 'ML & Physics Research',
+      'pinn': 'ML & Physics Research',
+      'pde': 'ML & Physics Research'
     };
 
     researchData.nodes.forEach(node => {
-      const cat = groupMapping[node.group] || 'General';
-      if (!groups[cat]) groups[cat] = [];
-      groups[cat].push(node.id);
+      const nodeTags = node.tags || [];
+      let placed = false;
+
+      nodeTags.forEach(tag => {
+        const cat = groupMapping[tag.toLowerCase()];
+        if (cat && groups[cat]) {
+          if (!groups[cat].includes(node.id)) {
+            groups[cat].push(node.id);
+            placed = true;
+          }
+        }
+      });
+
+      if (!placed) {
+        const cat = groupMapping[node.group] || 'General';
+        if (!groups[cat].includes(node.id)) {
+          groups[cat].push(node.id);
+        }
+      }
     });
 
     return groups;

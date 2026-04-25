@@ -3,58 +3,89 @@
     {
       "id": "avara",
       "name": "AVARA — Autonomous Validation & Agent Risk Authority",
-      "group": "security",
-      "color": "#3B6D11",
-      "description": "Runtime security and governance layer for autonomous AI agents."
+      "group": "ai",
+      "description": "Runtime security and governance layer for autonomous AI agents.",
+      "tags": [
+        "agent",
+        "security",
+        "ai"
+      ]
     },
     {
       "id": "caps",
       "name": "CAPS — Context-Aware Agentic Payment System",
-      "group": "security",
-      "color": "#3B6D11",
-      "description": "A deterministic payment kernel for autonomous agents."
+      "group": "ai",
+      "description": "A deterministic payment kernel for autonomous agents.",
+      "tags": [
+        "agent",
+        "security",
+        "systems",
+        "ai"
+      ]
     },
     {
       "id": "floework",
       "name": "Floework — Real-time Behavioral Telemetry",
       "group": "systems",
       "color": "#534AB7",
-      "description": "Distributed tracing for human interaction patterns."
+      "description": "Distributed tracing for human interaction patterns.",
+      "tags": [
+        "systems",
+        "product"
+      ]
     },
     {
       "id": "k-phd",
       "name": "K-PHD — Kernel-level Predictive Hang Detector",
       "group": "systems",
       "color": "#534AB7",
-      "description": "Predictive CPU starvation monitoring inside the Linux scheduler."
+      "description": "Predictive CPU starvation monitoring inside the Linux scheduler.",
+      "tags": [
+        "systems",
+        "kernel"
+      ]
     },
     {
       "id": "pinn",
       "name": "JointPINN — PM2.5 Source Identification",
       "group": "ml",
       "color": "#0047FF",
-      "description": "Dual-network PINN for inverse source identification"
+      "description": "Dual-network PINN for inverse source identification",
+      "tags": [
+        "ml"
+      ]
     },
     {
       "id": "shield",
       "name": "SHIELD — Adaptive Fraud Detection",
       "group": "security",
       "color": "#3B6D11",
-      "description": "Behavioral biometrics for secure mobile banking."
+      "description": "Behavioral biometrics for secure mobile banking.",
+      "tags": [
+        "security",
+        "ml"
+      ]
     },
     {
       "id": "badmosi",
       "name": "badmosi",
       "group": "ml",
       "color": "#0047FF",
-      "description": "badmosi"
+      "description": "badmosi",
+      "tags": [
+        "ml"
+      ]
     },
     {
       "id": "hi",
       "name": "hi",
-      "group": "ml",
-      "color": "#0047FF",
-      "description": ""
+      "group": "ai",
+      "description": "",
+      "tags": [
+        "ai",
+        "systems",
+        "kernel"
+      ]
     }
   ],
   "links": [

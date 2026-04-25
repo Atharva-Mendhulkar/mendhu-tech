@@ -41,11 +41,11 @@ const researchData = {
 };
 
 const tagToGroup = {
-  'ml': 'ml', 'pinn': 'ml', 'ai': 'ml',
+  'ai': 'ai', 'intelligence': 'ai', 'agent': 'ai',
+  'ml': 'ml', 'pinn': 'ml',
   'physics': 'physics', 'pde': 'physics',
   'systems': 'systems', 'kernel': 'systems',
-  'security': 'security', 'agent': 'security',
-  'saas': 'saas', 'product': 'saas',
+  'security': 'security', 'fraud': 'security',
   'concept': 'concept'
 };
 
@@ -74,7 +74,8 @@ files.forEach(filePath => {
     name: data.title || path.basename(filePath, '.md'),
     group: group,
     color: color,
-    description: data.description || ''
+    description: data.description || '',
+    tags: tags
   });
 
   researchData.files[id] = {
