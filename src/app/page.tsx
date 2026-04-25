@@ -50,7 +50,7 @@ export default function Home() {
         <div className="relative z-10 px-8 lg:px-14 py-12">
           
           {/* Introduction Section with Header and Meta Links */}
-          <section className="flex flex-col md:flex-row justify-between items-center gap-8 md:gap-12 mb-8 pb-8 border-b border-dashed border-border-strong">
+          <section className="flex flex-col md:flex-row justify-between items-center gap-8 md:gap-12 mb-8 pb-8 border-b border-dashed border-border-strong relative z-[200]">
             <div className="flex-1">
               <div className="section-tag">[01_ME]</div>
               <div className="fade-in flex items-center gap-6 mb-6">

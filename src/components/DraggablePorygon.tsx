@@ -73,9 +73,9 @@ export default function DraggablePorygon() {
           touchAction: 'none'
         }}
         className={`
-          w-24 h-24 relative z-[1000] select-none cursor-grab active:cursor-grabbing 
-          flex items-center justify-center transition-shadow
-          ${isDragging ? 'z-[10000] scale-110 drop-shadow-2xl' : 'hover:scale-105'}
+          w-24 h-24 relative select-none cursor-grab active:cursor-grabbing 
+          flex items-center justify-center transition-shadow pointer-events-auto
+          ${isDragging ? 'z-[99999] scale-110 drop-shadow-2xl' : 'z-[1000] hover:scale-105'}
         `}
       >
         <img 
