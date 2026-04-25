@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 
-const VAULT_PATH = process.env.VAULT_PATH || '../others';
+const VAULT_PATH = process.env.VAULT_PATH || './vault';
 const OUTPUT_FILE = './src/data/research.json';
 
 function walk(dir) {
@@ -101,7 +101,8 @@ files.forEach(filePath => {
   researchData.files[id] = {
     title: data.title || path.basename(filePath, '.md'),
     header: path.relative(VAULT_PATH, filePath),
-    html: parseMarkdown(content)
+    markdown: content,
+    html: parseMarkdown(content) // Keep fallback but prioritize markdown
   };
 
   // Extract links
