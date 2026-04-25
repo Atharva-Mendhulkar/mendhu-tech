@@ -86,7 +86,7 @@ interface GardenModalProps {
 export default function GardenModal({ isOpen, onClose }: GardenModalProps) {
   const fileKeys = Object.keys(researchData.files);
   const [activeFileId, setActiveFileId] = useState<string>(fileKeys[0] || '');
-  const [showGraph, setShowGraph] = useState(true);
+  const [showGraph, setShowGraph] = useState(false);
   const [isGraphMaximized, setIsGraphMaximized] = useState(false);
   const [expandedFolders, setExpandedFolders] = useState<Record<string, boolean>>({
     "Systems": true,
@@ -391,76 +391,109 @@ export default function GardenModal({ isOpen, onClose }: GardenModalProps) {
     );
   };
 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-8">
-      <div className="absolute inset-0 bg-[rgba(253,253,251,0.96)] backdrop-blur-[12px]" onClick={onClose} />
-      <div className="relative bg-paper border border-dashed border-border-strong flex flex-col shadow-[0_60px_120px_-30px_rgba(0,0,0,0.2)] w-[98vw] h-[96vh] rounded-[2px] overflow-hidden animate-modal-in">
-        <div className="flex items-center gap-4 p-4 border-b border-dashed border-border-strong bg-paper relative z-20">
-          <div className="flex gap-2">
-            <button onClick={onClose} className="w-3 h-3 rounded-full border border-red-500/30 bg-red-500/10 hover:bg-red-500/40" />
-            <div className="w-3 h-3 rounded-full border border-yellow-500/30 bg-yellow-500/10" />
-            <div className="w-3 h-3 rounded-full border border-green-500/30 bg-green-500/10" />
-          </div>
-          <div className="flex-1 text-center flex items-center justify-center gap-3">
-            <Globe size={14} className="text-ink-faint" />
-            <div className="font-mono text-[11px] font-bold tracking-[0.4em] text-ink uppercase">Knowledge Garden AUTHORITY // {fileKeys.length} NODES</div>
-          </div>
-          <div className="flex gap-2">
-            <button onClick={() => setIsGraphMaximized(!isGraphMaximized)} className={`font-mono text-[10px] px-3 py-1 border border-dashed border-border-strong hover:border-accent hover:text-accent transition-all flex items-center gap-2 ${isGraphMaximized ? 'bg-accent-light text-accent' : ''}`}>
-              {isGraphMaximized ? <Minimize2 size={12} /> : <Maximize2 size={12} />} {isGraphMaximized ? 'RESTORE' : 'MAX GRAPH'}
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2 md:p-8">
+      <div className="absolute inset-0 bg-[rgba(253,253,251,0.98)] backdrop-blur-[16px]" onClick={onClose} />
+      <div className="relative bg-paper border border-dashed border-border-strong flex flex-col shadow-[0_60px_120px_-30px_rgba(0,0,0,0.2)] w-full md:w-[98vw] h-[98vh] md:h-[96vh] rounded-[2px] overflow-hidden animate-modal-in">
+        
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row items-center gap-4 p-4 border-b border-dashed border-border-strong bg-paper relative z-30">
+          <div className="flex items-center justify-between w-full sm:w-auto gap-4">
+            <div className="flex gap-2">
+              <button onClick={onClose} className="w-3 h-3 rounded-full border border-red-500/30 bg-red-500/10 hover:bg-red-500/40" />
+              <div className="w-3 h-3 rounded-full border border-yellow-500/30 bg-yellow-500/10" />
+              <div className="w-3 h-3 rounded-full border border-green-500/30 bg-green-500/10" />
+            </div>
+            <button 
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className="lg:hidden font-mono text-[9px] px-3 py-1 border border-dashed border-border-strong hover:text-accent"
+            >
+              {isSidebarOpen ? '[CLOSE MENU]' : '[OPEN MENU]'}
             </button>
-            <button onClick={() => setShowGraph(!showGraph)} className="font-mono text-[10px] px-4 py-1 border border-dashed border-border-strong hover:border-accent hover:text-accent">
+          </div>
+
+          <div className="flex-1 text-center hidden sm:flex items-center justify-center gap-3">
+            <Globe size={14} className="text-ink-faint" />
+            <div className="font-mono text-[10px] md:text-[11px] font-bold tracking-[0.2em] md:tracking-[0.4em] text-ink uppercase truncate max-w-[200px] md:max-w-none">
+              Knowledge Garden AUTHORITY // {fileKeys.length} NODES
+            </div>
+          </div>
+
+          <div className="flex gap-2 w-full sm:w-auto justify-center">
+            <button onClick={() => setIsGraphMaximized(!isGraphMaximized)} className={`font-mono text-[9px] md:text-[10px] px-3 py-1 border border-dashed border-border-strong hover:border-accent hover:text-accent transition-all flex items-center gap-2 ${isGraphMaximized ? 'bg-accent-light text-accent' : ''}`}>
+              {isGraphMaximized ? <Minimize2 size={12} /> : <Maximize2 size={12} />} 
+              <span className="hidden xs:inline">{isGraphMaximized ? 'RESTORE' : 'MAX GRAPH'}</span>
+            </button>
+            <button onClick={() => setShowGraph(!showGraph)} className="font-mono text-[9px] md:text-[10px] px-4 py-1 border border-dashed border-border-strong hover:border-accent hover:text-accent whitespace-nowrap">
               [{showGraph ? 'HIDE GRAPH' : 'SHOW GRAPH'}]
             </button>
           </div>
         </div>
 
-        <div className="flex-1 flex overflow-hidden">
-          {!isGraphMaximized && (
-            <div className="w-[260px] border-r border-dashed border-border-strong overflow-y-auto shrink-0 bg-[rgba(26,26,26,0.01)]">
-              <div className="p-4 space-y-2">
-                {Object.entries(categories).map(([category, files]) => (
-                  <div key={category} className="mb-4">
-                    <button onClick={() => toggleFolder(category)} className="w-full font-mono text-[10px] text-ink-muted tracking-widest uppercase mb-1 flex items-center gap-2 hover:text-accent py-1">
-                      {expandedFolders[category] ? <ChevronDown size={12} className="text-accent" /> : <ChevronRight size={12} />}
-                      <span className={expandedFolders[category] ? 'text-ink font-bold' : ''}>{category}</span>
-                    </button>
-                    {expandedFolders[category] && (
-                      <div className="space-y-0.5 pl-3 border-l border-dashed border-border-strong/40 ml-1.5 mt-1">
-                        {files.map(id => {
-                          const file = researchData.files[id];
-                          if (!file) return null;
-                          return (
-                            <button key={id} onClick={() => setActiveFileId(id)} className={`w-full text-left font-mono text-[11px] px-3 py-1.5 transition-all flex items-center gap-2 ${activeFileId === id ? 'text-accent font-bold' : 'text-ink-muted hover:text-ink'}`}>
-                              <FileText size={10} className={activeFileId === id ? 'text-accent' : 'opacity-30'} />
-                              <span className="truncate">{file.title}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+        <div className="flex-1 flex overflow-hidden relative">
+          
+          {/* Sidebar (Explorer) */}
+          <div className={`
+            absolute lg:relative z-20 h-full w-[260px] border-r border-dashed border-border-strong overflow-y-auto bg-paper lg:bg-[rgba(26,26,26,0.01)] transition-transform duration-300
+            ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          `}>
+            <div className="p-4 space-y-2">
+              {Object.entries(categories).map(([category, files]) => (
+                <div key={category} className="mb-4">
+                  <button onClick={() => toggleFolder(category)} className="w-full font-mono text-[10px] text-ink-muted tracking-widest uppercase mb-1 flex items-center gap-2 hover:text-accent py-1">
+                    {expandedFolders[category] ? <ChevronDown size={12} className="text-accent" /> : <ChevronRight size={12} />}
+                    <span className={expandedFolders[category] ? 'text-ink font-bold' : ''}>{category}</span>
+                  </button>
+                  {expandedFolders[category] && (
+                    <div className="space-y-0.5 pl-3 border-l border-dashed border-border-strong/40 ml-1.5 mt-1">
+                      {files.map(id => {
+                        const file = researchData.files[id];
+                        if (!file) return null;
+                        return (
+                          <button key={id} onClick={() => { setActiveFileId(id); setIsSidebarOpen(false); }} className={`w-full text-left font-mono text-[11px] px-3 py-1.5 transition-all flex items-center gap-2 ${activeFileId === id ? 'text-accent font-bold' : 'text-ink-muted hover:text-ink'}`}>
+                            <FileText size={10} className={activeFileId === id ? 'text-accent' : 'opacity-30'} />
+                            <span className="truncate">{file.title}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
+          </div>
+
+          {/* Overlay for sidebar on mobile */}
+          {isSidebarOpen && (
+            <div className="absolute inset-0 bg-black/5 z-10 lg:hidden" onClick={() => setIsSidebarOpen(false)} />
           )}
 
+          {/* Main Editor */}
           {!isGraphMaximized && (
-            <div className="flex-1 overflow-y-auto relative bg-paper">
-              <div className="relative z-10 p-12 lg:p-20 max-w-[900px] mx-auto animate-fade-in">
-                <div className="flex items-center justify-between mb-12">
-                  <div className="font-mono text-[10px] text-accent tracking-[0.3em] uppercase font-bold flex items-center gap-4"><span className="h-px w-12 bg-accent/40"></span>{activeFile?.header}</div>
-                  <Share2 size={14} className="text-ink-faint" />
+            <div className="flex-1 overflow-y-auto relative bg-paper transition-all">
+              <div className="relative z-10 p-6 md:p-12 lg:p-20 max-w-[900px] mx-auto animate-fade-in">
+                <div className="flex items-center justify-between mb-8 md:mb-12">
+                  <div className="font-mono text-[9px] md:text-[10px] text-accent tracking-[0.2em] md:tracking-[0.3em] uppercase font-bold flex items-center gap-4">
+                    <span className="hidden xs:block h-px w-8 md:w-12 bg-accent/40"></span>
+                    {activeFile?.header}
+                  </div>
+                  <Share2 size={14} className="text-ink-faint shrink-0" />
                 </div>
                 <div className="garden-content">{renderContent()}</div>
               </div>
             </div>
           )}
 
+          {/* Graph View */}
           {showGraph && (
-            <div className={`border-l border-dashed border-border-strong bg-[rgba(26,26,26,0.01)] overflow-hidden shrink-0 flex flex-col relative transition-all duration-500 ${isGraphMaximized ? 'w-full' : 'w-[400px]'}`}>
+            <div className={`
+              ${isGraphMaximized ? 'w-full' : 'hidden lg:flex w-[400px] border-l border-dashed border-border-strong'}
+              bg-[rgba(26,26,26,0.01)] overflow-hidden shrink-0 flex-col relative transition-all duration-500
+            `}>
               <canvas ref={canvasRef} className="w-full h-full cursor-grab active:cursor-grabbing relative z-10" />
             </div>
           )}
