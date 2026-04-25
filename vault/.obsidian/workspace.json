@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "PINN.md",
+                "file": "CAPS.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "PINN"
+              "title": "CAPS"
             }
           },
           {
@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "badmosi.md",
+                "file": "AVARA.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "badmosi"
+              "title": "AVARA"
             }
           },
           {
@@ -41,12 +41,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "yo.md",
+                "file": "AVARA.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "yo"
+              "title": "AVARA"
             }
           }
         ],
@@ -123,7 +123,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "yo.md",
+                "file": "AVARA.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -133,7 +133,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for yo"
+              "title": "Backlinks for AVARA"
             }
           },
           {
@@ -184,13 +184,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "yo.md",
+                "file": "AVARA.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of yo"
+              "title": "Outline of AVARA"
             }
           },
           {
@@ -224,15 +224,15 @@
   },
   "active": "34a69b884a17d72b",
   "lastOpenFiles": [
-    "hi.md",
-    "PINN.md",
-    "SHIELD.md",
-    "yo.md",
     "badmosi.md",
     "AVARA.md",
     "CAPS.md",
-    "K-PHD.md",
     "Floework.md",
+    "K-PHD.md",
+    "SHIELD.md",
+    "PINN.md",
+    "hi.md",
+    "yo.md",
     "Untitled.canvas",
     "Untitled.base",
     "Untitled 1.base",
