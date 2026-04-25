@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Atharva Mendhulkar — Portfolio & Knowledge Garden
 
-## Getting Started
+Systems Engineer & AI Researcher. Exploring the intersection of physics-informed machine learning and kernel-level infrastructure.
 
-First, run the development server:
+[mendhu.tech](https://mendhu.tech)
 
+---
+
+## 🏛️ Project Architecture
+
+This repository contains my personal portfolio and a specialized **Knowledge Garden** interface. The architecture is designed for high-fidelity technical storytelling.
+
+### 🌿 Knowledge Garden
+A deterministic, interactive knowledge graph built from raw research notes.
+- **Sync Engine**: A custom Node.js script (`scripts/parse-vault.mjs`) that transforms an Obsidian vault into a high-performance JSON graph.
+- **Rendering**: Real-time rendering of Mermaid diagrams, GFM markdown, and wikilink navigation.
+- **Physics**: Force-directed layout using custom canvas simulation for high-density node interactions.
+
+### 🧪 Systems Lab
+A curated index of research and engineering projects.
+- **Data-Driven**: Projects are defined in `src/data/projects.ts` with real-time performance metrics.
+- **Responsive**: Fully optimized for mobile and desktop exploration.
+
+## 🛠️ Technical Stack
+
+- **Framework**: Next.js 16 (App Router)
+- **Styling**: Vanilla CSS + Tailwind CSS (Wireframe aesthetic)
+- **Visuals**: Lucide Icons, Mermaid.js
+- **Typography**: EB Garamond (Serif), JetBrains Mono (Monospace)
+- **Deployment**: Vercel
+
+## ⚙️ Development
+
+### Installation
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Knowledge Garden Sync
+To update the Knowledge Garden with new research notes from the `/vault` directory:
+```bash
+node scripts/parse-vault.mjs
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Run Locally
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📜 License
+MIT © [Atharva Mendhulkar](https://github.com/Atharva-Mendhulkar)
