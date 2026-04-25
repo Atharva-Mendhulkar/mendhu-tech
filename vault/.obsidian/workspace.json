@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "badmosi.md",
+                "file": "PINN.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "badmosi"
+              "title": "PINN"
             }
           }
         ]
@@ -94,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "badmosi.md",
+                "file": "PINN.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for badmosi"
+              "title": "Backlinks for PINN"
             }
           },
           {
@@ -155,13 +155,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "badmosi.md",
+                "file": "PINN.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of badmosi"
+              "title": "Outline of PINN"
             }
           },
           {
@@ -195,10 +195,10 @@
   },
   "active": "80668acbeb405586",
   "lastOpenFiles": [
+    "badmosi.md",
     "CAPS.md",
     "K-PHD.md",
     "AVARA.md",
-    "badmosi.md",
     "Floework.md",
     "PINN.md",
     "SHIELD.md",
