@@ -1,0 +1,38 @@
+name: Sync Vault Data
+
+on:
+  push:
+    paths:
+      - 'others/**'
+      - 'web/scripts/parse-vault.mjs'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          
+      - name: Install dependencies
+        run: |
+          cd web
+          npm install gray-matter
+          
+      - name: Parse Vault
+        run: |
+          cd web
+          node scripts/parse-vault.mjs
+        env:
+          VAULT_PATH: '../others'
+          
+      - name: Commit changes
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add web/src/data/research.json
+          git commit -m "chore: sync research data from vault [skip ci]" || echo "No changes to commit"
+          git push
