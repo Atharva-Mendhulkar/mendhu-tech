@@ -48,6 +48,13 @@
       "group": "ml",
       "color": "#0047FF",
       "description": "badmosi"
+    },
+    {
+      "id": "hi",
+      "name": "hi",
+      "group": "ml",
+      "color": "#0047FF",
+      "description": ""
     }
   ],
   "links": [
@@ -118,6 +125,12 @@
       "header": "badmosi.md",
       "markdown": "\n# badmosi\n\n```python\nprint(\"Hello World\")\n```\n\n[[CAPS]]\n",
       "html": "\n# badmosi\n\n```python\nprint(\"Hello World\")\n```\n\n<span class=\"wiki-link\" data-id=\"caps\">CAPS</span>\n"
+    },
+    "hi": {
+      "title": "hi",
+      "header": "hi.md",
+      "markdown": "# wassup wassup fambruh\n\nyo",
+      "html": "# wassup wassup fambruh\n\nyo"
     }
   }
 }
