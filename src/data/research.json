@@ -41,6 +41,13 @@
       "group": "security",
       "color": "#3B6D11",
       "description": "Behavioral biometrics for secure mobile banking."
+    },
+    {
+      "id": "badmosi",
+      "name": "badmosi",
+      "group": "general",
+      "color": "#BDBDBD",
+      "description": ""
     }
   ],
   "links": [
@@ -62,6 +69,10 @@
     },
     {
       "source": "shield",
+      "target": "caps"
+    },
+    {
+      "source": "badmosi",
       "target": "caps"
     }
   ],
@@ -101,6 +112,12 @@
       "header": "SHIELD.md",
       "markdown": "\n# SHIELD (Adaptive Fraud Detection)\n\nSHIELD is a behavioral biometrics engine that identifies users based on how they interact with their devices, rather than what they know or have.\n\n## Key Vectors\n- **Touch Dynamics**: Pressure, area, and curvature of swipes.\n- **Sensor Fusion**: Accelerometer and Gyroscope patterns during interaction.\n- **Sequence Analysis**: The order and timing of menu navigation.\n\n## Performance\nSHIELD achieves a **99.2% Accuracy** in identifying unauthorized session takeovers by analyzing the first 5 seconds of interaction.\n\n```mermaid\npie title Feature Importance\n    \"Touch Dynamics\" : 45\n    \"Sensor Fusion\" : 30\n    \"Navigation Sequence\" : 25\n```\n\nSee also: [[CAPS]] uses SHIELD scores to authorize high-value transactions.\n",
       "html": "<div class=\"font-serif text-[15px] leading-[1.8] text-ink-muted\">\n<div class=\"font-serif text-[24px] font-medium mb-4 text-ink\">SHIELD (Adaptive Fraud Detection)</div>\n\n<p class=\"mb-3\">SHIELD is a behavioral biometrics engine that identifies users based on how they interact with their devices, rather than what they know or have.</p>\n\n<div class=\"font-serif text-[20px] font-medium mb-3 mt-6 text-ink\">Key Vectors</div>\n<li class=\"ml-4 mb-1\"><strong>Touch Dynamics</strong>: Pressure, area, and curvature of swipes.</li>\n<li class=\"ml-4 mb-1\"><strong>Sensor Fusion</strong>: Accelerometer and Gyroscope patterns during interaction.</li>\n<li class=\"ml-4 mb-1\"><strong>Sequence Analysis</strong>: The order and timing of menu navigation.</li>\n\n<div class=\"font-serif text-[20px] font-medium mb-3 mt-6 text-ink\">Performance</div>\n<p class=\"mb-3\">SHIELD achieves a <strong>99.2% Accuracy</strong> in identifying unauthorized session takeovers by analyzing the first 5 seconds of interaction.</p>\n\n<code class=\"font-mono text-[13px] bg-[rgba(0,71,255,0.04)] border-l-2 border-accent px-4 py-3 my-4 text-ink block whitespace-pre-wrap\">mermaid\n<p class=\"mb-3\">pie title Feature Importance</p>\n<p class=\"mb-3\">    \"Touch Dynamics\" : 45</p>\n<p class=\"mb-3\">    \"Sensor Fusion\" : 30</p>\n<p class=\"mb-3\">    \"Navigation Sequence\" : 25</p>\n<p class=\"mb-3\"></code></p>\n\n<p class=\"mb-3\">See also: <span class=\"wiki-link\" data-id=\"CAPS\">CAPS</span> uses SHIELD scores to authorize high-value transactions.</p>\n</div>"
+    },
+    "badmosi": {
+      "title": "badmosi",
+      "header": "badmosi.md",
+      "markdown": "\n```python\nprint(\"Hello World\")\n```\n\n[[CAPS]]\n\nx",
+      "html": "<div class=\"font-serif text-[15px] leading-[1.8] text-ink-muted\">\n<code class=\"font-mono text-[13px] bg-[rgba(0,71,255,0.04)] border-l-2 border-accent px-4 py-3 my-4 text-ink block whitespace-pre-wrap\">python\n<p class=\"mb-3\">print(\"Hello World\")</p>\n<p class=\"mb-3\"></code></p>\n\n<p class=\"mb-3\"><span class=\"wiki-link\" data-id=\"CAPS\">CAPS</span></p>\n\n<p class=\"mb-3\">x</p></div>"
     }
   }
 }
