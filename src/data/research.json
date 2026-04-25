@@ -46,16 +46,6 @@
       ]
     },
     {
-      "id": "pinn",
-      "name": "JointPINN — PM2.5 Source Identification",
-      "group": "ml",
-      "color": "#0047FF",
-      "description": "Dual-network PINN for inverse source identification",
-      "tags": [
-        "ml"
-      ]
-    },
-    {
       "id": "shield",
       "name": "SHIELD — Adaptive Fraud Detection",
       "group": "security",
@@ -64,37 +54,6 @@
       "tags": [
         "security",
         "ml"
-      ]
-    },
-    {
-      "id": "badmosi",
-      "name": "badmosi",
-      "group": "ml",
-      "color": "#0047FF",
-      "description": "badmosi",
-      "tags": [
-        "ml"
-      ]
-    },
-    {
-      "id": "hi",
-      "name": "hi",
-      "group": "ai",
-      "description": "hlo",
-      "tags": [
-        "ai",
-        "systems",
-        "kernel"
-      ]
-    },
-    {
-      "id": "yo",
-      "name": "yo",
-      "group": "security",
-      "color": "#3B6D11",
-      "description": "idk",
-      "tags": [
-        "security"
       ]
     }
   ],
@@ -117,10 +76,6 @@
     },
     {
       "source": "shield",
-      "target": "caps"
-    },
-    {
-      "source": "badmosi",
       "target": "caps"
     }
   ],
@@ -149,35 +104,11 @@
       "markdown": "\n# K-PHD (Kernel-level Predictive Hang Detector)\n\nK-PHD is a Linux kernel module that embeds into the scheduler hot-path to measure nanosecond-level process wait times.\n\n## Mechanics\nBy hooking into `sched_switch` and `sched_wakeup` tracepoints, K-PHD computes an Exponential Moving Average (EMA) of wait latencies for every PID.\n\n## Prediction\nIf the EMA exceeds a threshold (e.g., 5ms), K-PHD signals a **Predictive Hang** via Netlink to userspace before the application actually freezes.\n\n```c\n// Example tracepoint hook\nTRACE_EVENT(sched_switch,\n    TP_PROTO(bool preempt, struct task_struct *prev, struct task_struct *next),\n    ...\n);\n```\n\nRelated: [[Floework]] uses similar behavioral signals but at the application layer.\n",
       "html": "\n# K-PHD (Kernel-level Predictive Hang Detector)\n\nK-PHD is a Linux kernel module that embeds into the scheduler hot-path to measure nanosecond-level process wait times.\n\n## Mechanics\nBy hooking into `sched_switch` and `sched_wakeup` tracepoints, K-PHD computes an Exponential Moving Average (EMA) of wait latencies for every PID.\n\n## Prediction\nIf the EMA exceeds a threshold (e.g., 5ms), K-PHD signals a **Predictive Hang** via Netlink to userspace before the application actually freezes.\n\n```c\n// Example tracepoint hook\nTRACE_EVENT(sched_switch,\n    TP_PROTO(bool preempt, struct task_struct *prev, struct task_struct *next),\n    ...\n);\n```\n\nRelated: <span class=\"wiki-link\" data-id=\"floework\">Floework</span> uses similar behavioral signals but at the application layer.\n"
     },
-    "pinn": {
-      "title": "JointPINN — PM2.5 Source Identification",
-      "header": "PINN.md",
-      "markdown": "",
-      "html": ""
-    },
     "shield": {
       "title": "SHIELD — Adaptive Fraud Detection",
       "header": "SHIELD.md",
       "markdown": "\n# SHIELD (Adaptive Fraud Detection)\n\nSHIELD is a behavioral biometrics engine that identifies users based on how they interact with their devices, rather than what they know or have.\n\n## Key Vectors\n- **Touch Dynamics**: Pressure, area, and curvature of swipes.\n- **Sensor Fusion**: Accelerometer and Gyroscope patterns during interaction.\n- **Sequence Analysis**: The order and timing of menu navigation.\n\n## Performance\nSHIELD achieves a **99.2% Accuracy** in identifying unauthorized session takeovers by analyzing the first 5 seconds of interaction.\n\n```mermaid\npie title Feature Importance\n    \"Touch Dynamics\" : 45\n    \"Sensor Fusion\" : 30\n    \"Navigation Sequence\" : 25\n```\n\nSee also: [[CAPS]] uses SHIELD scores to authorize high-value transactions.\n",
       "html": "\n# SHIELD (Adaptive Fraud Detection)\n\nSHIELD is a behavioral biometrics engine that identifies users based on how they interact with their devices, rather than what they know or have.\n\n## Key Vectors\n- **Touch Dynamics**: Pressure, area, and curvature of swipes.\n- **Sensor Fusion**: Accelerometer and Gyroscope patterns during interaction.\n- **Sequence Analysis**: The order and timing of menu navigation.\n\n## Performance\nSHIELD achieves a **99.2% Accuracy** in identifying unauthorized session takeovers by analyzing the first 5 seconds of interaction.\n\n```mermaid\npie title Feature Importance\n    \"Touch Dynamics\" : 45\n    \"Sensor Fusion\" : 30\n    \"Navigation Sequence\" : 25\n```\n\nSee also: <span class=\"wiki-link\" data-id=\"caps\">CAPS</span> uses SHIELD scores to authorize high-value transactions.\n"
-    },
-    "badmosi": {
-      "title": "badmosi",
-      "header": "badmosi.md",
-      "markdown": "\n# badmosi\n\n```python\nprint(\"Hello World\")\n```\n\n[[CAPS]]\n",
-      "html": "\n# badmosi\n\n```python\nprint(\"Hello World\")\n```\n\n<span class=\"wiki-link\" data-id=\"caps\">CAPS</span>\n"
-    },
-    "hi": {
-      "title": "hi",
-      "header": "hi.md",
-      "markdown": "# wassup wassup fambruh\n\nyo",
-      "html": "# wassup wassup fambruh\n\nyo"
-    },
-    "yo": {
-      "title": "yo",
-      "header": "yo.md",
-      "markdown": "yo ",
-      "html": "yo "
     }
   }
 }
