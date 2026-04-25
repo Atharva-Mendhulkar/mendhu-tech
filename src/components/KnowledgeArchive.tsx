@@ -16,7 +16,7 @@ export default function KnowledgeArchive({ onOpenGarden }: { onOpenGarden: () =>
         onClick={onOpenGarden}
       >
         {/* Background Asset - Banyan Tree with hatching */}
-        <div className="absolute right-[-40px] top-[-40px] w-[450px] h-[450px] opacity-[0.07] pointer-events-none select-none group-hover:opacity-[0.1] transition-opacity">
+        <div className="absolute right-[-40px] top-[-40px] w-[450px] h-[450px] opacity-[0.1] pointer-events-none select-none group-hover:opacity-[0.15] transition-opacity">
           <img src="/banyan.svg" alt="" className="w-full h-full object-contain" />
         </div>
 
@@ -36,8 +36,8 @@ export default function KnowledgeArchive({ onOpenGarden }: { onOpenGarden: () =>
         
         <div className="flex justify-end relative">
           {/* Background Overlay Layer (Banyan Watermark) */}
-          <div className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none opacity-[0.06] transform translate-x-4 translate-y-[-10px] hidden md:flex">
-            <img src="/banyan.svg" alt="" className="w-[220px] h-[220px] object-contain" />
+          <div className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none opacity-[0.08] transform translate-x-4 translate-y-[-4px] hidden md:flex">
+            <img src="/banyan.svg" alt="" className="w-[240px] h-[240px] object-contain" />
           </div>
 
           <div className="relative z-10">
