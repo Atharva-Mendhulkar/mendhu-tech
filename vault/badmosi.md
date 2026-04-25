@@ -1,8 +1,7 @@
 ---
 title: badmosi
 description: badmosi
-tags:
-  - ml
+tags: [ml] 
 ---
 
 # badmosi

@@ -1,10 +1,7 @@
 ---
 title: AVARA — Autonomous Validation & Agent Risk Authority
 description: Runtime security and governance layer for autonomous AI agents.
-tags:
-  - agent
-  - security
-  - ai
+tags: [agent, security, ai] 
 ---
 
 # AVARA (Autonomous Validation & Agent Risk Authority)

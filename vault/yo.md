@@ -1,6 +1,6 @@
 ---
 titl: Hi bro
-tags: security
+tags: [security]
 description: idk
 ---
 yo 

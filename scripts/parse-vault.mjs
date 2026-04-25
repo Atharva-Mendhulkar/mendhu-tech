@@ -64,9 +64,13 @@ files.forEach(filePath => {
   const { data, content } = matter(fileContent);
   const id = path.basename(filePath, '.md').toLowerCase().replace(/\s+/g, '_');
   
-  const tags = data.tags || [];
-  const primaryTag = tags.find(t => tagToGroup[t]) || 'general';
-  const group = tagToGroup[primaryTag] || 'general';
+  let tags = data.tags || [];
+  if (!Array.isArray(tags)) {
+    tags = typeof tags === 'string' ? [tags] : [];
+  }
+  
+  const primaryTag = tags.find(t => typeof t === 'string' && tagToGroup[t.toLowerCase()]) || 'general';
+  const group = tagToGroup[primaryTag.toLowerCase()] || 'general';
   const color = groupToColor[group];
 
   researchData.nodes.push({

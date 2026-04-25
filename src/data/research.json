@@ -80,11 +80,21 @@
       "id": "hi",
       "name": "hi",
       "group": "ai",
-      "description": "",
+      "description": "hlo",
       "tags": [
         "ai",
         "systems",
         "kernel"
+      ]
+    },
+    {
+      "id": "yo",
+      "name": "yo",
+      "group": "security",
+      "color": "#3B6D11",
+      "description": "idk",
+      "tags": [
+        "security"
       ]
     }
   ],
@@ -162,6 +172,12 @@
       "header": "hi.md",
       "markdown": "# wassup wassup fambruh\n\nyo",
       "html": "# wassup wassup fambruh\n\nyo"
+    },
+    "yo": {
+      "title": "yo",
+      "header": "yo.md",
+      "markdown": "yo ",
+      "html": "yo "
     }
   }
 }
