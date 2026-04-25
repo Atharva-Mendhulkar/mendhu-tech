@@ -116,8 +116,8 @@
     "badmosi": {
       "title": "badmosi",
       "header": "badmosi.md",
-      "markdown": "\n```python\nprint(\"Hello World\")\n```\n\n[[CAPS]]\n\nx",
-      "html": "<div class=\"font-serif text-[15px] leading-[1.8] text-ink-muted\">\n<code class=\"font-mono text-[13px] bg-[rgba(0,71,255,0.04)] border-l-2 border-accent px-4 py-3 my-4 text-ink block whitespace-pre-wrap\">python\n<p class=\"mb-3\">print(\"Hello World\")</p>\n<p class=\"mb-3\"></code></p>\n\n<p class=\"mb-3\"><span class=\"wiki-link\" data-id=\"CAPS\">CAPS</span></p>\n\n<p class=\"mb-3\">x</p></div>"
+      "markdown": "\n```python\nprint(\"Hello World\")\n```\n\n[[CAPS]]\n",
+      "html": "<div class=\"font-serif text-[15px] leading-[1.8] text-ink-muted\">\n<code class=\"font-mono text-[13px] bg-[rgba(0,71,255,0.04)] border-l-2 border-accent px-4 py-3 my-4 text-ink block whitespace-pre-wrap\">python\n<p class=\"mb-3\">print(\"Hello World\")</p>\n<p class=\"mb-3\"></code></p>\n\n<p class=\"mb-3\"><span class=\"wiki-link\" data-id=\"CAPS\">CAPS</span></p>\n</div>"
     }
   }
 }
