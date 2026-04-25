@@ -74,18 +74,23 @@ export default function DraggablePorygon() {
       {/* The Draggable Icon */}
       <div
         ref={iconRef}
-        onMouseDown={(e) => onStart(e.clientX, e.clientY)}
-        onTouchStart={(e) => onStart(e.touches[0].clientX, e.touches[0].clientY)}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          onStart(e.clientX, e.clientY);
+        }}
+        onTouchStart={(e) => {
+          onStart(e.touches[0].clientX, e.touches[0].clientY);
+        }}
         style={{ 
           transform: `translate(${position.x}px, ${position.y}px)`,
           transition: isDragging ? 'none' : 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)'
         }}
-        className={`relative z-10 select-none cursor-grab active:cursor-grabbing touch-none ${isDragging ? 'z-50' : ''}`}
+        className={`w-24 h-24 relative z-20 select-none cursor-grab active:cursor-grabbing touch-none flex items-center justify-center ${isDragging ? 'z-50' : ''}`}
       >
         <img 
           src="/porygon.svg" 
           alt="Porygon" 
-          className="w-24 h-24 opacity-90 pointer-events-none"
+          className="w-24 h-24 opacity-90"
           draggable={false}
         />
         
