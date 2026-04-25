@@ -17,10 +17,12 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata = {
   title: "Atharva Mendhulkar",
-  description: "Atharva Mendhulkar's Portfolio",
+  description: "Systems Engineer & AI Researcher",
   metadataBase: new URL("https://mendhu.tech"),
   icons: {
     icon: "/porygon.svg",
+    shortcut: "/porygon.svg",
+    apple: "/porygon.svg",
   },
   openGraph: {
     title: "Atharva Mendhulkar",

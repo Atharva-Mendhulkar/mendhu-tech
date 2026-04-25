@@ -34,16 +34,23 @@ export default function KnowledgeArchive({ onOpenGarden }: { onOpenGarden: () =>
           </div>
         </div>
         
-        <div className="flex justify-end relative z-10">
-          <button 
-            className="font-mono text-[11px] text-accent border border-dashed border-accent px-8 py-2.5 hover:bg-accent-light transition-all cursor-pointer group-hover:border-solid uppercase tracking-widest" 
-            onClick={(e) => {
-              e.stopPropagation();
-              onOpenGarden();
-            }}
-          >
-            [open garden →]
-          </button>
+        <div className="flex justify-end relative">
+          {/* Background Overlay Layer (Banyan Watermark) */}
+          <div className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none opacity-[0.06] transform translate-x-4 translate-y-[-10px] hidden md:flex">
+            <img src="/banyan.svg" alt="" className="w-[220px] h-[220px] object-contain" />
+          </div>
+
+          <div className="relative z-10">
+            <button 
+              className="font-mono text-[11px] text-accent border border-dashed border-accent px-8 py-2.5 hover:bg-accent-light transition-all cursor-pointer group-hover:border-solid uppercase tracking-widest bg-paper/50 backdrop-blur-[2px]" 
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenGarden();
+              }}
+            >
+              [open garden →]
+            </button>
+          </div>
         </div>
       </div>
     </section>
