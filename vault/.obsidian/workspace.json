@@ -94,6 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "badmosi.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -103,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks"
+              "title": "Backlinks for badmosi"
             }
           },
           {
@@ -154,12 +155,13 @@
             "state": {
               "type": "outline",
               "state": {
+                "file": "badmosi.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline"
+              "title": "Outline of badmosi"
             }
           },
           {
@@ -191,7 +193,7 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "80668acbeb405586",
+  "active": "9ef9a9181eeadd6b",
   "lastOpenFiles": [
     "AVARA.md",
     "CAPS.md",
