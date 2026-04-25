@@ -10,48 +10,37 @@ export default function DraggablePorygon() {
   const iconRef = useRef<HTMLDivElement>(null);
   const startPos = useRef({ x: 0, y: 0 });
 
-  const onStart = useCallback((clientX: number, clientY: number) => {
+  const onPointerDown = (e: React.PointerEvent) => {
+    // Only left click
+    if (e.button !== 0 && e.pointerType === 'mouse') return;
+    
     setIsDragging(true);
+    e.currentTarget.setPointerCapture(e.pointerId);
+    
     startPos.current = {
-      x: clientX - position.x,
-      y: clientY - position.y
+      x: e.clientX - position.x,
+      y: e.clientY - position.y
     };
-  }, [position]);
+  };
 
-  const onMove = useCallback((clientX: number, clientY: number) => {
+  const onPointerMove = (e: React.PointerEvent) => {
     if (!isDragging) return;
-    const newX = clientX - startPos.current.x;
-    const newY = clientY - startPos.current.y;
+    
+    const newX = e.clientX - startPos.current.x;
+    const newY = e.clientY - startPos.current.y;
+    
     setPosition({ x: newX, y: newY });
-    if (Math.abs(newX) > 10 || Math.abs(newY) > 10) {
+    
+    if (Math.abs(newX) > 5 || Math.abs(newY) > 5) {
       setHasMoved(true);
     }
-  }, [isDragging]);
+  };
 
-  const onEnd = useCallback(() => {
+  const onPointerUp = (e: React.PointerEvent) => {
+    if (!isDragging) return;
     setIsDragging(false);
-  }, []);
-
-  useEffect(() => {
-    if (isDragging) {
-      const handleMouseMove = (e: MouseEvent) => onMove(e.clientX, e.clientY);
-      const handleTouchMove = (e: TouchEvent) => onMove(e.touches[0].clientX, e.touches[0].clientY);
-      const handleMouseUp = () => onEnd();
-      const handleTouchEnd = () => onEnd();
-
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-      window.addEventListener('touchmove', handleTouchMove);
-      window.addEventListener('touchend', handleTouchEnd);
-
-      return () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mouseup', handleMouseUp);
-        window.removeEventListener('touchmove', handleTouchMove);
-        window.removeEventListener('touchend', handleTouchEnd);
-      };
-    }
-  }, [isDragging, onMove, onEnd]);
+    e.currentTarget.releasePointerCapture(e.pointerId);
+  };
 
   const handleReset = () => {
     setPosition({ x: 0, y: 0 });
@@ -74,29 +63,31 @@ export default function DraggablePorygon() {
       {/* The Draggable Icon */}
       <div
         ref={iconRef}
-        onMouseDown={(e) => {
-          e.preventDefault();
-          onStart(e.clientX, e.clientY);
-        }}
-        onTouchStart={(e) => {
-          onStart(e.touches[0].clientX, e.touches[0].clientY);
-        }}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
         style={{ 
           transform: `translate(${position.x}px, ${position.y}px)`,
-          transition: isDragging ? 'none' : 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)'
+          transition: isDragging ? 'none' : 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+          touchAction: 'none'
         }}
-        className={`w-24 h-24 relative z-20 select-none cursor-grab active:cursor-grabbing touch-none flex items-center justify-center ${isDragging ? 'z-50' : ''}`}
+        className={`
+          w-24 h-24 relative z-[1000] select-none cursor-grab active:cursor-grabbing 
+          flex items-center justify-center transition-shadow
+          ${isDragging ? 'z-[10000] scale-110 drop-shadow-2xl' : 'hover:scale-105'}
+        `}
       >
         <img 
           src="/porygon.svg" 
           alt="Porygon" 
-          className="w-24 h-24 opacity-90"
+          className="w-full h-full opacity-90 pointer-events-none"
           draggable={false}
         />
         
-        {/* Subtle shadow/indicator when dragging */}
+        {/* Visual feedback during drag */}
         {isDragging && (
-          <div className="absolute inset-0 rounded-full border-2 border-dashed border-accent/20 animate-pulse scale-110" />
+          <div className="absolute inset-0 rounded-full border-2 border-dashed border-accent/30 animate-spin-slow scale-125" />
         )}
       </div>
     </div>
