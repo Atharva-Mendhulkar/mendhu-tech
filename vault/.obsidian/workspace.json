@@ -11,10 +11,14 @@
             "id": "80668acbeb405586",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "badmosi.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "New tab"
+              "title": "badmosi"
             }
           }
         ]
@@ -90,7 +94,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "PINN.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -100,7 +103,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for PINN"
+              "title": "Backlinks"
             }
           },
           {
@@ -109,12 +112,11 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "PINN.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from PINN"
+              "title": "Outgoing links"
             }
           },
           {
@@ -152,21 +154,30 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "PINN.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of PINN"
+              "title": "Outline"
+            }
+          },
+          {
+            "id": "9ef9a9181eeadd6b",
+            "type": "leaf",
+            "state": {
+              "type": "git-view",
+              "state": {},
+              "icon": "git-pull-request",
+              "title": "Source Control"
             }
           }
-        ]
+        ],
+        "currentTab": 5
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -176,12 +187,24 @@
       "daily-notes:Open today's daily note": false,
       "templates:Insert template": false,
       "command-palette:Open command palette": false,
-      "bases:Create new base": false
+      "bases:Create new base": false,
+      "obsidian-git:Open Git source control": false
     }
   },
-  "active": "5dab72ca6b9a64b8",
+  "active": "80668acbeb405586",
   "lastOpenFiles": [
-    "ml.md",
-    "PINN.md"
+    "AVARA.md",
+    "CAPS.md",
+    "badmosi.md",
+    "Floework.md",
+    "K-PHD.md",
+    "PINN.md",
+    "SHIELD.md",
+    "Untitled.canvas",
+    "Untitled.base",
+    "Untitled 1.base",
+    "Untitled 3.base",
+    "Untitled 2.base",
+    "ml.md"
   ]
 }
