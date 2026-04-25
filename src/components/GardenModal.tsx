@@ -157,10 +157,14 @@ export default function GardenModal({ isOpen, onClose }: GardenModalProps) {
     if (canvas.parentElement) resizeObserver.observe(canvas.parentElement);
 
     if (nodesRef.current.length === 0) {
+      const rect = canvas.getBoundingClientRect();
+      const lw = rect.width || 400;
+      const lh = rect.height || 600;
+      
       nodesRef.current = researchData.nodes.map(n => ({
         ...n,
-        x: (canvas.width || 400) / 2 + (Math.random() - 0.5) * 200,
-        y: (canvas.height || 600) / 2 + (Math.random() - 0.5) * 400,
+        x: lw / 2 + (Math.random() - 0.5) * 200,
+        y: lh / 2 + (Math.random() - 0.5) * 400,
         vx: 0,
         vy: 0,
         radius: researchData.links.filter(l => l.source === n.id || l.target === n.id).length > 2 ? 14 : 10
@@ -203,15 +207,19 @@ export default function GardenModal({ isOpen, onClose }: GardenModalProps) {
     window.addEventListener('mouseup', handleMouseUp);
 
     const tick = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const dpr = window.devicePixelRatio || 1;
+      const lw = canvas.width / dpr;
+      const lh = canvas.height / dpr;
+      
+      ctx.clearRect(0, 0, lw, lh);
 
       const k = 0.05, damping = 0.9, repulsion = 6000, centerPull = 0.015, linkDist = 130;
 
       for (let i = 0; i < simNodes.length; i++) {
         const n1 = simNodes[i];
         if (n1 === dragNodeRef.current) continue;
-        n1.vx += (canvas.width / 2 - n1.x) * centerPull;
-        n1.vy += (canvas.height / 2 - n1.y) * centerPull;
+        n1.vx += (lw / 2 - n1.x) * centerPull;
+        n1.vy += (lh / 2 - n1.y) * centerPull;
 
         for (let j = i + 1; j < simNodes.length; j++) {
           const n2 = simNodes[j];
@@ -238,8 +246,8 @@ export default function GardenModal({ isOpen, onClose }: GardenModalProps) {
         if (n === dragNodeRef.current) return;
         n.vx *= damping; n.vy *= damping;
         n.x += n.vx; n.y += n.vy;
-        n.x = Math.max(20, Math.min(canvas.width - 20, n.x));
-        n.y = Math.max(20, Math.min(canvas.height - 20, n.y));
+        n.x = Math.max(20, Math.min(lw - 20, n.x));
+        n.y = Math.max(20, Math.min(lh - 20, n.y));
       });
 
       // Draw Edges (High Visibility)

@@ -1,11 +1,11 @@
 ---
-title: Badmos
+title: badmosi
 description: badmosi
 tags:
-  - ai
+  - ml
 ---
 
-# Badmosi
+# badmosi
 
 ```python
 print("Hello World")
