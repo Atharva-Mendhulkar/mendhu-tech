@@ -42,7 +42,7 @@ export default function SystemsLab({ onOpenModal }: SystemsLabProps) {
           <div 
             key={project.id}
             onClick={() => onOpenModal(project.id)}
-            className="group relative border border-dashed border-[rgba(0,71,255,0.3)] bg-paper p-6 rounded-xl hover:border-solid hover:border-accent hover:-translate-y-0.5 hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] transition-all cursor-pointer overflow-hidden fade-in"
+            className="project-card group relative border border-dashed border-[rgba(0,71,255,0.3)] bg-paper p-6 rounded-xl hover:border-solid hover:border-accent hover:-translate-y-0.5 hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] transition-all cursor-pointer overflow-hidden fade-in"
           >
             <div className="font-mono text-[9px] text-ink-faint tracking-[0.07em] mb-1 uppercase">
               {project.category}

@@ -85,7 +85,7 @@ body.modal-open { overflow: hidden; }
   }
   .cursor-ring.on-accent { border-color: var(--accent); width: 26px; height: 26px; border-style: dashed; }
   .cursor-ring.on-terminal { border-color: #00FF88; }
-  body, a, button, [role="button"] { cursor: none; }
+  body, a, button, [role="button"], .cursor-pointer, .cursor-grab, .cursor-grabbing { cursor: none !important; }
 
   /* Porygon drag state — cursor becomes expanded blue ring */
   body.porygon-dragging .cursor-ring {
