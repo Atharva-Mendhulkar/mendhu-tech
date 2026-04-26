@@ -8,6 +8,7 @@ export default function DraggablePorygon() {
   const [isDragging, setIsDragging] = useState(false);
   const [hasMoved, setHasMoved] = useState(false);
   const iconRef = useRef<HTMLDivElement>(null);
+  const resetTimerRef = useRef<NodeJS.Timeout | null>(null);
   const startPos = useRef({ x: 0, y: 0 });
 
   const onPointerDown = (e: React.PointerEvent) => {
@@ -26,18 +27,31 @@ export default function DraggablePorygon() {
   const onPointerMove = (e: React.PointerEvent) => {
     if (!isDragging) return;
     
-    let newX = e.clientX - startPos.current.x;
-    let newY = e.clientY - startPos.current.y;
+    const newX = e.clientX - startPos.current.x;
+    const newY = e.clientY - startPos.current.y;
     
     // Magnetic snapping to origin (0, 0)
     const distance = Math.sqrt(newX * newX + newY * newY);
     const magneticThreshold = 40;
     
-    // Reset if over the name or within magnetic threshold
+    // Reset if over the name (with 1s delay) or within magnetic threshold (instant)
     const elementsAtPoint = document.elementsFromPoint(e.clientX, e.clientY);
     const isOverResetZone = elementsAtPoint.some(el => el.classList.contains('porygon-reset-zone'));
     
-    if (distance < magneticThreshold || isOverResetZone) {
+    if (isOverResetZone) {
+      if (!resetTimerRef.current) {
+        resetTimerRef.current = setTimeout(() => {
+          handleReset();
+        }, 1000);
+      }
+    } else {
+      if (resetTimerRef.current) {
+        clearTimeout(resetTimerRef.current);
+        resetTimerRef.current = null;
+      }
+    }
+
+    if (distance < magneticThreshold) {
       handleReset();
       return;
     }
@@ -53,11 +67,19 @@ export default function DraggablePorygon() {
     if (!isDragging) return;
     setIsDragging(false);
     e.currentTarget.releasePointerCapture(e.pointerId);
+    if (resetTimerRef.current) {
+      clearTimeout(resetTimerRef.current);
+      resetTimerRef.current = null;
+    }
   };
 
   const handleReset = () => {
     setPosition({ x: 0, y: 0 });
     setHasMoved(false);
+    if (resetTimerRef.current) {
+      clearTimeout(resetTimerRef.current);
+      resetTimerRef.current = null;
+    }
   };
 
   return (

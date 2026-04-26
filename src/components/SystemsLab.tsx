@@ -41,7 +41,7 @@ export default function SystemsLab({ onOpenModal }: SystemsLabProps) {
           <div 
             key={project.id}
             onClick={() => onOpenModal(project.id)}
-            className="group relative border border-dashed border-[rgba(0,71,255,0.3)] bg-paper p-6 rounded-xl hover:border-solid hover:border-accent hover:-translate-y-0.5 hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] transition-all cursor-pointer overflow-hidden"
+            className="group relative border border-dashed border-[rgba(0,71,255,0.3)] bg-paper p-6 rounded-xl hover:border-solid hover:border-accent hover:-translate-y-0.5 hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] transition-all cursor-pointer overflow-hidden fade-in"
           >
             {/* Featured Star Badge */}
             <div className="absolute top-0 right-4 font-mono text-[9px] text-accent bg-accent-light border-x border-b border-dashed border-accent px-2 py-0.5 z-20">

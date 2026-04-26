@@ -13,11 +13,8 @@
   --terminal-dim: #888;
   --border: rgba(26,26,26,0.12);
   --border-strong: rgba(26,26,26,0.25);
-  
-  --font-serif: var(--font-eb-garamond), Georgia, serif;
-  --font-mono: var(--font-jetbrains-mono), "Courier New", monospace;
 }
-
+  
 @theme inline {
   --color-paper: var(--paper);
   --color-ink: var(--ink);
@@ -31,11 +28,17 @@
   --color-border-subtle: var(--border);
   --color-border-strong: var(--border-strong);
   
-  --font-serif: var(--font-serif);
-  --font-mono: var(--font-mono);
+  --font-serif: var(--font-eb-garamond), Georgia, serif;
+  --font-mono: var(--font-jetbrains-mono), "Courier New", monospace;
 
   --animate-spin-slow: spin-slow 20s linear infinite;
   --animate-spin-reverse-slow: spin-reverse-slow 15s linear infinite;
+  --animate-typewriter: typewriter 2s steps(40) forwards;
+}
+
+@keyframes typewriter {
+  from { width: 0; }
+  to { width: 100%; }
 }
 
 @keyframes spin-slow {
@@ -84,9 +87,13 @@ body, a, button, [role="button"] { cursor: none; }
 .fade-in { opacity: 0; transform: translateY(14px); animation: fadein .55s ease forwards; }
 @keyframes fadein { to { opacity: 1; transform: translateY(0); } }
 .fade-in:nth-child(1) { animation-delay: .1s; }
-.fade-in:nth-child(2) { animation-delay: .22s; }
-.fade-in:nth-child(3) { animation-delay: .34s; }
-.fade-in:nth-child(4) { animation-delay: .46s; }
+.fade-in:nth-child(2) { animation-delay: .2s; }
+.fade-in:nth-child(3) { animation-delay: .3s; }
+.fade-in:nth-child(4) { animation-delay: .4s; }
+.fade-in:nth-child(5) { animation-delay: .5s; }
+.fade-in:nth-child(6) { animation-delay: .6s; }
+.fade-in:nth-child(7) { animation-delay: .7s; }
+.fade-in:nth-child(8) { animation-delay: .8s; }
 
 /* Marquee */
 @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }

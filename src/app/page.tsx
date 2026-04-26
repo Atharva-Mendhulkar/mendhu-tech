@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CustomCursor from "@/components/CustomCursor";
 import BlogSection from "@/components/BlogSection";
 import SystemsLab from "@/components/SystemsLab";
@@ -12,6 +12,24 @@ import DraggablePorygon from '@/components/DraggablePorygon';
 export default function Home() {
   const [activeModalId, setActiveModalId] = useState<string | null>(null);
   const [isGardenOpen, setIsGardenOpen] = useState(false);
+  const [typedName, setTypedName] = useState("");
+  const fullName = "Atharva";
+  const fullSurname = "Mendhulkar.";
+
+  useEffect(() => {
+    let current = "";
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i < fullName.length) {
+        current += fullName[i];
+        setTypedName(current);
+        i++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 100);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleExit = () => {
     window.open("about:blank", "_self");
@@ -50,14 +68,14 @@ export default function Home() {
         <div className="relative z-10 px-8 lg:px-14 py-12">
           
           {/* Introduction Section with Header and Meta Links */}
-          <section className="flex flex-col md:flex-row justify-between items-center gap-8 md:gap-12 mb-8 pb-8 border-b border-dashed border-border-strong relative z-[200]">
+          <section className="fade-in flex flex-col md:flex-row justify-between items-center gap-8 md:gap-12 mb-8 pb-8 border-b border-dashed border-border-strong relative z-[200]">
             <div className="flex-1">
               <div className="section-tag">[01_ME]</div>
-              <div className="fade-in flex items-center gap-6 mb-6">
-                <h1 className="porygon-reset-zone font-serif text-[clamp(48px,8vw,72px)] font-normal tracking-[-0.03em] leading-[1] text-ink transition-transform hover:scale-[1.01]">
-                  Atharva<br /><em className="italic text-accent">Mendhulkar.</em>
+              <div className="flex items-center gap-6 mb-6">
+                <h1 className="porygon-reset-zone font-serif text-[clamp(48px,8vw,72px)] font-normal tracking-[-0.03em] leading-[1] text-ink transition-transform hover:scale-[1.01] overflow-hidden whitespace-nowrap border-r-2 border-accent animate-pulse-slow" style={{ width: 'fit-content' }}>
+                  {typedName}<br /><em className="italic text-accent">{typedName.length >= fullName.length ? fullSurname : ""}</em>
                 </h1>
-                <div className="relative flex items-center justify-center">
+                <div className="relative flex items-center justify-center z-[500]">
                   <DraggablePorygon />
                 </div>
               </div>
@@ -120,7 +138,7 @@ export default function Home() {
               <span className="text-border-strong">|</span>
               <span>v2.0.4-stable</span>
               <span className="text-border-strong">|</span>
-              <span>© {new Date().getFullYear()}</span>
+              <span>© Atharva Mendhulkar{new Date().getFullYear()}</span>
             </div>
             <div className="font-mono text-[10px] text-ink-faint uppercase tracking-widest">
               mendhu.tech
