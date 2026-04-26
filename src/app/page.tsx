@@ -7,11 +7,33 @@ import SystemsLab from "@/components/SystemsLab";
 import KnowledgeArchive from "@/components/KnowledgeArchive";
 import GardenModal from "@/components/GardenModal";
 import ProjectModal from "@/components/ProjectModal";
+import MinimizedPill from "@/components/MinimizedPill";
 import DraggablePorygon from '@/components/DraggablePorygon';
 
 export default function Home() {
   const [activeModalId, setActiveModalId] = useState<string | null>(null);
   const [isGardenOpen, setIsGardenOpen] = useState(false);
+  const [minimizedItems, setMinimizedItems] = useState<{ id: string, title: string, type: 'garden' | 'project' }[]>([]);
+
+  const handleMinimizeModal = (id: string, title: string, type: 'garden' | 'project') => {
+    if (type === 'garden') setIsGardenOpen(false);
+    else setActiveModalId(null);
+    
+    if (!minimizedItems.find(item => item.id === id)) {
+      setMinimizedItems(prev => [...prev, { id, title, type }]);
+    }
+  };
+
+  const handleRestoreModal = (id: string, type: 'garden' | 'project') => {
+    if (type === 'garden') setIsGardenOpen(true);
+    else setActiveModalId(id);
+    
+    setMinimizedItems(prev => prev.filter(item => item.id !== id));
+  };
+
+  const handleClosePill = (id: string) => {
+    setMinimizedItems(prev => prev.filter(item => item.id !== id));
+  };
 
   const handleExit = () => {
     window.open("about:blank", "_self");
@@ -130,8 +152,29 @@ export default function Home() {
         </div>
       </div>
 
-      <ProjectModal activeId={activeModalId} onClose={() => setActiveModalId(null)} />
-      <GardenModal isOpen={isGardenOpen} onClose={() => setIsGardenOpen(false)} />
+      {/* MODALS */}
+      <GardenModal 
+        isOpen={isGardenOpen} 
+        onClose={() => setIsGardenOpen(false)} 
+        onMinimize={(id, title) => handleMinimizeModal(id, title, 'garden')}
+      />
+      <ProjectModal 
+        activeId={activeModalId} 
+        onClose={() => setActiveModalId(null)} 
+        onMinimize={(id, title) => handleMinimizeModal(id, title, 'project')}
+      />
+
+      {/* MINIMIZED PILLS */}
+      <div className="fixed bottom-6 right-6 z-[10000] flex flex-col gap-3 items-end">
+        {minimizedItems.map((item) => (
+          <MinimizedPill 
+            key={item.id}
+            item={item}
+            onRestore={() => handleRestoreModal(item.id, item.type)}
+            onClose={() => handleClosePill(item.id)}
+          />
+        ))}
+      </div>
     </main>
   );
 }

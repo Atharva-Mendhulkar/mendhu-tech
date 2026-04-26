@@ -11,7 +11,7 @@ A graph-based research archive that visualizes the interconnected nature of syst
 - **Wikilink Resolution**: Custom markdown parser that supports Obsidian-style `[[wikilinks]]` for seamless inter-document navigation.
 - **Mermaid Integration**: Real-time rendering of technical sequence diagrams and flowcharts within research notes.
 
-### 2. High-Fidelity Blog Integration
+### 2. High-Fidelity Blog Integration (not live yet)
 A metadata-driven technical blog designed for deep-dives into kernel-level monitoring and ML research.
 - **Headless Content Pipeline**: Uses `gray-matter` to parse markdown frontmatter, allowing for a pure Git-based CMS workflow.
 - **Tailored Typography**: Leverages EB Garamond for a classic research feel, contrasted with JetBrains Mono for technical snippets.

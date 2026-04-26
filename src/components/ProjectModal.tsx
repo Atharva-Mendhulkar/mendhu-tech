@@ -1,16 +1,18 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from 'react';
+import { ExternalLink, Minus, X, Terminal } from 'lucide-react';
 import { projects, Project } from '@/data/projects';
 
 interface ProjectModalProps {
   activeId: string | null;
   onClose: () => void;
+  onMinimize: (id: string, title: string) => void;
 }
 
 type ModalState = 'idle' | 'booting' | 'detail';
 
-export default function ProjectModal({ activeId, onClose }: ProjectModalProps) {
+export default function ProjectModal({ activeId, onClose, onMinimize }: ProjectModalProps) {
   const [modalState, setModalState] = useState<ModalState>('idle');
   const [bootLines, setBootLines] = useState<string[]>([]);
   const [activeFeatureIdx, setActiveFeatureIdx] = useState(0);
@@ -84,22 +86,55 @@ export default function ProjectModal({ activeId, onClose }: ProjectModalProps) {
 
         {/* Chrome Bar */}
         <div className="flex items-center gap-4 p-4 border-b border-dashed border-border-strong shrink-0 relative z-10 bg-paper">
-          <div className="flex gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full border border-ink/20 bg-ink/5" />
-            <div className="w-2.5 h-2.5 rounded-full border border-ink/20 bg-ink/5" />
-            <div className="w-2.5 h-2.5 rounded-full border border-ink/20 bg-ink/5" />
+          <div className="flex gap-1.5 px-2">
+            <button 
+              onClick={onClose}
+              className="w-3 h-3 rounded-full border border-red-500/30 bg-red-500/10 hover:bg-red-500/40 transition-colors flex items-center justify-center group"
+            >
+              <X size={8} className="text-red-600 opacity-0 group-hover:opacity-100" />
+            </button>
+            <button 
+              onClick={() => onMinimize(project.id, project.title)}
+              className="w-3 h-3 rounded-full border border-yellow-500/30 bg-yellow-500/10 hover:bg-yellow-500/40 transition-colors flex items-center justify-center group"
+            >
+              <Minus size={8} className="text-yellow-600 opacity-0 group-hover:opacity-100" />
+            </button>
+            <div className="w-3 h-3 rounded-full border border-green-500/30 bg-green-500/10" />
           </div>
           
-          <div className="flex-1 text-center font-mono text-[10px] text-ink-faint uppercase tracking-[0.2em]">
+          <div className="flex-1 text-center font-mono text-[10px] text-ink-faint uppercase tracking-[0.2em] flex items-center justify-center gap-2">
+            <Terminal size={12} />
             {project.slug}.sys_inspect
           </div>
 
-          <button 
-            onClick={onClose}
-            className="font-mono text-[10px] text-ink-muted hover:text-accent border border-dashed border-border-strong px-3 py-1 transition-all cursor-pointer"
-          >
-            [CLOSE]
-          </button>
+          <div className="flex items-center gap-2">
+            {project.links.github && (
+              <a 
+                href={project.links.github} 
+                target="_blank"
+                className="font-mono text-[10px] text-ink-muted hover:text-accent border border-dashed border-border-strong px-3 py-1.5 transition-all cursor-pointer flex items-center gap-2 hover:bg-accent-light hover:border-solid"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                <span className="hidden sm:inline">CODE</span>
+              </a>
+            )}
+            {project.links.demo && (
+              <a 
+                href={project.links.demo} 
+                target="_blank"
+                className="font-mono text-[10px] text-white bg-accent border border-solid border-accent px-4 py-1.5 transition-all cursor-pointer flex items-center gap-2 hover:bg-accent/90 shadow-[0_4px_12px_rgba(0,71,255,0.2)]"
+              >
+                <ExternalLink size={12} />
+                <span className="hidden sm:inline">LIVE DEMO</span>
+              </a>
+            )}
+            <button 
+              onClick={onClose}
+              className="font-mono text-[10px] text-ink-muted hover:text-red-600 border border-dashed border-border-strong px-3 py-1.5 transition-all cursor-pointer hover:bg-red-50 hover:border-red-200"
+            >
+              [X]
+            </button>
+          </div>
         </div>
 
         <div className="flex-1 relative flex overflow-hidden">

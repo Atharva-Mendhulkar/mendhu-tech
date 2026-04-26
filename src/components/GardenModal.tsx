@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import mermaid from 'mermaid';
-import { ChevronRight, ChevronDown, FileText, Folder, Maximize2, Minimize2, Share2, Globe } from 'lucide-react';
+import { ChevronRight, ChevronDown, FileText, Folder, Maximize2, Minimize2, Share2, Globe, Minus, X } from 'lucide-react';
 import rawResearchData from '@/data/research.json';
 
 // Initialize mermaid
@@ -99,9 +99,10 @@ const researchData = rawResearchData as unknown as ResearchData;
 interface GardenModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onMinimize: (id: string, title: string) => void;
 }
 
-export default function GardenModal({ isOpen, onClose }: GardenModalProps) {
+export default function GardenModal({ isOpen, onClose, onMinimize }: GardenModalProps) {
   const fileKeys = Object.keys(researchData.files);
   const [activeFileId, setActiveFileId] = useState<string>(fileKeys[0] || '');
   const [showGraph, setShowGraph] = useState(false);
@@ -271,7 +272,7 @@ export default function GardenModal({ isOpen, onClose }: GardenModalProps) {
       
       ctx.clearRect(0, 0, lw, lh);
 
-      const k = 0.05, damping = 0.9, repulsion = 6000, centerPull = 0.015, linkDist = 130;
+      const k = 0.05, damping = 0.9, repulsion = 6000, centerPull = 0.015, linkDist = 200;
 
       for (let i = 0; i < simNodes.length; i++) {
         const n1 = simNodes[i];
@@ -486,8 +487,15 @@ export default function GardenModal({ isOpen, onClose }: GardenModalProps) {
         <div className="flex flex-col sm:flex-row items-center gap-4 p-4 border-b border-dashed border-border-strong bg-paper relative z-30">
           <div className="flex items-center justify-between w-full sm:w-auto gap-4">
             <div className="flex gap-2">
-              <button onClick={onClose} className="w-3 h-3 rounded-full border border-red-500/30 bg-red-500/10 hover:bg-red-500/40" />
-              <div className="w-3 h-3 rounded-full border border-yellow-500/30 bg-yellow-500/10" />
+              <button onClick={onClose} className="w-3 h-3 rounded-full border border-red-500/30 bg-red-500/10 hover:bg-red-500/40 flex items-center justify-center group">
+                <X size={8} className="text-red-600 opacity-0 group-hover:opacity-100" />
+              </button>
+              <button 
+                onClick={() => onMinimize('garden-authority', 'Knowledge Garden')}
+                className="w-3 h-3 rounded-full border border-yellow-500/30 bg-yellow-500/10 hover:bg-yellow-500/40 flex items-center justify-center group"
+              >
+                <Minus size={8} className="text-yellow-600 opacity-0 group-hover:opacity-100" />
+              </button>
               <div className="w-3 h-3 rounded-full border border-green-500/30 bg-green-500/10" />
             </div>
             <button 
@@ -586,6 +594,11 @@ export default function GardenModal({ isOpen, onClose }: GardenModalProps) {
               bg-[rgba(26,26,26,0.01)] overflow-hidden shrink-0 flex-col relative transition-all duration-500
             `}>
               <canvas ref={canvasRef} className="w-full h-full cursor-grab active:cursor-grabbing relative z-10" />
+              {/* Background Dots */}
+              <div 
+                className="absolute inset-0 pointer-events-none opacity-[0.4]"
+                style={{ backgroundImage: 'radial-gradient(rgba(0, 0, 0, 0.25) 1px, transparent 1px)', backgroundSize: '16px 16px' }}
+              />
             </div>
           )}
         </div>
