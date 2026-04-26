@@ -18,6 +18,9 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata = {
   title: "Atharva Mendhulkar | Systems Engineer & AI Researcher",
   description: "Portfolio of Atharva Mendhulkar, a Systems Engineer and AI Researcher specializing in physics-informed machine learning, kernel-level infrastructure, and autonomous agentic systems.",
+  alternates: {
+    canonical: '/',
+  },
   keywords: ["Atharva Mendhulkar", "Systems Engineer", "AI Researcher", "PINNs", "Machine Learning", "Kernel Development", "Agentic Systems", "Digital Garden"],
   metadataBase: new URL("https://mendhu.tech"),
   authors: [{ name: "Atharva Mendhulkar" }],
