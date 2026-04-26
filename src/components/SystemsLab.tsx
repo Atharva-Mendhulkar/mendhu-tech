@@ -1,8 +1,8 @@
 "use client";
 
+/* REFINED VERSION - NO ANALYSIS BUTTON ON TILES */
 import React, { useState } from 'react';
-import { Layout } from 'lucide-react';
-import { projects, standardProjects, categories } from '@/data/projects';
+import { projects, categories } from '@/data/projects';
 
 interface SystemsLabProps {
   onOpenModal: (id: string) => void;
