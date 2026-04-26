@@ -34,8 +34,8 @@ export default function DraggablePorygon() {
     const magneticThreshold = 40;
     
     if (distance < magneticThreshold) {
-      newX = 0;
-      newY = 0;
+      handleReset();
+      return;
     }
     
     setPosition({ x: newX, y: newY });

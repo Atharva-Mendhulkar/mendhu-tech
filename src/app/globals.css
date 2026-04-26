@@ -104,8 +104,7 @@ body, a, button, [role="button"] { cursor: none; }
 }
 .section-tag::after {
   content: ''; flex: 1; height: 1px;
-  background: repeating-linear-gradient(to right, var(--accent) 0, var(--accent) 4px, transparent 4px, transparent 8px);
-  opacity: 0.4;
+  background: repeating-linear-gradient(to right, var(--border-strong) 0, var(--border-strong) 4px, transparent 4px, transparent 8px);
 }
 
 /* Modal overlay */
@@ -134,3 +133,4 @@ body::before {
   pointer-events: none;
   z-index: 0;
 }
+

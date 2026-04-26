@@ -13,7 +13,7 @@ export default function LogBar() {
   const displayItems = [...logItems, ...logItems];
 
   return (
-    <div className="log-bar sticky top-0 z-[100] border-b border-dashed border-border-strong bg-[rgba(253,253,251,0.92)] backdrop-blur-[4px] overflow-hidden">
+    <div className="log-bar sticky top-0 z-[100] border-b border-dashed border-accent bg-[rgba(253,253,251,0.92)] backdrop-blur-[4px] overflow-hidden">
       {/* Subtle diagonal hatch overlay */}
       <div 
         className="absolute inset-0 pointer-events-none opacity-[0.04]" 
@@ -30,9 +30,9 @@ export default function LogBar() {
               href={item.href} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="hover:text-ink transition-colors"
+              className="group hover:text-ink transition-colors"
             >
-              <span className="border-b border-dashed border-border-strong text-ink pb-0.5">{item.text}</span> — {item.date}
+              <span className="border-b border-dashed border-border-strong group-hover:border-accent text-ink pb-0.5 transition-colors">{item.text}</span> — {item.date}
             </a>
           </div>
         ))}
