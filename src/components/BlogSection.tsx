@@ -98,37 +98,40 @@ export default function BlogSection() {
     <section className="py-10 border-b border-dashed border-border-strong relative z-10">
       <div className="section-tag">[02_INTELLECTUAL_LOG]</div>
       
-      <div className="flex flex-col gap-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-[10px]">
         {displayPosts.map((post, i) => (
           <a 
             key={i}
             href={post.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="fade-in border border-dashed border-border-strong p-8 bg-[rgba(253,253,251,0.72)] hover:bg-[rgba(0,71,255,0.025)] hover:border-solid hover:border-accent transition-all duration-300 flex justify-between items-start group cursor-pointer relative rounded-2xl overflow-hidden"
+            className="fade-in border border-dashed border-border-strong p-8 bg-[rgba(253,253,251,0.72)] hover:bg-[rgba(0,71,255,0.025)] hover:border-solid hover:border-accent transition-all duration-300 flex flex-col justify-between group cursor-pointer relative rounded-2xl overflow-hidden"
           >
             {/* Corner Marks */}
             <span className="absolute top-1 left-1 font-mono text-[8px] text-ink-faint opacity-30">+</span>
             <span className="absolute top-1 right-1 font-mono text-[8px] text-ink-faint opacity-30">+</span>
             
-            <div className="flex-1 relative z-10">
+            <div className="relative z-10">
               <div className="font-mono text-[9.5px] text-ink-faint mb-2 tracking-wider uppercase">
                 latest draft · blog.mendhu.tech
               </div>
-              <div className="font-serif text-[18px] text-ink font-medium mb-2 group-hover:text-accent transition-colors italic">
+              <div className="font-serif text-[18px] text-ink font-medium mb-4 group-hover:text-accent transition-colors italic leading-snug">
                 {post.title}
               </div>
-              <div className="font-mono text-[9.5px] text-ink-muted flex items-center gap-2">
+            </div>
+
+            <div className="flex justify-between items-end mt-auto">
+              <div className="font-mono text-[9.5px] text-ink-muted flex flex-wrap items-center gap-2">
                 {formatDate(post.publishedAt)} 
                 <span className="text-border-strong">·</span> 
-                {post.tags.slice(0, 3).map(t => t.name).join(', ')} 
+                {post.tags.slice(0, 2).map(t => t.name).join(', ')} 
                 <span className="text-border-strong">·</span> 
-                ~{post.readTimeInMinutes} min read
+                ~{post.readTimeInMinutes} min
               </div>
-            </div>
-            
-            <div className="font-mono text-[10px] text-accent pt-5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
-              Read draft →
+              
+              <div className="font-mono text-[10px] text-accent opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+                Read →
+              </div>
             </div>
           </a>
         ))}

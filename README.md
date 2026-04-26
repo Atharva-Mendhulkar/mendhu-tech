@@ -18,7 +18,8 @@ A metadata-driven technical blog designed for deep-dives into kernel-level monit
 
 ### 3. Systems-First Design Language
 - **Architectural Aesthetic**: Modeled after drafting paper and blueprints, utilizing radial-gradient grids and hatching patterns.
-- **Interactive Telemetry**: Includes specialized UI components like the `LogBar` marquee and a custom pointer-captured draggable brand icon with magnetic snapping.
+- **High-Fidelity Animations**: Features a macOS-inspired **Genie effect** for modal transitions and an ultra-fast staggered reveal system.
+- **Persistent Interaction**: Includes a 'Banyan' minimization dock and a custom pointer-captured draggable brand icon with magnetic snapping and stable global movement tracking.
 
 ## Technical Architecture
 

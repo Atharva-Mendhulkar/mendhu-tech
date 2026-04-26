@@ -26,56 +26,48 @@ export default function DraggablePorygon() {
     };
   };
 
-  useEffect(() => {
+  const onPointerMove = (e: React.PointerEvent) => {
     if (!isDragging) return;
-
-    const handlePointerMove = (e: PointerEvent) => {
-      const newX = e.clientX - startPos.current.x;
-      const newY = e.clientY - startPos.current.y;
-      
-      const distance = Math.sqrt(newX * newX + newY * newY);
-      const magneticThreshold = 40;
-      
-      const elementsAtPoint = document.elementsFromPoint(e.clientX, e.clientY);
-      const isOverResetZone = elementsAtPoint.some(el => el.classList.contains('porygon-reset-zone'));
-      
-      if (isOverResetZone) {
-        if (!resetTimerRef.current) {
-          resetTimerRef.current = setTimeout(() => {
-            handleReset();
-          }, 1000);
-        }
-      } else {
-        if (resetTimerRef.current) {
-          clearTimeout(resetTimerRef.current);
-          resetTimerRef.current = null;
-        }
+    
+    const newX = e.clientX - startPos.current.x;
+    const newY = e.clientY - startPos.current.y;
+    
+    const distance = Math.sqrt(newX * newX + newY * newY);
+    const magneticThreshold = 40;
+    
+    const elementsAtPoint = document.elementsFromPoint(e.clientX, e.clientY);
+    const isOverResetZone = elementsAtPoint.some(el => el.classList.contains('porygon-reset-zone'));
+    
+    if (isOverResetZone) {
+      if (!resetTimerRef.current) {
+        resetTimerRef.current = setTimeout(() => {
+          handleReset();
+        }, 1000);
       }
-
-      if (distance < magneticThreshold) {
-        handleReset();
-        return;
-      }
-      
-      setPosition({ x: newX, y: newY });
-      if (Math.abs(newX) > 5 || Math.abs(newY) > 5) setHasMoved(true);
-    };
-
-    const handlePointerUp = (e: PointerEvent) => {
-      setIsDragging(false);
+    } else {
       if (resetTimerRef.current) {
         clearTimeout(resetTimerRef.current);
         resetTimerRef.current = null;
       }
-    };
+    }
 
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('pointerup', handlePointerUp);
-    return () => {
-      window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('pointerup', handlePointerUp);
-    };
-  }, [isDragging]);
+    if (distance < magneticThreshold) {
+      handleReset();
+      return;
+    }
+    
+    setPosition({ x: newX, y: newY });
+    if (Math.abs(newX) > 5 || Math.abs(newY) > 5) setHasMoved(true);
+  };
+
+  const onPointerUp = (e: React.PointerEvent) => {
+    setIsDragging(false);
+    e.currentTarget.releasePointerCapture(e.pointerId);
+    if (resetTimerRef.current) {
+      clearTimeout(resetTimerRef.current);
+      resetTimerRef.current = null;
+    }
+  };
 
   const handleReset = () => {
     setPosition({ x: 0, y: 0 });
@@ -108,6 +100,9 @@ export default function DraggablePorygon() {
       <div
         ref={iconRef}
         onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
         style={{ 
           transform: `translate(${position.x}px, ${position.y}px)`,
           transition: isDragging ? 'none' : 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',

@@ -220,15 +220,18 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: GardenModal
       const lw = rect.width || 400;
       const lh = rect.height || 600;
       
-      nodesRef.current = researchData.nodes.map(n => ({
+      nodesRef.current = researchData.nodes.map((n, i) => ({
         ...n,
         x: lw / 2 + (Math.random() - 0.5) * 200,
         y: lh / 2 + (Math.random() - 0.5) * 400,
         vx: 0,
         vy: 0,
-        radius: researchData.links.filter(l => l.source === n.id || l.target === n.id).length > 2 ? 14 : 10
+        radius: researchData.links.filter(l => l.source === n.id || l.target === n.id).length > 2 ? 14 : 10,
+        revealTime: i * 150 // Staggered reveal
       }));
     }
+    
+    const startTime = Date.now();
     
     const simNodes = nodesRef.current;
     const simLinks = researchData.links
@@ -310,7 +313,9 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: GardenModal
       });
 
       // Draw Edges (High Visibility)
+      const elapsed = Date.now() - startTime;
       simLinks.forEach(l => {
+        if (elapsed < l.source.revealTime || elapsed < l.target.revealTime) return;
         const isActive = l.source.id === activeFileIdRef.current || l.target.id === activeFileIdRef.current;
         ctx.beginPath();
         ctx.setLineDash(isActive ? [] : [4, 4]);
@@ -323,6 +328,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: GardenModal
 
       // Draw Nodes (Premium Glass)
       simNodes.forEach(node => {
+        if (elapsed < node.revealTime) return;
         const isActive = node.id === activeFileIdRef.current;
         const isConnected = simLinks.some(l => 
           (l.source.id === node.id && l.target.id === activeFileIdRef.current) ||
@@ -480,7 +486,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: GardenModal
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2 md:p-8">
       <div className="absolute inset-0 bg-[rgba(253,253,251,0.98)] backdrop-blur-[16px]" onClick={onClose} />
       <div 
-        className="relative bg-paper border border-dashed border-border-strong flex flex-col shadow-[0_60px_120px_-30px_rgba(0,0,0,0.2)] w-full md:w-[98vw] h-[98vh] md:h-[96vh] rounded-[2px] overflow-hidden animate-genie origin-bottom-right"
+        className="relative bg-paper border border-dashed border-border-strong flex flex-col shadow-[0_60px_120px_-30px_rgba(0,0,0,0.2)] w-full md:w-[98vw] h-[98vh] md:h-[96vh] rounded-[2px] overflow-hidden transition-all duration-500"
       >
         
         {/* Header */}
@@ -514,10 +520,12 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: GardenModal
           </div>
 
           <div className="flex gap-2 w-full sm:w-auto justify-center">
-            <button onClick={() => setIsGraphMaximized(!isGraphMaximized)} className={`font-mono text-[9px] md:text-[10px] px-3 py-1 border border-dashed border-border-strong hover:border-accent hover:text-accent transition-all flex items-center gap-2 ${isGraphMaximized ? 'bg-accent-light text-accent' : ''}`}>
-              {isGraphMaximized ? <Minimize2 size={12} /> : <Maximize2 size={12} />} 
-              <span className="hidden xs:inline">{isGraphMaximized ? 'RESTORE' : 'MAX GRAPH'}</span>
-            </button>
+            {showGraph && (
+              <button onClick={() => setIsGraphMaximized(!isGraphMaximized)} className={`font-mono text-[9px] md:text-[10px] px-3 py-1 border border-dashed border-border-strong hover:border-accent hover:text-accent transition-all flex items-center gap-2 ${isGraphMaximized ? 'bg-accent-light text-accent' : ''}`}>
+                {isGraphMaximized ? <Minimize2 size={12} /> : <Maximize2 size={12} />} 
+                <span className="hidden xs:inline">{isGraphMaximized ? 'RESTORE' : 'MAX GRAPH'}</span>
+              </button>
+            )}
             <button onClick={() => setShowGraph(!showGraph)} className="font-mono text-[9px] md:text-[10px] px-4 py-1 border border-dashed border-border-strong hover:border-accent hover:text-accent whitespace-nowrap">
               [{showGraph ? 'HIDE GRAPH' : 'SHOW GRAPH'}]
             </button>
