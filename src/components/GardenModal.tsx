@@ -535,7 +535,13 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: GardenModal
                 <span className="hidden xs:inline">{isGraphMaximized ? 'RESTORE' : 'MAX GRAPH'}</span>
               </button>
             )}
-            <button onClick={() => setShowGraph(!showGraph)} className="font-mono text-[9px] md:text-[10px] px-4 py-1 border border-dashed border-border-strong hover:border-accent hover:text-accent whitespace-nowrap">
+            <button 
+              onClick={() => {
+                if (showGraph) setIsGraphMaximized(false);
+                setShowGraph(!showGraph);
+              }} 
+              className="font-mono text-[9px] md:text-[10px] px-4 py-1 border border-dashed border-border-strong hover:border-accent hover:text-accent whitespace-nowrap"
+            >
               [{showGraph ? 'HIDE GRAPH' : 'SHOW GRAPH'}]
             </button>
           </div>
