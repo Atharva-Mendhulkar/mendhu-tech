@@ -13,7 +13,7 @@ export default function LogBar() {
   const displayItems = [...logItems, ...logItems];
 
   return (
-    <div className="log-bar sticky top-0 z-[100] border-b border-dashed border-accent bg-[rgba(253,253,251,0.92)] backdrop-blur-[4px] overflow-hidden">
+    <div className="log-bar sticky top-0 z-[100] border-b border-dashed border-[rgba(0,71,255,0.3)] bg-[rgba(253,253,251,0.92)] backdrop-blur-[4px] overflow-hidden">
       {/* Subtle diagonal hatch overlay */}
       <div 
         className="absolute inset-0 pointer-events-none opacity-[0.04]" 
