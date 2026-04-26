@@ -35,7 +35,10 @@ export default function DraggablePorygon() {
       const distance = Math.sqrt(newX * newX + newY * newY);
       const magneticThreshold = 40;
       
-      if (distance < magneticThreshold) {
+      const elementsAtPoint = document.elementsFromPoint(e.clientX, e.clientY);
+      const isOverResetZone = elementsAtPoint.some(el => el.classList.contains('porygon-reset-zone'));
+      
+      if (distance < magneticThreshold || isOverResetZone) {
         handleReset();
         return;
       }

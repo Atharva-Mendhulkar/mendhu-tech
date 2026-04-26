@@ -61,18 +61,7 @@ export default function BlogSection() {
     return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   };
 
-  if (loading) {
-    return (
-      <section className="py-10 border-b border-dashed border-border-strong relative z-10">
-        <div className="section-tag">[02_INTELLECTUAL_LOG]</div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-[10px]">
-          {[1, 2].map(i => (
-            <div key={i} className="border border-dashed border-border-strong p-8 bg-[rgba(253,253,251,0.72)] animate-pulse h-48 rounded-2xl" />
-          ))}
-        </div>
-      </section>
-    );
-  }
+  if (loading) return null;
 
   // Fallback if no posts or error
   const displayPosts = (posts.length > 0 && !error) ? posts : [
@@ -95,7 +84,7 @@ export default function BlogSection() {
   ];
 
   return (
-    <section className="py-10 border-b border-dashed border-border-strong relative z-10">
+    <section className="py-10 border-b border-dashed border-border-strong relative z-10 fade-in">
       <div className="section-tag">[02_INTELLECTUAL_LOG]</div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-[10px]">
@@ -105,7 +94,7 @@ export default function BlogSection() {
             href={post.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="fade-in border border-dashed border-border-strong p-8 bg-[rgba(253,253,251,0.72)] hover:bg-[rgba(0,71,255,0.025)] hover:border-solid hover:border-accent transition-all duration-300 flex flex-col justify-between group cursor-pointer relative rounded-2xl overflow-hidden"
+            className="border border-dashed border-border-strong p-8 bg-[rgba(253,253,251,0.72)] hover:bg-[rgba(0,71,255,0.025)] hover:border-solid hover:border-accent transition-all duration-300 flex flex-col justify-between group cursor-pointer relative rounded-2xl overflow-hidden"
           >
             {/* Corner Marks */}
             <span className="absolute top-1 left-1 font-mono text-[8px] text-ink-faint opacity-30">+</span>
