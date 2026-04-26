@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { RefreshCw } from 'lucide-react';
 
 export default function DraggablePorygon() {
@@ -8,73 +8,69 @@ export default function DraggablePorygon() {
   const [isDragging, setIsDragging] = useState(false);
   const [hasMoved, setHasMoved] = useState(false);
   const iconRef = useRef<HTMLDivElement>(null);
-  const resetTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const draggingRef = useRef(false);
   const startPos = useRef({ x: 0, y: 0 });
-  const pointerIdRef = useRef<number | null>(null);
-
-  const onPointerDown = (e: React.PointerEvent) => {
-    if (e.button !== 0 && e.pointerType === 'mouse') return;
-    
-    setIsDragging(true);
-    pointerIdRef.current = e.pointerId;
-    e.currentTarget.setPointerCapture(e.pointerId);
-    
-    startPos.current = {
-      x: e.clientX - position.x,
-      y: e.clientY - position.y
-    };
-  };
+  const posRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
-    if (!isDragging) return;
+    const el = iconRef.current;
+    if (!el) return;
 
-    const handlePointerMove = (e: PointerEvent) => {
+    const onDown = (e: PointerEvent) => {
+      if (e.button !== 0) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      draggingRef.current = true;
+      setIsDragging(true);
+
+      startPos.current = {
+        x: e.clientX - posRef.current.x,
+        y: e.clientY - posRef.current.y
+      };
+    };
+
+    const onMove = (e: PointerEvent) => {
+      if (!draggingRef.current) return;
+
       const newX = e.clientX - startPos.current.x;
       const newY = e.clientY - startPos.current.y;
-      
-      const distance = Math.sqrt(newX * newX + newY * newY);
-      const magneticThreshold = 40;
-      
-      const elementsAtPoint = document.elementsFromPoint(e.clientX, e.clientY);
-      const isOverResetZone = elementsAtPoint.some(el => el.classList.contains('porygon-reset-zone'));
-      
-      if (distance < magneticThreshold || isOverResetZone) {
-        handleReset();
-        return;
-      }
-      
+
+      posRef.current = { x: newX, y: newY };
       setPosition({ x: newX, y: newY });
-      if (Math.abs(newX) > 5 || Math.abs(newY) > 5) setHasMoved(true);
-    };
 
-    const handlePointerUp = (e: PointerEvent) => {
-      setIsDragging(false);
-      if (pointerIdRef.current !== null && iconRef.current) {
-        try { iconRef.current.releasePointerCapture(pointerIdRef.current); } catch (err) {}
+      if (Math.abs(newX) > 5 || Math.abs(newY) > 5) {
+        setHasMoved(true);
       }
     };
 
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('pointerup', handlePointerUp);
-    return () => {
-      window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('pointerup', handlePointerUp);
+    const onUp = () => {
+      if (!draggingRef.current) return;
+      draggingRef.current = false;
+      setIsDragging(false);
     };
-  }, [isDragging]);
+
+    el.addEventListener('pointerdown', onDown);
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+
+    return () => {
+      el.removeEventListener('pointerdown', onDown);
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+    };
+  }, []);
 
   const handleReset = () => {
+    posRef.current = { x: 0, y: 0 };
     setPosition({ x: 0, y: 0 });
     setHasMoved(false);
     setIsDragging(false);
-    if (pointerIdRef.current !== null && iconRef.current) {
-      try { iconRef.current.releasePointerCapture(pointerIdRef.current); } catch (e) {}
-      pointerIdRef.current = null;
-    }
+    draggingRef.current = false;
   };
 
   return (
     <div className="relative flex items-center justify-center w-24 h-24">
-      {/* The Reset Button at the original position */}
       {hasMoved && (
         <button
           onClick={handleReset}
@@ -85,10 +81,8 @@ export default function DraggablePorygon() {
         </button>
       )}
 
-      {/* The Draggable Icon */}
       <div
         ref={iconRef}
-        onPointerDown={onPointerDown}
         style={{ 
           transform: `translate(${position.x}px, ${position.y}px)`,
           transition: isDragging ? 'none' : 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
@@ -96,7 +90,7 @@ export default function DraggablePorygon() {
         }}
         className={`
           w-24 h-24 relative select-none cursor-grab active:cursor-grabbing 
-          flex items-center justify-center transition-shadow pointer-events-auto
+          flex items-center justify-center pointer-events-auto
           ${isDragging ? 'z-[99999] scale-110 drop-shadow-2xl' : 'z-[1000] hover:scale-105'}
         `}
       >
@@ -107,7 +101,6 @@ export default function DraggablePorygon() {
           draggable={false}
         />
         
-        {/* Visual feedback during drag */}
         {isDragging && (
           <div className="absolute inset-0 rounded-full border-2 border-dashed border-accent/30 animate-spin-slow scale-125" />
         )}

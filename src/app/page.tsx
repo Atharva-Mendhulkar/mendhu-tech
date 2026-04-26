@@ -79,7 +79,7 @@ export default function Home() {
             <div className="flex-1">
               <div className="section-tag">[01_ME]</div>
               <div className="flex items-center gap-6 mb-6">
-                <h1 className="porygon-reset-zone font-serif text-[clamp(48px,8vw,72px)] font-normal tracking-[-0.03em] leading-[1] text-ink transition-transform hover:scale-[1.01]">
+                <h1 className="font-serif text-[clamp(48px,8vw,72px)] font-normal tracking-[-0.03em] leading-[1] text-ink transition-transform hover:scale-[1.01]">
                   Atharva<br /><em className="italic text-accent">Mendhulkar.</em>
                 </h1>
                 <div className="relative flex items-center justify-center z-[500]">

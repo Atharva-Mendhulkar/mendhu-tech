@@ -30,10 +30,28 @@ interface Post {
   url: string;
 }
 
+const FALLBACK_POSTS: Post[] = [
+  {
+    title: "Physics-Informed Neural Networks for Urban Air Quality Modeling",
+    brief: "Exploring the intersection of fluid dynamics and deep learning...",
+    publishedAt: new Date().toISOString(),
+    tags: [{ name: 'PM2.5' }, { name: 'PDE' }, { name: 'ML' }],
+    readTimeInMinutes: 12,
+    url: "https://blog.mendhu.tech"
+  },
+  {
+    title: "Architecting AVARA: Runtime Security for Autonomous AI Agents",
+    brief: "Developing a governance layer for machine-speed agent ecosystems...",
+    publishedAt: new Date().toISOString(),
+    tags: [{ name: 'Security' }, { name: 'AI' }],
+    readTimeInMinutes: 8,
+    url: "https://blog.mendhu.tech"
+  }
+];
+
 export default function BlogSection() {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  // Start with fallback data immediately — no empty state
+  const [posts, setPosts] = useState<Post[]>(FALLBACK_POSTS);
 
   useEffect(() => {
     async function fetchPosts() {
@@ -45,12 +63,12 @@ export default function BlogSection() {
         });
         const json = await response.json();
         const fetchedPosts = json.data?.publication?.posts?.edges?.map((e: any) => e.node) || [];
-        setPosts(fetchedPosts);
+        if (fetchedPosts.length > 0) {
+          setPosts(fetchedPosts);
+        }
       } catch (err) {
         console.error('Error fetching Hashnode posts:', err);
-        setError(true);
-      } finally {
-        setLoading(false);
+        // Keep fallback data
       }
     }
     fetchPosts();
@@ -61,40 +79,18 @@ export default function BlogSection() {
     return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   };
 
-  if (loading) return null;
-
-  // Fallback if no posts or error
-  const displayPosts = (posts.length > 0 && !error) ? posts : [
-    {
-      title: "Physics-Informed Neural Networks for Urban Air Quality Modeling",
-      brief: "Exploring the intersection of fluid dynamics and deep learning...",
-      publishedAt: new Date().toISOString(),
-      tags: [{ name: 'PM2.5' }, { name: 'PDE' }, { name: 'ML' }],
-      readTimeInMinutes: 12,
-      url: "https://blog.mendhu.tech"
-    },
-    {
-      title: "Architecting AVARA: Runtime Security for Autonomous AI Agents",
-      brief: "Developing a governance layer for machine-speed agent ecosystems...",
-      publishedAt: new Date().toISOString(),
-      tags: [{ name: 'Security' }, { name: 'AI' }],
-      readTimeInMinutes: 8,
-      url: "https://blog.mendhu.tech"
-    }
-  ];
-
   return (
-    <section className="py-10 border-b border-dashed border-border-strong relative z-10 fade-in">
+    <section className="py-10 border-b border-dashed border-border-strong relative z-10">
       <div className="section-tag">[02_INTELLECTUAL_LOG]</div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-[10px]">
-        {displayPosts.map((post, i) => (
+        {posts.map((post, i) => (
           <a 
             key={i}
             href={post.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="border border-dashed border-border-strong p-8 bg-[rgba(253,253,251,0.72)] hover:bg-[rgba(0,71,255,0.025)] hover:border-solid hover:border-accent transition-all duration-300 flex flex-col justify-between group cursor-pointer relative rounded-2xl overflow-hidden"
+            className="fade-in border border-dashed border-border-strong p-8 bg-[rgba(253,253,251,0.72)] hover:bg-[rgba(0,71,255,0.025)] hover:border-solid hover:border-accent transition-all duration-300 flex flex-col justify-between group cursor-pointer relative rounded-2xl overflow-hidden"
           >
             {/* Corner Marks */}
             <span className="absolute top-1 left-1 font-mono text-[8px] text-ink-faint opacity-30">+</span>
