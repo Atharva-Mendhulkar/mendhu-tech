@@ -12,15 +12,9 @@ import DraggablePorygon from '@/components/DraggablePorygon';
 
 export default function Home() {
   const [activeModalId, setActiveModalId] = useState<string | null>(null);
-  const [initialShowMetrics, setInitialShowMetrics] = useState(false);
   const [isGardenOpen, setIsGardenOpen] = useState(false);
-  const [minimizedItems, setMinimizedItems] = useState<{ id: string, title: string, type: 'garden' | 'project', initialShowMetrics?: boolean }[]>([]);
+  const [minimizedItems, setMinimizedItems] = useState<{ id: string, title: string, type: 'garden' | 'project' }[]>([]);
   const [restoredId, setRestoredId] = useState<string | null>(null);
-
-  const handleOpenProject = (id: string, showMetrics: boolean = false) => {
-    setInitialShowMetrics(showMetrics);
-    setActiveModalId(id);
-  };
 
   const handleMinimizeModal = (id: string, title: string, type: 'garden' | 'project') => {
     if (type === 'garden') setIsGardenOpen(false);
@@ -28,18 +22,14 @@ export default function Home() {
     setRestoredId(null);
     
     if (!minimizedItems.find(item => item.id === id)) {
-      setMinimizedItems(prev => [...prev, { id, title, type, initialShowMetrics: type === 'project' ? initialShowMetrics : false }]);
+      setMinimizedItems(prev => [...prev, { id, title, type }]);
     }
   };
 
   const handleRestoreModal = (id: string, type: 'garden' | 'project') => {
     setRestoredId(id);
     if (type === 'garden') setIsGardenOpen(true);
-    else {
-      const item = minimizedItems.find(i => i.id === id);
-      setInitialShowMetrics(item?.initialShowMetrics || false);
-      setActiveModalId(id);
-    }
+    else setActiveModalId(id);
     
     setMinimizedItems(prev => prev.filter(item => item.id !== id));
   };
@@ -57,16 +47,10 @@ export default function Home() {
     <main className="min-h-screen relative">
       <CustomCursor />
 
-      {/* 
-        OUTER CONTAINER 
-        Dashed vertical lines marking the 1000px content boundary.
-      */}
+      {/* OUTER CONTAINER */}
       <div className="max-w-[1000px] mx-auto border-x border-dashed border-border-strong min-h-[85vh] relative shadow-sm">
         
-        {/* 
-          PAPER TEXTURE & HATCH 
-          The only place the warm paper color is painted.
-        */}
+        {/* PAPER TEXTURE & HATCH */}
         <div 
           aria-hidden 
           className="absolute inset-0 z-0"
@@ -107,6 +91,7 @@ export default function Home() {
                 <a 
                   href="https://github.com/Atharva-Mendhulkar" 
                   target="_blank" 
+                  rel="noopener noreferrer"
                   className="group flex items-center gap-2 font-mono text-[11px] text-accent border border-dashed border-accent px-4 py-2 hover:bg-accent-light hover:border-solid transition-all"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
@@ -115,6 +100,7 @@ export default function Home() {
                 <a 
                   href="https://x.com/atharvarta" 
                   target="_blank" 
+                  rel="noopener noreferrer"
                   className="group flex items-center gap-2 font-mono text-[11px] text-accent border border-dashed border-accent px-4 py-2 hover:bg-accent-light hover:border-solid transition-all"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg>
@@ -130,6 +116,7 @@ export default function Home() {
                 <a 
                   href="https://drive.google.com/file/d/1fRhtpOOUqrIayHYB34IQtjnDG0x1sL3l/view?usp=sharing" 
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="group flex items-center gap-2 font-mono text-[11px] text-accent border border-dashed border-accent px-4 py-2 hover:bg-accent-light hover:border-solid transition-all"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
@@ -143,7 +130,7 @@ export default function Home() {
           <BlogSection />
 
           {/* ─── PHASE 5: LAB ─── */}
-          <SystemsLab onOpenModal={handleOpenProject} />
+          <SystemsLab onOpenModal={setActiveModalId} />
 
           {/* ─── PHASE 7: KNOWLEDGE ─── */}
           <KnowledgeArchive onOpenGarden={() => setIsGardenOpen(true)} />
@@ -155,7 +142,7 @@ export default function Home() {
               <span className="text-border-strong">|</span>
               <span>v2.0.4-stable</span>
               <span className="text-border-strong">|</span>
-              <span>© Atharva Mendhulkar{new Date().getFullYear()}</span>
+              <span>© Atharva Mendhulkar {new Date().getFullYear()}</span>
             </div>
             <div className="font-mono text-[10px] text-ink-faint uppercase tracking-widest">
               mendhu.tech
@@ -176,7 +163,6 @@ export default function Home() {
         onClose={() => setActiveModalId(null)}
         onMinimize={(id, title) => handleMinimizeModal(id, title, 'project')}
         skipBoot={restoredId === activeModalId}
-        initialShowMetrics={initialShowMetrics}
       />
 
       {/* MINIMIZED PILLS */}
