@@ -12,7 +12,7 @@ export default function KnowledgeArchive({ onOpenGarden }: { onOpenGarden: () =>
       <div className="section-tag">[04_DIGITAL_GARDEN]</div>
       
       <div 
-        className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center border border-dashed border-border-strong p-10 bg-paper rounded-xl relative z-10 group cursor-pointer hover:border-solid hover:border-accent transition-all duration-300 overflow-hidden fade-in"
+        className="garden-tile grid grid-cols-1 md:grid-cols-2 gap-6 items-center border border-dashed border-border-strong p-10 bg-paper rounded-xl relative z-10 group cursor-pointer hover:border-solid hover:border-accent transition-all duration-300 overflow-hidden fade-in"
         onClick={onOpenGarden}
       >
         {/* Background Asset - Banyan Tree with hatching */}

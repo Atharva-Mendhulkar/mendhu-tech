@@ -8,29 +8,29 @@ export default function CustomCursor() {
   const [isHoveringTerminal, setIsHoveringTerminal] = useState(false);
 
   useEffect(() => {
-    const updatePosition = (e: MouseEvent) => {
+    const updatePosition = (e: PointerEvent) => {
       if (cursorRef.current) {
         cursorRef.current.style.left = `${e.clientX}px`;
         cursorRef.current.style.top = `${e.clientY}px`;
       }
     };
 
-    const updateHoverState = (e: MouseEvent) => {
+    const updateHoverState = (e: PointerEvent) => {
       const target = e.target as HTMLElement;
       
-      const isClickable = !!target.closest('a, button, .project-card, .tree-file, .filter-btn');
+      const isClickable = !!target.closest('a, button, .project-card, .garden-tile, .tree-file, .filter-btn');
       setIsHovering(isClickable);
 
       const isTerminal = !!target.closest('.terminal-bg, .modal-window');
       setIsHoveringTerminal(isTerminal);
     };
 
-    window.addEventListener("mousemove", updatePosition);
-    window.addEventListener("mouseover", updateHoverState);
+    window.addEventListener("pointermove", updatePosition);
+    window.addEventListener("pointerover", updateHoverState);
 
     return () => {
-      window.removeEventListener("mousemove", updatePosition);
-      window.removeEventListener("mouseover", updateHoverState);
+      window.removeEventListener("pointermove", updatePosition);
+      window.removeEventListener("pointerover", updateHoverState);
     };
   }, []);
 
