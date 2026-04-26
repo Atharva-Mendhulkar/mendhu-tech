@@ -1,50 +1,34 @@
-# Atharva Mendhulkar — Portfolio & Knowledge Garden
+# Atharva Mendhulkar
 
+Systems Engineer and AI Researcher exploring the intersection of physics-informed machine learning and kernel-level infrastructure.
 
-[mendhu.tech](https://mendhu.tech)
+## Technical Focus
 
----
+- **Systems Engineering**: Kernel-level predictive monitoring, distributed tracing, and high-performance ingestion engines.
+- **AI Research**: Physics-Informed Neural Networks (PINNs) for inverse source identification and autonomous agent governance.
+- **Infrastructure**: Deterministic payment kernels and behavioral biometrics for secure mobile banking.
 
-## Project Architecture
+## Selected Research & Projects
 
-This repository contains my personal portfolio and a specialized **Knowledge Garden** interface. The architecture is designed for high-fidelity technical storytelling.
+### PINN — Urban Air Quality Modeling
+Dual-network Physics-Informed Neural Network for inverse source identification in urban environments. Focuses on PM2.5 dispersion using PDE-constrained optimization.
 
-### Knowledge Garden
-A deterministic, interactive knowledge graph built from raw research notes.
-- **Sync Engine**: A custom Node.js script (`scripts/parse-vault.mjs`) that transforms an Obsidian vault into a high-performance JSON graph.
-- **Rendering**: Real-time rendering of Mermaid diagrams, GFM markdown, and wikilink navigation.
-- **Physics**: Force-directed layout using custom canvas simulation for high-density node interactions.
+### AVARA — Agent Risk Authority
+Runtime security and governance layer for autonomous AI agents. Implements intent validation and deterministic circuit breakers for agentic workflows.
 
-### Systems Lab
-A curated index of research and engineering projects.
-- **Data-Driven**: Projects are defined in `src/data/projects.ts` with real-time performance metrics.
-- **Responsive**: Fully optimized for mobile and desktop exploration.
+### K-PHD — Kernel Hang Detector
+Kernel-level predictive monitoring inside the Linux scheduler. Uses real-time behavioral telemetry to identify and prevent CPU starvation.
+
+## Knowledge Garden
+
+The repository includes a curated Knowledge Garden, a graph-based research archive containing technical notes on systems, security, and intelligence.
 
 ## Technical Stack
 
-- **Framework**: Next.js 16 (App Router)
-- **Styling**: Vanilla CSS + Tailwind CSS (Wireframe aesthetic)
-- **Visuals**: Lucide Icons, Mermaid.js
-- **Typography**: EB Garamond (Serif), JetBrains Mono (Monospace)
-- **Deployment**: Vercel
+- **Languages**: C, Go, Python, TypeScript
+- **Systems**: Linux Kernel, eBPF, Distributed Systems
+- **AI/ML**: PyTorch, PINNs, Agentic Workflows
+- **Frontend**: Next.js, Tailwind CSS, Canvas API
 
-## Development
-
-### Installation
-```bash
-npm install
-```
-
-### Knowledge Garden Sync
-To update the Knowledge Garden with new research notes from the `/vault` directory:
-```bash
-node scripts/parse-vault.mjs
-```
-
-### Run Locally
-```bash
-npm run dev
-```
-
-## License
-MIT © [Atharva Mendhulkar](https://github.com/Atharva-Mendhulkar)
+---
+mendhu.tech

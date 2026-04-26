@@ -2,7 +2,7 @@
 
 :root {
   --paper: #FDFDFB;
-  --paper-dark: #EBEBE9;
+  --paper-dark: #f3f1f1;
   --ink: #1A1A1A;
   --ink-muted: #6B6B6B;
   --ink-faint: #BDBDBD;
@@ -104,7 +104,8 @@ body, a, button, [role="button"] { cursor: none; }
 }
 .section-tag::after {
   content: ''; flex: 1; height: 1px;
-  background: repeating-linear-gradient(to right, var(--border-strong) 0, var(--border-strong) 4px, transparent 4px, transparent 8px);
+  background: repeating-linear-gradient(to right, var(--accent) 0, var(--accent) 4px, transparent 4px, transparent 8px);
+  opacity: 0.4;
 }
 
 /* Modal overlay */

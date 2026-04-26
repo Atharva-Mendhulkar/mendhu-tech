@@ -26,8 +26,17 @@ export default function DraggablePorygon() {
   const onPointerMove = (e: React.PointerEvent) => {
     if (!isDragging) return;
     
-    const newX = e.clientX - startPos.current.x;
-    const newY = e.clientY - startPos.current.y;
+    let newX = e.clientX - startPos.current.x;
+    let newY = e.clientY - startPos.current.y;
+    
+    // Magnetic snapping to origin (0, 0)
+    const distance = Math.sqrt(newX * newX + newY * newY);
+    const magneticThreshold = 40;
+    
+    if (distance < magneticThreshold) {
+      newX = 0;
+      newY = 0;
+    }
     
     setPosition({ x: newX, y: newY });
     
