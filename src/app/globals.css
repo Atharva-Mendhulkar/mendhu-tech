@@ -84,16 +84,23 @@ body.modal-open { overflow: hidden; }
 body, a, button, [role="button"] { cursor: none; }
 
 /* Fade-in animation */
-.fade-in { opacity: 0; transform: translateY(14px); animation: fadein .25s ease forwards; }
+.fade-in { opacity: 0; transform: translateY(14px); animation: fadein .2s ease forwards; }
 @keyframes fadein { to { opacity: 1; transform: translateY(0); } }
-.fade-in:nth-child(1) { animation-delay: .05s; }
-.fade-in:nth-child(2) { animation-delay: .1s; }
-.fade-in:nth-child(3) { animation-delay: .15s; }
-.fade-in:nth-child(4) { animation-delay: .2s; }
-.fade-in:nth-child(5) { animation-delay: .25s; }
-.fade-in:nth-child(6) { animation-delay: .3s; }
-.fade-in:nth-child(7) { animation-delay: .35s; }
-.fade-in:nth-child(8) { animation-delay: .4s; }
+.fade-in:nth-child(1) { animation-delay: .02s; }
+.fade-in:nth-child(2) { animation-delay: .04s; }
+.fade-in:nth-child(3) { animation-delay: .06s; }
+.fade-in:nth-child(4) { animation-delay: .08s; }
+.fade-in:nth-child(5) { animation-delay: .1s; }
+.fade-in:nth-child(6) { animation-delay: .12s; }
+.fade-in:nth-child(7) { animation-delay: .14s; }
+.fade-in:nth-child(8) { animation-delay: .16s; }
+
+/* Pill Animation */
+.animate-pill-in { animation: pill-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+@keyframes pill-in {
+  from { opacity: 0; transform: scale(0.8) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
 
 /* Marquee */
 @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
