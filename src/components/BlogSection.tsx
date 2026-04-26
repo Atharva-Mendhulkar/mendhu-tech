@@ -61,7 +61,18 @@ export default function BlogSection() {
     return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   };
 
-  if (loading) return null;
+  if (loading) {
+    return (
+      <section className="py-10 border-b border-dashed border-border-strong relative z-10">
+        <div className="section-tag">[02_INTELLECTUAL_LOG]</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-[10px]">
+          {[1, 2].map(i => (
+            <div key={i} className="border border-dashed border-border-strong p-8 bg-[rgba(253,253,251,0.72)] animate-pulse h-48 rounded-2xl" />
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   // Fallback if no posts or error
   const displayPosts = (posts.length > 0 && !error) ? posts : [

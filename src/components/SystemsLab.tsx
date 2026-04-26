@@ -43,22 +43,29 @@ export default function SystemsLab({ onOpenModal }: SystemsLabProps) {
             onClick={() => onOpenModal(project.id)}
             className="group relative border border-dashed border-[rgba(0,71,255,0.3)] bg-paper p-6 rounded-xl hover:border-solid hover:border-accent hover:-translate-y-0.5 hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] transition-all cursor-pointer overflow-hidden fade-in"
           >
-            {/* Featured Star Badge */}
-            <div className="absolute top-0 right-4 flex items-center z-20">
-              {project.links.demo && (
+            <div className="absolute top-0 right-4 flex items-center gap-2 z-20">
+              {project.id === 'floework' && project.links.demo && (
                 <a 
                   href={project.links.demo} 
                   target="_blank" 
                   onClick={(e) => e.stopPropagation()}
-                  className="font-mono text-[9px] text-white bg-accent border border-solid border-accent px-3 py-1 rounded-b-sm hover:bg-accent/90 transition-all flex items-center gap-1.5 shadow-sm"
+                  className="font-mono text-[8px] text-white bg-accent border border-solid border-accent px-2 py-1 rounded-b-[2px] hover:bg-accent/90 transition-all flex items-center gap-1 shadow-sm"
                 >
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                   DEMO
                 </a>
               )}
-              <div className="font-mono text-[9px] text-accent bg-accent-light border-x border-b border-dashed border-accent px-2 py-1 ml-2">
-                ★
-              </div>
+              {project.links.github && (
+                <a 
+                  href={project.links.github} 
+                  target="_blank" 
+                  onClick={(e) => e.stopPropagation()}
+                  className="font-mono text-[8px] text-ink-muted border border-dashed border-border-strong bg-paper px-2 py-1 rounded-b-[2px] hover:border-solid hover:border-accent hover:text-accent transition-all flex items-center gap-1"
+                >
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                  GITHUB
+                </a>
+              )}
             </div>
 
             <div className="font-mono text-[9px] text-ink-faint tracking-[0.07em] mb-1 uppercase">
@@ -101,17 +108,7 @@ export default function SystemsLab({ onOpenModal }: SystemsLabProps) {
             {/* Footer */}
             <div className="flex justify-between items-center pt-4 border-t border-dashed border-border-strong">
               <div className="flex gap-4">
-                {project.links.demo && (
-                  <a 
-                    href={project.links.demo} 
-                    target="_blank" 
-                    onClick={(e) => e.stopPropagation()}
-                    className="font-mono text-[9.5px] text-ink-muted border border-dashed border-border-strong px-3 py-1 rounded-[2px] hover:border-solid hover:border-accent hover:text-accent transition-all flex items-center gap-1.5"
-                  >
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                    demo
-                  </a>
-                )}
+                {/* Footer links removed - moved to top right */}
               </div>
               <span className="font-mono text-[9px] text-accent uppercase font-medium group-hover:underline">
                 {project.statusLabel} →
