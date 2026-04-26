@@ -12,24 +12,6 @@ import DraggablePorygon from '@/components/DraggablePorygon';
 export default function Home() {
   const [activeModalId, setActiveModalId] = useState<string | null>(null);
   const [isGardenOpen, setIsGardenOpen] = useState(false);
-  const [typedName, setTypedName] = useState("");
-  const fullName = "Atharva";
-  const fullSurname = "Mendhulkar.";
-
-  useEffect(() => {
-    let current = "";
-    let i = 0;
-    const interval = setInterval(() => {
-      if (i < fullName.length) {
-        current += fullName[i];
-        setTypedName(current);
-        i++;
-      } else {
-        clearInterval(interval);
-      }
-    }, 100);
-    return () => clearInterval(interval);
-  }, []);
 
   const handleExit = () => {
     window.open("about:blank", "_self");
@@ -72,8 +54,8 @@ export default function Home() {
             <div className="flex-1">
               <div className="section-tag">[01_ME]</div>
               <div className="flex items-center gap-6 mb-6">
-                <h1 className="porygon-reset-zone font-serif text-[clamp(48px,8vw,72px)] font-normal tracking-[-0.03em] leading-[1] text-ink transition-transform hover:scale-[1.01] overflow-hidden whitespace-nowrap border-r-2 border-accent animate-pulse-slow" style={{ width: 'fit-content' }}>
-                  {typedName}<br /><em className="italic text-accent">{typedName.length >= fullName.length ? fullSurname : ""}</em>
+                <h1 className="porygon-reset-zone font-serif text-[clamp(48px,8vw,72px)] font-normal tracking-[-0.03em] leading-[1] text-ink transition-transform hover:scale-[1.01]">
+                  Atharva<br /><em className="italic text-accent">Mendhulkar.</em>
                 </h1>
                 <div className="relative flex items-center justify-center z-[500]">
                   <DraggablePorygon />

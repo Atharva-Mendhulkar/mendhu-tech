@@ -98,7 +98,7 @@ export default function BlogSection() {
     <section className="py-10 border-b border-dashed border-border-strong relative z-10">
       <div className="section-tag">[02_INTELLECTUAL_LOG]</div>
       
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-10">
         {displayPosts.map((post, i) => (
           <a 
             key={i}

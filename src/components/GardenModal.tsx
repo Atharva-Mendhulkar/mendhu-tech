@@ -480,7 +480,6 @@ export default function GardenModal({ isOpen, onClose }: GardenModalProps) {
       <div className="absolute inset-0 bg-[rgba(253,253,251,0.98)] backdrop-blur-[16px]" onClick={onClose} />
       <div 
         className="relative bg-paper border border-dashed border-border-strong flex flex-col shadow-[0_60px_120px_-30px_rgba(0,0,0,0.2)] w-full md:w-[98vw] h-[98vh] md:h-[96vh] rounded-[2px] overflow-hidden animate-modal-in"
-        style={{ backgroundImage: 'radial-gradient(rgba(0, 0, 0, 0.25) 1px, transparent 1px)', backgroundSize: '16px 16px' }}
       >
         
         {/* Header */}
@@ -527,9 +526,13 @@ export default function GardenModal({ isOpen, onClose }: GardenModalProps) {
             <div className="p-4 space-y-2">
               {Object.entries(categories).map(([category, files]) => (
                 <div key={category} className="mb-4">
-                  <button onClick={() => toggleFolder(category)} className="w-full font-mono text-[10px] text-ink-muted tracking-widest uppercase mb-1 flex items-center gap-2 hover:text-accent py-1">
+                  <button 
+                    onClick={() => toggleFolder(category)} 
+                    className={`w-full font-mono text-[10px] tracking-widest uppercase mb-1 flex items-center gap-2 px-3 py-2 rounded-[2px] transition-all
+                      ${expandedFolders[category] ? 'bg-accent-light text-accent border border-dashed border-accent/30' : 'text-ink-muted hover:bg-black/5 hover:text-ink'}`}
+                  >
                     {expandedFolders[category] ? <ChevronDown size={12} className="text-accent" /> : <ChevronRight size={12} />}
-                    <span className={expandedFolders[category] ? 'text-ink font-bold' : ''}>{category}</span>
+                    <span className={expandedFolders[category] ? 'font-bold' : ''}>{category}</span>
                   </button>
                   {expandedFolders[category] && (
                     <div className="space-y-0.5 pl-3 border-l border-dashed border-border-strong/40 ml-1.5 mt-1">
@@ -537,8 +540,13 @@ export default function GardenModal({ isOpen, onClose }: GardenModalProps) {
                         const file = researchData.files[id];
                         if (!file) return null;
                         return (
-                          <button key={id} onClick={() => { setActiveFileId(id); setIsSidebarOpen(false); }} className={`w-full text-left font-mono text-[11px] px-3 py-1.5 transition-all flex items-center gap-2 ${activeFileId === id ? 'text-accent font-bold' : 'text-ink-muted hover:text-ink'}`}>
-                            <FileText size={10} className={activeFileId === id ? 'text-accent' : 'opacity-30'} />
+                          <button 
+                            key={id} 
+                            onClick={() => { setActiveFileId(id); setIsSidebarOpen(false); }} 
+                            className={`w-full text-left font-mono text-[11px] px-3 py-2 rounded-[2px] transition-all flex items-center gap-2 mb-0.5
+                              ${activeFileId === id ? 'bg-accent text-white shadow-md' : 'text-ink-muted hover:bg-accent-light hover:text-accent'}`}
+                          >
+                            <FileText size={10} className={activeFileId === id ? 'text-white' : 'opacity-30'} />
                             <span className="truncate">{file.title}</span>
                           </button>
                         );

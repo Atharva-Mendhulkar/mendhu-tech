@@ -10,12 +10,14 @@ export default function DraggablePorygon() {
   const iconRef = useRef<HTMLDivElement>(null);
   const resetTimerRef = useRef<NodeJS.Timeout | null>(null);
   const startPos = useRef({ x: 0, y: 0 });
+  const pointerIdRef = useRef<number | null>(null);
 
   const onPointerDown = (e: React.PointerEvent) => {
     // Only left click
     if (e.button !== 0 && e.pointerType === 'mouse') return;
     
     setIsDragging(true);
+    pointerIdRef.current = e.pointerId;
     e.currentTarget.setPointerCapture(e.pointerId);
     
     startPos.current = {
@@ -76,6 +78,13 @@ export default function DraggablePorygon() {
   const handleReset = () => {
     setPosition({ x: 0, y: 0 });
     setHasMoved(false);
+    setIsDragging(false);
+    if (pointerIdRef.current !== null && iconRef.current) {
+      try {
+        iconRef.current.releasePointerCapture(pointerIdRef.current);
+      } catch (e) {}
+      pointerIdRef.current = null;
+    }
     if (resetTimerRef.current) {
       clearTimeout(resetTimerRef.current);
       resetTimerRef.current = null;
