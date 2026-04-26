@@ -8,12 +8,13 @@ interface ProjectModalProps {
   activeId: string | null;
   onClose: () => void;
   onMinimize: (id: string, title: string) => void;
+  skipBoot?: boolean;
 }
 
 type ModalState = 'idle' | 'booting' | 'detail';
 
-export default function ProjectModal({ activeId, onClose, onMinimize }: ProjectModalProps) {
-  const [modalState, setModalState] = useState<ModalState>('idle');
+export default function ProjectModal({ activeId, onClose, onMinimize, skipBoot }: ProjectModalProps) {
+  const [modalState, setModalState] = useState<ModalState>(skipBoot ? 'detail' : 'idle');
   const [bootLines, setBootLines] = useState<string[]>([]);
   const [activeFeatureIdx, setActiveFeatureIdx] = useState(0);
   const project = projects.find(p => p.id === activeId);
@@ -23,23 +24,27 @@ export default function ProjectModal({ activeId, onClose, onMinimize }: ProjectM
 
   useEffect(() => {
     if (activeId && project) {
-      setModalState('booting');
-      setBootLines([]);
-      
-      let currentLine = 0;
-      const typeNextLine = () => {
-        if (currentLine < project.terminalBoot.length) {
-          const line = project.terminalBoot[currentLine];
-          setBootLines(prev => [...prev, line]);
-          currentLine++;
-          const delay = line.startsWith('$') ? 250 : 120;
-          setTimeout(typeNextLine, delay);
-        } else {
-          setTimeout(() => setModalState('detail'), 600);
-        }
-      };
-      
-      setTimeout(typeNextLine, 200);
+      if (skipBoot) {
+        setModalState('detail');
+      } else {
+        setModalState('booting');
+        setBootLines([]);
+        
+        let currentLine = 0;
+        const typeNextLine = () => {
+          if (currentLine < project.terminalBoot.length) {
+            const line = project.terminalBoot[currentLine];
+            setBootLines(prev => [...prev, line]);
+            currentLine++;
+            const delay = line.startsWith('$') ? 250 : 120;
+            setTimeout(typeNextLine, delay);
+          } else {
+            setTimeout(() => setModalState('detail'), 600);
+          }
+        };
+        
+        setTimeout(typeNextLine, 200);
+      }
       document.body.style.overflow = 'hidden';
     } else {
       setModalState('idle');
@@ -78,7 +83,7 @@ export default function ProjectModal({ activeId, onClose, onMinimize }: ProjectM
     <div className={`fixed inset-0 z-[9999] flex items-center justify-center transition-opacity duration-400 ${activeId ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
       <div className="absolute inset-0 bg-[rgba(253,253,251,0.92)] backdrop-blur-[8px]" onClick={onClose} />
 
-      <div className={`relative w-[92vw] h-[85vh] bg-paper rounded-[2px] border border-dashed border-border-strong overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] transition-all duration-500 flex flex-col ${modalState !== 'idle' ? 'scale-100 opacity-100' : 'scale-[0.98] opacity-0'}`}>
+      <div className={`relative w-[92vw] h-[85vh] bg-paper rounded-[2px] border border-dashed border-border-strong overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] flex flex-col animate-genie origin-bottom-right ${modalState !== 'idle' ? 'scale-100 opacity-100' : 'scale-[0.98] opacity-0'}`}>
         
         {/* Background Hatching */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.03] z-0" 
@@ -108,16 +113,6 @@ export default function ProjectModal({ activeId, onClose, onMinimize }: ProjectM
           </div>
 
           <div className="flex items-center gap-2">
-            {project.links.github && (
-              <a 
-                href={project.links.github} 
-                target="_blank"
-                className="font-mono text-[10px] text-ink-muted hover:text-accent border border-dashed border-border-strong px-3 py-1.5 transition-all cursor-pointer flex items-center gap-2 hover:bg-accent-light hover:border-solid"
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
-                <span className="hidden sm:inline">CODE</span>
-              </a>
-            )}
             {project.links.demo && (
               <a 
                 href={project.links.demo} 
@@ -128,12 +123,6 @@ export default function ProjectModal({ activeId, onClose, onMinimize }: ProjectM
                 <span className="hidden sm:inline">LIVE DEMO</span>
               </a>
             )}
-            <button 
-              onClick={onClose}
-              className="font-mono text-[10px] text-ink-muted hover:text-red-600 border border-dashed border-border-strong px-3 py-1.5 transition-all cursor-pointer hover:bg-red-50 hover:border-red-200"
-            >
-              [X]
-            </button>
           </div>
         </div>
 
@@ -233,12 +222,16 @@ export default function ProjectModal({ activeId, onClose, onMinimize }: ProjectM
                 ))}
               </div>
 
-              <div className="mt-auto pt-10 border-t border-dashed border-border-strong flex gap-8">
+              <div className="mt-auto pt-10 border-t border-dashed border-border-strong">
                 {project.links.github && (
-                  <a href={project.links.github} target="_blank" className="font-mono text-[11px] text-accent hover:underline uppercase tracking-widest">github</a>
-                )}
-                {project.links.demo && (
-                  <a href={project.links.demo} target="_blank" className="font-mono text-[11px] text-accent hover:underline uppercase tracking-widest">live demo</a>
+                  <a 
+                    href={project.links.github} 
+                    target="_blank" 
+                    className="font-mono text-[11px] text-accent border border-dashed border-accent px-6 py-3 flex items-center justify-center gap-3 hover:bg-accent-light hover:border-solid transition-all uppercase tracking-widest font-medium"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                    Source Code
+                  </a>
                 )}
               </div>
             </div>

@@ -105,13 +105,13 @@ export default function BlogSection() {
             href={post.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="fade-in border border-dashed border-border-strong p-8 bg-[rgba(253,253,251,0.72)] hover:bg-[rgba(0,71,255,0.025)] hover:border-solid hover:border-accent transition-all duration-300 flex justify-between items-start group cursor-pointer relative rounded-2xl"
+            className="fade-in border border-dashed border-border-strong p-8 bg-[rgba(253,253,251,0.72)] hover:bg-[rgba(0,71,255,0.025)] hover:border-solid hover:border-accent transition-all duration-300 flex justify-between items-start group cursor-pointer relative rounded-2xl overflow-hidden"
           >
             {/* Corner Marks */}
-            <span className="absolute top-1 left-1 font-mono text-[8px] text-ink-faint">+</span>
-            <span className="absolute top-1 right-1 font-mono text-[8px] text-ink-faint">+</span>
+            <span className="absolute top-1 left-1 font-mono text-[8px] text-ink-faint opacity-30">+</span>
+            <span className="absolute top-1 right-1 font-mono text-[8px] text-ink-faint opacity-30">+</span>
             
-            <div className="flex-1">
+            <div className="flex-1 relative z-10">
               <div className="font-mono text-[9.5px] text-ink-faint mb-2 tracking-wider uppercase">
                 latest draft · blog.mendhu.tech
               </div>

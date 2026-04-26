@@ -14,10 +14,12 @@ export default function Home() {
   const [activeModalId, setActiveModalId] = useState<string | null>(null);
   const [isGardenOpen, setIsGardenOpen] = useState(false);
   const [minimizedItems, setMinimizedItems] = useState<{ id: string, title: string, type: 'garden' | 'project' }[]>([]);
+  const [restoredId, setRestoredId] = useState<string | null>(null);
 
   const handleMinimizeModal = (id: string, title: string, type: 'garden' | 'project') => {
     if (type === 'garden') setIsGardenOpen(false);
     else setActiveModalId(null);
+    setRestoredId(null);
     
     if (!minimizedItems.find(item => item.id === id)) {
       setMinimizedItems(prev => [...prev, { id, title, type }]);
@@ -25,6 +27,7 @@ export default function Home() {
   };
 
   const handleRestoreModal = (id: string, type: 'garden' | 'project') => {
+    setRestoredId(id);
     if (type === 'garden') setIsGardenOpen(true);
     else setActiveModalId(id);
     
@@ -160,8 +163,9 @@ export default function Home() {
       />
       <ProjectModal 
         activeId={activeModalId} 
-        onClose={() => setActiveModalId(null)} 
+        onClose={() => { setActiveModalId(null); setRestoredId(null); }} 
         onMinimize={(id, title) => handleMinimizeModal(id, title, 'project')}
+        skipBoot={restoredId === activeModalId}
       />
 
       {/* MINIMIZED PILLS */}
