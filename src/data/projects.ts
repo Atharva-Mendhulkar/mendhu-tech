@@ -232,7 +232,7 @@ export const projects: Project[] = [
         media: { type: "screen", label: "Live FlowBoard" }
       }
     ],
-    links: { github: "https://github.com/Atharva-Mendhulkar/floework", paper: null, demo: "https://floework.vercel.app" }
+    links: { github: "https://github.com/Atharva-Mendhulkar/floework", paper: null, demo: null}
   }
 ];
 
