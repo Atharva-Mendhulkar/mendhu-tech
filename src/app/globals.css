@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --paper: #F2F2F0;
+  --paper: #FDFDFB;
+  --paper-dark: #EBEBE9;
   --ink: #1A1A1A;
   --ink-muted: #6B6B6B;
   --ink-faint: #BDBDBD;
@@ -48,7 +49,7 @@
 }
 
 body {
-  background-color: var(--paper);
+  background-color: var(--paper-dark);
   background-image: radial-gradient(rgba(0, 0, 0, 0.25) 1px, transparent 1px);
   background-size: 16px 16px;
   color: var(--ink);
