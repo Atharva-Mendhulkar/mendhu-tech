@@ -478,7 +478,10 @@ export default function GardenModal({ isOpen, onClose }: GardenModalProps) {
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2 md:p-8">
       <div className="absolute inset-0 bg-[rgba(253,253,251,0.98)] backdrop-blur-[16px]" onClick={onClose} />
-      <div className="relative bg-paper border border-dashed border-border-strong flex flex-col shadow-[0_60px_120px_-30px_rgba(0,0,0,0.2)] w-full md:w-[98vw] h-[98vh] md:h-[96vh] rounded-[2px] overflow-hidden animate-modal-in">
+      <div 
+        className="relative bg-paper border border-dashed border-border-strong flex flex-col shadow-[0_60px_120px_-30px_rgba(0,0,0,0.2)] w-full md:w-[98vw] h-[98vh] md:h-[96vh] rounded-[2px] overflow-hidden animate-modal-in"
+        style={{ backgroundImage: 'radial-gradient(rgba(0, 0, 0, 0.25) 1px, transparent 1px)', backgroundSize: '16px 16px' }}
+      >
         
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-center gap-4 p-4 border-b border-dashed border-border-strong bg-paper relative z-30">
