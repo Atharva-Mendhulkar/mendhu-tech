@@ -66,6 +66,25 @@ export default function Home() {
         <span className="absolute bottom-2 left-2 z-20 font-mono text-[9px] text-ink-faint select-none">+</span>
         <span className="absolute bottom-2 right-2 z-20 font-mono text-[9px] text-ink-faint select-none">+</span>
 
+          {/* JSON-LD Structured Data */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "Person",
+                name: "Atharva Mendhulkar",
+                url: "https://mendhu.tech",
+                jobTitle: "Systems Engineer & AI Researcher",
+                sameAs: [
+                  "https://github.com/Atharva-Mendhulkar",
+                  "https://x.com/atharvarta",
+                ],
+                description: "Systems Engineer & AI Researcher specializing in physics-informed machine learning and kernel-level infrastructure.",
+              }),
+            }}
+          />
+
         <div className="relative z-10 px-8 lg:px-14 py-12">
           
           {/* Introduction Section with Header and Meta Links */}

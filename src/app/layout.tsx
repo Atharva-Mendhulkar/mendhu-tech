@@ -16,21 +16,42 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata = {
-  title: "Atharva Mendhulkar",
-  description: "Systems Engineer & AI Researcher",
+  title: "Atharva Mendhulkar | Systems Engineer & AI Researcher",
+  description: "Portfolio of Atharva Mendhulkar, a Systems Engineer and AI Researcher specializing in physics-informed machine learning, kernel-level infrastructure, and autonomous agentic systems.",
+  keywords: ["Atharva Mendhulkar", "Systems Engineer", "AI Researcher", "PINNs", "Machine Learning", "Kernel Development", "Agentic Systems", "Digital Garden"],
   metadataBase: new URL("https://mendhu.tech"),
+  authors: [{ name: "Atharva Mendhulkar" }],
+  creator: "Atharva Mendhulkar",
   icons: {
     icon: "/porygon.svg",
     shortcut: "/porygon.svg",
     apple: "/porygon.svg",
   },
   openGraph: {
-    title: "Atharva Mendhulkar",
-    description: "Systems Engineer & AI Researcher",
+    title: "Atharva Mendhulkar | Systems Engineer & AI Researcher",
+    description: "Exploring the intersection of physics-informed machine learning and kernel-level infrastructure.",
     url: "https://mendhu.tech",
+    siteName: "Atharva Mendhulkar Portfolio",
+    locale: "en_US",
     type: "website",
   },
-  twitter: { card: "summary_large_image" },
+  twitter: {
+    card: "summary_large_image",
+    title: "Atharva Mendhulkar | Systems Engineer & AI Researcher",
+    description: "Exploring the intersection of physics-informed machine learning and kernel-level infrastructure.",
+    creator: "@atharvarta",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 };
 
 export default function RootLayout({

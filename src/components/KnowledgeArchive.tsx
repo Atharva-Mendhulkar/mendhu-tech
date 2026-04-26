@@ -17,7 +17,7 @@ export default function KnowledgeArchive({ onOpenGarden }: { onOpenGarden: () =>
       >
         {/* Background Asset - Banyan Tree with hatching */}
         <div className="absolute right-[-40px] top-[-40px] w-[450px] h-[450px] opacity-[0.1] pointer-events-none select-none group-hover:opacity-[0.15] transition-opacity">
-          <img src="/banyan.svg" alt="" className="w-full h-full object-contain" />
+          <img src="/banyan.svg" alt="Digital Garden Banyan Tree Illustration" className="w-full h-full object-contain" />
         </div>
 
         {/* Corner Marks */}

@@ -143,7 +143,7 @@ export default function DraggablePorygon() {
       >
         <img 
           src="/porygon.svg" 
-          alt="Porygon" 
+          alt="Interactive Porygon Mascot" 
           className="w-full h-full opacity-90 pointer-events-none"
           draggable={false}
         />
