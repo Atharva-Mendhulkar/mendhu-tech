@@ -11,6 +11,7 @@ export default function DraggablePorygon() {
   const draggingRef = useRef(false);
   const startPos = useRef({ x: 0, y: 0 });
   const posRef = useRef({ x: 0, y: 0 });
+  const nameTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const el = iconRef.current;
@@ -42,12 +43,38 @@ export default function DraggablePorygon() {
       if (Math.abs(newX) > 5 || Math.abs(newY) > 5) {
         setHasMoved(true);
       }
+
+      // Check if over the name element
+      const elementsAtPoint = document.elementsFromPoint(e.clientX, e.clientY);
+      const isOverName = elementsAtPoint.some(el => 
+        el.tagName === 'H1' || el.closest('h1')
+      );
+
+      if (isOverName) {
+        // Start a timer — if still over name after 1.5s, auto-reset
+        if (!nameTimerRef.current) {
+          nameTimerRef.current = setTimeout(() => {
+            doReset();
+          }, 1500);
+        }
+      } else {
+        // Left the name zone — cancel timer
+        if (nameTimerRef.current) {
+          clearTimeout(nameTimerRef.current);
+          nameTimerRef.current = null;
+        }
+      }
     };
 
     const onUp = () => {
       if (!draggingRef.current) return;
       draggingRef.current = false;
       setIsDragging(false);
+      // Clear name timer on release
+      if (nameTimerRef.current) {
+        clearTimeout(nameTimerRef.current);
+        nameTimerRef.current = null;
+      }
     };
 
     el.addEventListener('pointerdown', onDown);
@@ -58,22 +85,27 @@ export default function DraggablePorygon() {
       el.removeEventListener('pointerdown', onDown);
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
+      if (nameTimerRef.current) clearTimeout(nameTimerRef.current);
     };
   }, []);
 
-  const handleReset = () => {
+  const doReset = () => {
     posRef.current = { x: 0, y: 0 };
     setPosition({ x: 0, y: 0 });
     setHasMoved(false);
     setIsDragging(false);
     draggingRef.current = false;
+    if (nameTimerRef.current) {
+      clearTimeout(nameTimerRef.current);
+      nameTimerRef.current = null;
+    }
   };
 
   return (
     <div className="relative flex items-center justify-center w-24 h-24">
       {hasMoved && (
         <button
-          onClick={handleReset}
+          onClick={doReset}
           className="absolute inset-0 m-auto w-10 h-10 rounded-full border border-dashed border-accent text-accent flex items-center justify-center bg-paper hover:bg-accent-light hover:border-solid transition-all animate-fade-in z-0 group"
           title="Return Porygon"
         >

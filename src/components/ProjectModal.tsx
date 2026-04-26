@@ -83,7 +83,7 @@ export default function ProjectModal({ activeId, onClose, onMinimize, skipBoot }
     <div className={`fixed inset-0 z-[9999] flex items-center justify-center transition-opacity duration-400 ${activeId ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
       <div className="absolute inset-0 bg-[rgba(253,253,251,0.92)] backdrop-blur-[8px]" onClick={onClose} />
 
-      <div className={`relative w-[92vw] h-[85vh] bg-paper rounded-[2px] border border-dashed border-border-strong overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] transition-all duration-500 flex flex-col ${modalState !== 'idle' ? 'scale-100 opacity-100' : 'scale-[0.98] opacity-0'}`}>
+      <div className={`relative w-full h-full md:w-[92vw] md:h-[85vh] bg-paper rounded-[2px] border border-dashed border-border-strong overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] transition-all duration-500 flex flex-col ${modalState !== 'idle' ? 'scale-100 opacity-100' : 'scale-[0.98] opacity-0'}`}>
         
         {/* Background Hatching */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.03] z-0" 
@@ -129,7 +129,7 @@ export default function ProjectModal({ activeId, onClose, onMinimize, skipBoot }
         <div className="flex-1 relative flex overflow-hidden">
           {/* BOOT PHASE */}
           {modalState === 'booting' && (
-            <div className="absolute inset-0 p-12 font-mono text-[13px] text-ink bg-paper z-20 flex flex-col">
+            <div className="absolute inset-0 p-6 md:p-12 font-mono text-[12px] md:text-[13px] text-ink bg-paper z-20 flex flex-col">
               <div className="max-w-2xl">
                 {bootLines.map((line, i) => (
                   <div key={i} className={`mb-2 ${line.startsWith('$') ? 'text-accent' : 'text-ink-muted'}`}>
@@ -142,10 +142,10 @@ export default function ProjectModal({ activeId, onClose, onMinimize, skipBoot }
           )}
 
           {/* DETAIL PHASE */}
-          <div className={`flex-1 flex overflow-hidden transition-opacity duration-700 ${modalState === 'detail' ? 'opacity-100' : 'opacity-0'}`}>
+          <div className={`flex-1 flex flex-col md:flex-row overflow-hidden transition-opacity duration-700 ${modalState === 'detail' ? 'opacity-100' : 'opacity-0'}`}>
             
             {/* LEFT: Content */}
-            <div ref={scrollRef} className="w-[60%] overflow-y-auto border-r border-dashed border-border-strong p-16 scroll-smooth bg-paper/50 relative z-10">
+            <div ref={scrollRef} className="flex-1 overflow-y-auto md:border-r border-dashed border-border-strong p-6 md:p-16 scroll-smooth bg-paper/50 relative z-10 md:w-[60%]">
               <div className="mb-20">
                 <div className="font-mono text-[10px] text-accent tracking-[0.15em] mb-4 uppercase font-medium">
                   {project.category} · {project.statusLabel}
@@ -181,7 +181,7 @@ export default function ProjectModal({ activeId, onClose, onMinimize, skipBoot }
             </div>
 
             {/* RIGHT: Visuals/Metrics */}
-            <div className="w-[40%] bg-paper p-16 flex flex-col gap-10 relative z-10">
+            <div className="md:w-[40%] bg-paper p-6 md:p-16 flex flex-col gap-6 md:gap-10 relative z-10 border-t md:border-t-0 border-dashed border-border-strong shrink-0">
               {/* Corner Marks */}
               <span className="absolute top-4 left-4 font-mono text-[10px] text-ink-faint">+</span>
               <span className="absolute top-4 right-4 font-mono text-[10px] text-ink-faint">+</span>

@@ -71,17 +71,22 @@ body.modal-open { overflow: hidden; }
 ::-webkit-scrollbar-thumb { background: var(--ink-faint); border-radius: 2px; }
 
 /* Custom cursor */
-.cursor-ring {
-  position: fixed; width: 18px; height: 18px;
-  border: 1px solid var(--ink); border-radius: 50%;
-  pointer-events: none; z-index: 99999;
-  transform: translate(-50%, -50%);
-  transition: width .18s, height .18s, border-color .18s, border-style .18s;
-  mix-blend-mode: multiply;
+/* Custom cursor — only on devices with a mouse (not touch) */
+.cursor-ring { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  .cursor-ring {
+    display: block;
+    position: fixed; width: 18px; height: 18px;
+    border: 1px solid var(--ink); border-radius: 50%;
+    pointer-events: none; z-index: 99999;
+    transform: translate(-50%, -50%);
+    transition: width .18s, height .18s, border-color .18s, border-style .18s;
+    mix-blend-mode: multiply;
+  }
+  .cursor-ring.on-accent { border-color: var(--accent); width: 26px; height: 26px; border-style: dashed; }
+  .cursor-ring.on-terminal { border-color: #00FF88; }
+  body, a, button, [role="button"] { cursor: none; }
 }
-.cursor-ring.on-accent { border-color: var(--accent); width: 26px; height: 26px; border-style: dashed; }
-.cursor-ring.on-terminal { border-color: #00FF88; }
-body, a, button, [role="button"] { cursor: none; }
 
 /* Fade-in animation */
 .fade-in { opacity: 0; transform: translateY(14px); animation: fadein .5s ease forwards; }
@@ -105,6 +110,9 @@ body, a, button, [role="button"] { cursor: none; }
 /* Marquee */
 @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 .animate-marquee { animation: marquee 32s linear infinite; }
+@media (max-width: 768px) {
+  .animate-marquee { animation: marquee 16s linear infinite; }
+}
 
 /* Terminal animations */
 @keyframes termfade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
