@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState } from 'react';
+import { Layout } from 'lucide-react';
 import { projects, standardProjects, categories } from '@/data/projects';
 
 interface SystemsLabProps {
-  onOpenModal: (id: string) => void;
+  onOpenModal: (id: string, showMetrics?: boolean) => void;
 }
 
 export default function SystemsLab({ onOpenModal }: SystemsLabProps) {
@@ -67,6 +68,7 @@ export default function SystemsLab({ onOpenModal }: SystemsLabProps) {
                   <a 
                     href={project.links.github} 
                     target="_blank" 
+                    rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
                     className="font-mono text-[10px] text-ink-muted hover:text-accent border border-dashed border-border-strong px-3 py-1.5 rounded-[2px] hover:bg-accent-light hover:border-solid hover:border-accent transition-all flex items-center gap-1.5"
                   >
@@ -74,6 +76,16 @@ export default function SystemsLab({ onOpenModal }: SystemsLabProps) {
                     GITHUB
                   </a>
                 )}
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onOpenModal(project.id, true);
+                  }}
+                  className="font-mono text-[10px] text-accent border border-dashed border-accent px-3 py-1.5 rounded-[2px] hover:bg-accent-light hover:border-solid transition-all flex items-center gap-1.5"
+                >
+                  <Layout size={11} />
+                  ANALYSIS
+                </button>
               </div>
             </div>
             

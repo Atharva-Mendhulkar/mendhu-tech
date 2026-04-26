@@ -479,14 +479,23 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: GardenModal
   };
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => setIsMounted(true), 10);
+    } else {
+      setIsMounted(false);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2 md:p-8">
+    <div className={`fixed inset-0 z-[9999] flex items-center justify-center p-2 md:p-8 transition-opacity duration-500 ${isMounted ? 'opacity-100' : 'opacity-0'}`}>
       <div className="absolute inset-0 bg-[rgba(253,253,251,0.98)] backdrop-blur-[16px]" onClick={onClose} />
       <div 
-        className="relative bg-paper border border-dashed border-border-strong flex flex-col shadow-[0_60px_120px_-30px_rgba(0,0,0,0.2)] w-full md:w-[98vw] h-[98vh] md:h-[96vh] rounded-[2px] overflow-hidden transition-all duration-500"
+        className="relative bg-paper border border-dashed border-border-strong flex flex-col shadow-[0_60px_120px_-30px_rgba(0,0,0,0.2)] w-full md:w-[98vw] h-[98vh] md:h-[96vh] rounded-[2px] overflow-hidden transition-all duration-500 animate-modal-enter"
       >
         
         {/* Header */}

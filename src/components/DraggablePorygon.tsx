@@ -7,6 +7,7 @@ export default function DraggablePorygon() {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [hasMoved, setHasMoved] = useState(false);
+  const [hasLeftThreshold, setHasLeftThreshold] = useState(false);
   const iconRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
   const startPos = useRef({ x: 0, y: 0 });
@@ -24,6 +25,7 @@ export default function DraggablePorygon() {
 
       draggingRef.current = true;
       setIsDragging(true);
+      document.body.classList.add('porygon-dragging');
 
       startPos.current = {
         x: e.clientX - posRef.current.x,
@@ -37,6 +39,18 @@ export default function DraggablePorygon() {
       const newX = e.clientX - startPos.current.x;
       const newY = e.clientY - startPos.current.y;
 
+      // Magnetic snap: if close to origin AND has left threshold once, snap and reset
+      const distToOrigin = Math.sqrt(newX * newX + newY * newY);
+      
+      if (distToOrigin > 80) {
+        setHasLeftThreshold(true);
+      }
+
+      if (distToOrigin < 50 && hasLeftThreshold) {
+        doReset();
+        return;
+      }
+
       posRef.current = { x: newX, y: newY };
       setPosition({ x: newX, y: newY });
 
@@ -44,21 +58,19 @@ export default function DraggablePorygon() {
         setHasMoved(true);
       }
 
-      // Check if over the name element
+      // Name-over detection: auto-reset after 2.5s
       const elementsAtPoint = document.elementsFromPoint(e.clientX, e.clientY);
-      const isOverName = elementsAtPoint.some(el => 
+      const isOverName = elementsAtPoint.some(el =>
         el.tagName === 'H1' || el.closest('h1')
       );
 
       if (isOverName) {
-        // Start a timer — if still over name after 1.5s, auto-reset
         if (!nameTimerRef.current) {
           nameTimerRef.current = setTimeout(() => {
             doReset();
-          }, 1500);
+          }, 2500);
         }
       } else {
-        // Left the name zone — cancel timer
         if (nameTimerRef.current) {
           clearTimeout(nameTimerRef.current);
           nameTimerRef.current = null;
@@ -70,7 +82,7 @@ export default function DraggablePorygon() {
       if (!draggingRef.current) return;
       draggingRef.current = false;
       setIsDragging(false);
-      // Clear name timer on release
+      document.body.classList.remove('porygon-dragging');
       if (nameTimerRef.current) {
         clearTimeout(nameTimerRef.current);
         nameTimerRef.current = null;
@@ -85,16 +97,19 @@ export default function DraggablePorygon() {
       el.removeEventListener('pointerdown', onDown);
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
+      document.body.classList.remove('porygon-dragging');
       if (nameTimerRef.current) clearTimeout(nameTimerRef.current);
     };
-  }, []);
+  }, [hasMoved, hasLeftThreshold]);
 
   const doReset = () => {
     posRef.current = { x: 0, y: 0 };
     setPosition({ x: 0, y: 0 });
     setHasMoved(false);
+    setHasLeftThreshold(false);
     setIsDragging(false);
     draggingRef.current = false;
+    document.body.classList.remove('porygon-dragging');
     if (nameTimerRef.current) {
       clearTimeout(nameTimerRef.current);
       nameTimerRef.current = null;
@@ -121,9 +136,9 @@ export default function DraggablePorygon() {
           touchAction: 'none'
         }}
         className={`
-          w-24 h-24 relative select-none cursor-grab active:cursor-grabbing 
+          w-24 h-24 relative select-none
           flex items-center justify-center pointer-events-auto
-          ${isDragging ? 'z-[99999] scale-110 drop-shadow-2xl' : 'z-[1000] hover:scale-105'}
+          ${isDragging ? 'z-[99999] scale-110 drop-shadow-2xl' : 'z-[1000] hover:scale-105 cursor-grab'}
         `}
       >
         <img 

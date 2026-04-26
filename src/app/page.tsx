@@ -12,9 +12,15 @@ import DraggablePorygon from '@/components/DraggablePorygon';
 
 export default function Home() {
   const [activeModalId, setActiveModalId] = useState<string | null>(null);
+  const [initialShowMetrics, setInitialShowMetrics] = useState(false);
   const [isGardenOpen, setIsGardenOpen] = useState(false);
-  const [minimizedItems, setMinimizedItems] = useState<{ id: string, title: string, type: 'garden' | 'project' }[]>([]);
+  const [minimizedItems, setMinimizedItems] = useState<{ id: string, title: string, type: 'garden' | 'project', initialShowMetrics?: boolean }[]>([]);
   const [restoredId, setRestoredId] = useState<string | null>(null);
+
+  const handleOpenProject = (id: string, showMetrics: boolean = false) => {
+    setInitialShowMetrics(showMetrics);
+    setActiveModalId(id);
+  };
 
   const handleMinimizeModal = (id: string, title: string, type: 'garden' | 'project') => {
     if (type === 'garden') setIsGardenOpen(false);
@@ -22,14 +28,18 @@ export default function Home() {
     setRestoredId(null);
     
     if (!minimizedItems.find(item => item.id === id)) {
-      setMinimizedItems(prev => [...prev, { id, title, type }]);
+      setMinimizedItems(prev => [...prev, { id, title, type, initialShowMetrics: type === 'project' ? initialShowMetrics : false }]);
     }
   };
 
   const handleRestoreModal = (id: string, type: 'garden' | 'project') => {
     setRestoredId(id);
     if (type === 'garden') setIsGardenOpen(true);
-    else setActiveModalId(id);
+    else {
+      const item = minimizedItems.find(i => i.id === id);
+      setInitialShowMetrics(item?.initialShowMetrics || false);
+      setActiveModalId(id);
+    }
     
     setMinimizedItems(prev => prev.filter(item => item.id !== id));
   };
@@ -77,7 +87,7 @@ export default function Home() {
           {/* Introduction Section with Header and Meta Links */}
           <section className="fade-in flex flex-col md:flex-row justify-between items-center gap-8 md:gap-12 mb-8 pb-8 border-b border-dashed border-border-strong relative z-[200]">
             <div className="flex-1">
-              <div className="section-tag">[01_ME]</div>
+              <div className="section-tag">[01_ABOUT_ME]</div>
               <div className="flex items-center gap-6 mb-6">
                 <h1 className="font-serif text-[clamp(48px,8vw,72px)] font-normal tracking-[-0.03em] leading-[1] text-ink transition-transform hover:scale-[1.01]">
                   Atharva<br /><em className="italic text-accent">Mendhulkar.</em>
@@ -133,7 +143,7 @@ export default function Home() {
           <BlogSection />
 
           {/* ─── PHASE 5: LAB ─── */}
-          <SystemsLab onOpenModal={setActiveModalId} />
+          <SystemsLab onOpenModal={handleOpenProject} />
 
           {/* ─── PHASE 7: KNOWLEDGE ─── */}
           <KnowledgeArchive onOpenGarden={() => setIsGardenOpen(true)} />
@@ -163,9 +173,10 @@ export default function Home() {
       />
       <ProjectModal 
         activeId={activeModalId} 
-        onClose={() => { setActiveModalId(null); setRestoredId(null); }} 
+        onClose={() => setActiveModalId(null)}
         onMinimize={(id, title) => handleMinimizeModal(id, title, 'project')}
         skipBoot={restoredId === activeModalId}
+        initialShowMetrics={initialShowMetrics}
       />
 
       {/* MINIMIZED PILLS */}

@@ -80,13 +80,30 @@ body.modal-open { overflow: hidden; }
     border: 1px solid var(--ink); border-radius: 50%;
     pointer-events: none; z-index: 99999;
     transform: translate(-50%, -50%);
-    transition: width .18s, height .18s, border-color .18s, border-style .18s;
+    transition: width .18s, height .18s, border-color .18s, border-style .18s, background-color .18s;
     mix-blend-mode: multiply;
   }
   .cursor-ring.on-accent { border-color: var(--accent); width: 26px; height: 26px; border-style: dashed; }
   .cursor-ring.on-terminal { border-color: #00FF88; }
   body, a, button, [role="button"] { cursor: none; }
+
+  /* Porygon drag state — cursor becomes expanded blue ring */
+  body.porygon-dragging .cursor-ring {
+    width: 36px; height: 36px;
+    border-color: var(--accent);
+    border-width: 2px;
+    border-style: dashed;
+    background-color: rgba(0, 71, 255, 0.06);
+  }
+  body.porygon-dragging, body.porygon-dragging * { cursor: none !important; }
 }
+
+/* Smooth modal entrance */
+@keyframes modal-enter {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.animate-modal-enter { animation: modal-enter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
 /* Fade-in animation */
 .fade-in { opacity: 0; transform: translateY(14px); animation: fadein .5s ease forwards; }
