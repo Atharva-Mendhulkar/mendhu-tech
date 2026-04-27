@@ -92,7 +92,7 @@ export default function Home() {
             <div className="flex-1">
               <div className="section-tag">[01_ABOUT_ME]</div>
               <div className="flex items-center gap-6 mb-6">
-                <h1 className="font-serif text-[clamp(48px,8vw,72px)] font-normal tracking-[-0.03em] leading-[1] text-ink transition-transform hover:scale-[1.01]">
+                <h1 data-name-target className="font-serif text-[clamp(48px,8vw,72px)] font-normal tracking-[-0.03em] leading-[1] text-ink transition-transform hover:scale-[1.01]">
                   Atharva<br /><em className="italic text-accent">Mendhulkar.</em>
                 </h1>
                 <div className="relative flex items-center justify-center z-[500]">
@@ -146,13 +146,19 @@ export default function Home() {
           </section>
 
           {/* ─── PHASE 4: BLOG ─── */}
-          <BlogSection />
+          <div data-logs-target>
+            <BlogSection />
+          </div>
 
           {/* ─── PHASE 5: LAB ─── */}
-          <SystemsLab onOpenModal={setActiveModalId} />
+          <div data-projects-target>
+            <SystemsLab onOpenModal={setActiveModalId} />
+          </div>
 
           {/* ─── PHASE 7: KNOWLEDGE ─── */}
-          <KnowledgeArchive onOpenGarden={() => setIsGardenOpen(true)} />
+          <div data-garden-target>
+            <KnowledgeArchive onOpenGarden={() => setIsGardenOpen(true)} />
+          </div>
 
           {/* ─── FOOTER ─── */}
           <footer className="pt-20 pb-8 flex justify-between items-center border-t border-dashed border-border-strong mt-12">
