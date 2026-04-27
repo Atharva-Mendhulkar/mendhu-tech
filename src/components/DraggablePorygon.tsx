@@ -51,28 +51,73 @@ export default function DraggablePorygon() {
   const iconRef      = useRef<HTMLDivElement>(null);
   const draggingRef  = useRef(false);
   const startPos     = useRef({ x: 0, y: 0 });
+  const clickOffset  = useRef({ x: 0, y: 0 });
   const posRef       = useRef({ x: 0, y: 0 });
   const snapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
-  // dialogue refs (memory)
+  // dialogue refs (memory & control)
   const lastMessageRef = useRef<string | null>(null);
   const lastZoneRef    = useRef<string | null>(null);
   const cooldownRef    = useRef(false);
+  const isRareRef      = useRef(false);
   const messageTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
+  // zone stability refs
+  const zoneStabilityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const zoneLockRef           = useRef(false);
+  const pendingZoneRef        = useRef<string | null>(null);
+
+  // ── zone detection ───────────────────────────────────────────────────────
+
+  const getZoneRects = useCallback(() => {
+    const zones = ['name', 'logs', 'projects', 'garden'];
+    const rects: Record<string, DOMRect> = {};
+    zones.forEach(z => {
+      const el = document.querySelector(`[data-${z}-target]`);
+      if (el) rects[z] = el.getBoundingClientRect();
+    });
+    return rects;
+  }, []);
+
+  const detectZoneByRect = useCallback((clientX: number, clientY: number) => {
+    const rects = getZoneRects();
+    for (const [zone, rect] of Object.entries(rects)) {
+      if (
+        clientX >= rect.left && 
+        clientX <= rect.right && 
+        clientY >= rect.top && 
+        clientY <= rect.bottom
+      ) {
+        return zone;
+      }
+    }
+    return null;
+  }, [getZoneRects]);
 
   // ── dialogue logic ───────────────────────────────────────────────────────
 
-  const triggerDialogue = useCallback((type: 'progression' | 'zone' | 'snap', zoneKey?: keyof typeof DIALOGUE_POOLS.zones) => {
+  const triggerDialogue = useCallback((type: 'first' | 'progression' | 'zone' | 'snap', zoneKey?: keyof typeof DIALOGUE_POOLS.zones) => {
     if (cooldownRef.current) return;
+    
+    // Priority check: Lower priority must not override higher if a message is active
+    // 1. first, 2. progression (drag start), 3. zone, 4. snap
+    if (message) {
+       const priorities = { 'first': 4, 'progression': 3, 'zone': 2, 'snap': 1 };
+       // This is a simplified priority — basically if something is showing, don't interrupt
+       // unless it's a higher priority event. But since we have a hard cooldown, we just return.
+       return;
+    }
 
     let pool: string[] = [];
+    let wasRare = false;
     
-    // Step 1: Rare override (7% chance)
-    if (Math.random() < 0.07) {
+    // Step 1: Rare override (10% chance, no back-to-back)
+    if (Math.random() < 0.10 && !isRareRef.current) {
       pool = DIALOGUE_POOLS.rare;
+      wasRare = true;
     } else {
       // Step 2: Normal selection
-      if (!hasInteracted) {
+      if (type === 'first') {
         pool = DIALOGUE_POOLS.first;
       } else if (type === 'progression') {
         if (interactionCount < 3) pool = DIALOGUE_POOLS.mood.neutral;
@@ -92,22 +137,18 @@ export default function DraggablePorygon() {
     const finalPool = filteredPool.length > 0 ? filteredPool : pool;
     const selected = finalPool[Math.floor(Math.random() * finalPool.length)];
 
-    // Validation & Commit
     if (selected === lastMessageRef.current) return;
 
     // First interaction special handling
-    if (!hasInteracted) {
+    if (type === 'first' && !hasInteracted) {
       setMessage("Scanning...");
       cooldownRef.current = true;
       setTimeout(() => {
         setMessage(selected);
         lastMessageRef.current = selected;
         setHasInteracted(true);
-        // Start cooldown after the real message appears
-        setTimeout(() => {
-          cooldownRef.current = false;
-        }, 1000);
-        // Disappear after 1.5s
+        isRareRef.current = wasRare;
+        setTimeout(() => { cooldownRef.current = false; }, 1500);
         if (messageTimerRef.current) clearTimeout(messageTimerRef.current);
         messageTimerRef.current = setTimeout(() => setMessage(null), 1500);
       }, 800);
@@ -116,29 +157,15 @@ export default function DraggablePorygon() {
 
     setMessage(selected);
     lastMessageRef.current = selected;
+    isRareRef.current = wasRare;
     cooldownRef.current = true;
 
-    // Cooldown & Cleanup
     if (messageTimerRef.current) clearTimeout(messageTimerRef.current);
     messageTimerRef.current = setTimeout(() => {
       setMessage(null);
-      // Wait a bit more before allowing new messages to prevent jitter
-      setTimeout(() => {
-        cooldownRef.current = false;
-      }, 500);
+      setTimeout(() => { cooldownRef.current = false; }, 1000);
     }, 1500);
-  }, [hasInteracted, interactionCount]);
-
-  const detectZone = (clientX: number, clientY: number) => {
-    const els = document.elementsFromPoint(clientX, clientY);
-    for (const el of els) {
-      if (el.hasAttribute('data-name-target')) return 'name';
-      if (el.closest('[data-logs-target]')) return 'logs';
-      if (el.closest('[data-projects-target]')) return 'projects';
-      if (el.closest('[data-garden-target]')) return 'garden';
-    }
-    return null;
-  };
+  }, [hasInteracted, interactionCount, message]);
 
   // ── helpers ──────────────────────────────────────────────────────────────
 
@@ -154,6 +181,7 @@ export default function DraggablePorygon() {
     draggingRef.current = false;
     document.body.classList.remove('porygon-dragging');
     lastZoneRef.current = null;
+    pendingZoneRef.current = null;
 
     setTimeout(() => setPhase('idle'), 520);
   }, []);
@@ -166,6 +194,13 @@ export default function DraggablePorygon() {
 
     const onDown = (e: PointerEvent) => {
       if (e.button !== 0) return;
+      
+      const rect = el.getBoundingClientRect();
+      clickOffset.current = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+
       if (phase === 'snapped') {
         if (snapTimerRef.current) {
           clearTimeout(snapTimerRef.current);
@@ -176,17 +211,16 @@ export default function DraggablePorygon() {
       e.preventDefault();
       e.stopPropagation();
 
-      if (snapTimerRef.current) {
-        clearTimeout(snapTimerRef.current);
-        snapTimerRef.current = null;
-      }
-
       draggingRef.current = true;
       setPhase('dragging');
       document.body.classList.add('porygon-dragging');
       
-      setInteractionCount(prev => prev + 1);
-      triggerDialogue('progression');
+      setInteractionCount(prev => {
+        const next = prev + 1;
+        if (!hasInteracted) triggerDialogue('first');
+        else triggerDialogue('progression');
+        return next;
+      });
 
       startPos.current = {
         x: e.clientX - posRef.current.x,
@@ -211,13 +245,27 @@ export default function DraggablePorygon() {
       posRef.current = { x: newX, y: newY };
       setPosition({ x: newX, y: newY });
 
-      // Zone detection
-      const zone = detectZone(e.clientX, e.clientY);
-      if (zone && zone !== lastZoneRef.current) {
-        lastZoneRef.current = zone;
-        triggerDialogue('zone', zone as keyof typeof DIALOGUE_POOLS.zones);
-      } else if (!zone) {
-        lastZoneRef.current = null;
+      // Zone detection with stability threshold
+      const zone = detectZoneByRect(e.clientX, e.clientY);
+      
+      if (zone !== pendingZoneRef.current) {
+        pendingZoneRef.current = zone;
+        if (zoneStabilityTimerRef.current) clearTimeout(zoneStabilityTimerRef.current);
+        
+        if (zone && zone !== lastZoneRef.current && !zoneLockRef.current) {
+          zoneStabilityTimerRef.current = setTimeout(() => {
+            if (pendingZoneRef.current === zone) {
+              lastZoneRef.current = zone;
+              triggerDialogue('zone', zone as keyof typeof DIALOGUE_POOLS.zones);
+              
+              // Zone Lock
+              zoneLockRef.current = true;
+              setTimeout(() => { zoneLockRef.current = false; }, 500);
+            }
+          }, 100);
+        } else if (!zone) {
+          lastZoneRef.current = null;
+        }
       }
     };
 
@@ -226,8 +274,9 @@ export default function DraggablePorygon() {
 
       draggingRef.current = false;
       document.body.classList.remove('porygon-dragging');
+      pendingZoneRef.current = null;
 
-      const zone = detectZone(e.clientX, e.clientY);
+      const zone = detectZoneByRect(e.clientX, e.clientY);
       if (zone === 'name') {
         setPhase('snapped');
         triggerDialogue('snap');
@@ -249,7 +298,7 @@ export default function DraggablePorygon() {
       window.removeEventListener('pointerup', onUp);
       document.body.classList.remove('porygon-dragging');
     };
-  }, [phase, hasLeftThreshold, triggerDialogue, doReset]);
+  }, [phase, hasLeftThreshold, triggerDialogue, doReset, detectZoneByRect, hasInteracted]);
 
   // ── derived ───────────────────────────────────────────────────────────────
 
@@ -295,8 +344,8 @@ export default function DraggablePorygon() {
         }}
         className={[
           'w-24 h-24 relative select-none flex items-center justify-center pointer-events-auto',
-          isDragging  ? 'z-[99999] scale-110 drop-shadow-2xl cursor-grabbing' : '',
-          isSnapped   ? 'z-[99999] scale-125 cursor-grab' : '',
+          isDragging  ? 'z-[99999] drop-shadow-2xl cursor-grabbing' : '',
+          isSnapped   ? 'z-[99999] cursor-grab' : '',
           isReturning ? 'z-[99999] opacity-75' : '',
           phase === 'idle' ? 'z-[1000] hover:scale-105 cursor-grab' : '',
         ].join(' ')}
@@ -324,12 +373,12 @@ export default function DraggablePorygon() {
 
         {/* Spinning dashed ring while dragging */}
         {isDragging && (
-          <div className="absolute inset-0 rounded-full border-2 border-dashed border-accent/30 animate-spin-slow scale-125 pointer-events-none" />
+          <div className="absolute inset-0 rounded-full border-2 border-dashed border-accent/30 animate-spin-slow scale-110 pointer-events-none" />
         )}
 
         {/* Pulsing ring while snapped */}
         {isSnapped && (
-          <div className="absolute inset-0 rounded-full border-2 border-dashed border-accent scale-150 animate-ping pointer-events-none opacity-60" />
+          <div className="absolute inset-0 rounded-full border-2 border-dashed border-accent scale-110 animate-ping pointer-events-none opacity-60" />
         )}
       </div>
     </div>
