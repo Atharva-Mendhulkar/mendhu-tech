@@ -21,6 +21,13 @@ A metadata-driven technical blog designed for deep-dives into kernel-level monit
 - **High-Fidelity Animations**: Features a macOS-inspired **Genie effect** for modal transitions and an ultra-fast staggered reveal system.
 - **Persistent Interaction**: Includes a 'Banyan' minimization dock and a custom pointer-captured draggable brand icon with magnetic snapping and stable global movement tracking.
 
+### 4. Interactive Dialogue System
+The portfolio features a state-driven interaction engine via the Porygon mascot.
+- **Anchored Dragging**: Pixel-accurate dragging using click-offset math to ensure the cursor stays attached to the grab point.
+- **Contextual Dialogue**: A priority-based messaging system that reacts to user interactions (drag starts, snaps, recalls) and site zones.
+- **Zone Awareness**: Robust spatial detection using bounding-box intersection thresholds (100ms dwell time) and entry locks (500ms) to prevent flickering and noise.
+- **Evolving State**: Interaction memory that progresses the mascot's persona from neutral to curious based on engagement levels.
+
 ## Technical Architecture
 
 - **Framework**: Next.js 15 (App Router)

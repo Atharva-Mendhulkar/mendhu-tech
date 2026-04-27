@@ -5,188 +5,159 @@ import { RefreshCw } from 'lucide-react';
 
 type Phase = 'idle' | 'dragging' | 'snapped' | 'returning';
 
-// ── dialogue constants ───────────────────────────────────────────────────
+// ── dialogue ─────────────────────────────────────────────────────────────────
+// Kept intentionally sparse — silence > noise.
 
-const DIALOGUE_POOLS = {
+const DIALOGUE = {
   first: [
-    "Oh. You’re real.",
+    "Oh. You're real.",
     "User detected.",
-    "Interaction… unexpected.",
-    "You activated me.",
-    "You found me.",
     "Hello, operator.",
+    "You found me.",
     "I was waiting.",
-    "You weren’t supposed to find this…"
   ],
-  mood: {
-    neutral: ["User detected.", "Input received."],
-    curious: ["You again.", "Exploring…", "Still here.", "Interesting."],
-    witty: ["I see a pattern.", "Consistent behavior.", "You like this.", "Predictable."]
-  },
+  progression: [
+    ["Input received.", "Processing…"],       // interactions 1–3
+    ["You again.", "Still here.", "Hmm."],    // 4–7
+    ["Predictable.", "I see a pattern."],     // 8+
+  ],
   zones: {
-    name: ["Creator… probably.", "Main character?"],
-    logs: ["Brain dump.", "Thinking… loudly.", "Mind in progress."],
-    projects: ["Built, not talked.", "Breakable systems.", "It runs. Mostly."],
-    garden: ["Touch grass. Mentally.", "Messy on purpose.", "Connections everywhere."]
+    name:     ["Creator… probably.", "Main character?"],
+    logs:     ["Brain dump.", "Thinking… loudly."],
+    projects: ["Built, not talked.", "It runs. Mostly."],
+    garden:   ["Touch grass. Mentally.", "Messy on purpose."],
   },
-  rare: [
-    "Beep. Interesting.",
-    "Scan complete… maybe.",
-    "Suspiciously smart.",
-    "Data smells good.",
-    "Worth inspecting."
-  ]
+  rare:   ["Beep. Interesting.", "Data smells good.", "Worth inspecting.", "Suspiciously smart."],
+  snap:   ["Connection established", "Linked."],
+  recall: ["LEAVE ME ALONE!", "Ahhhhhhhhhh.....", "Back to base.", "Fine. Coming back."],
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function DraggablePorygon() {
-  const [position, setPosition]                 = useState({ x: 0, y: 0 });
-  const [phase, setPhase]                       = useState<Phase>('idle');
-  const [hasLeftThreshold, setHasLeftThreshold] = useState(false);
-  
-  // dialogue state
-  const [message, setMessage]                   = useState<string | null>(null);
-  const [interactionCount, setInteractionCount] = useState(0);
-  const [hasInteracted, setHasInteracted]       = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [phase, setPhase]       = useState<Phase>('idle');
+  const [message, setMessage]   = useState<string | null>(null);
 
-  const iconRef      = useRef<HTMLDivElement>(null);
-  const draggingRef  = useRef(false);
-  const startPos     = useRef({ x: 0, y: 0 });
-  const clickOffset  = useRef({ x: 0, y: 0 });
-  const posRef       = useRef({ x: 0, y: 0 });
-  const snapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  
-  // dialogue refs (memory & control)
-  const lastMessageRef = useRef<string | null>(null);
-  const lastZoneRef    = useRef<string | null>(null);
-  const cooldownRef    = useRef(false);
-  const isRareRef      = useRef(false);
+  // ── element refs ──────────────────────────────────────────────────────────
+  const iconRef = useRef<HTMLDivElement>(null);
+
+  // ── drag refs ─────────────────────────────────────────────────────────────
+  const draggingRef   = useRef(false);
+  const posRef        = useRef({ x: 0, y: 0 });
+  // naturalPos = viewport position of the element with no transform applied.
+  // Computed once on pointerdown so moves are pure offset math.
+  const naturalPosRef = useRef({ x: 0, y: 0 });
+  // dragAnchor = cursor offset within the element at grab time.
+  const dragAnchorRef = useRef({ x: 0, y: 0 });
+  // hasLeftThreshold kept as ref so the single-mount effect never goes stale.
+  const hasLeftThresholdRef = useRef(false);
+
+  // ── timer refs ────────────────────────────────────────────────────────────
+  const snapTimerRef    = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messageTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  
-  // zone stability refs
-  const zoneStabilityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const zoneLockRef           = useRef(false);
-  const pendingZoneRef        = useRef<string | null>(null);
 
-  // ── zone detection ───────────────────────────────────────────────────────
+  // ── dialogue refs (all mutation via ref → no effect re-run needed) ────────
+  const cooldownRef      = useRef(false);
+  const lastMessageRef   = useRef<string | null>(null);
+  const lastRareRef      = useRef(false);
+  const interactionRef   = useRef(0);
+  const hasInteractedRef = useRef(false);
 
-  const getZoneRects = useCallback(() => {
-    const zones = ['name', 'logs', 'projects', 'garden'];
-    const rects: Record<string, DOMRect> = {};
-    zones.forEach(z => {
-      const el = document.querySelector(`[data-${z}-target]`);
-      if (el) rects[z] = el.getBoundingClientRect();
-    });
-    return rects;
-  }, []);
+  // ── zone refs ─────────────────────────────────────────────────────────────
+  const lastZoneRef    = useRef<string | null>(null);
+  const pendingZoneRef = useRef<string | null>(null);
+  const zoneTimerRef   = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const zoneLockRef    = useRef(false);
 
-  const detectZoneByRect = useCallback((clientX: number, clientY: number) => {
-    const rects = getZoneRects();
-    for (const [zone, rect] of Object.entries(rects)) {
-      if (
-        clientX >= rect.left && 
-        clientX <= rect.right && 
-        clientY >= rect.top && 
-        clientY <= rect.bottom
-      ) {
+  // ── zone detection (pure rect check — no DOM stacking / z-index noise) ───
+
+  const detectZone = (clientX: number, clientY: number): string | null => {
+    for (const zone of ['name', 'logs', 'projects', 'garden']) {
+      const el = document.querySelector(`[data-${zone}-target]`);
+      if (!el) continue;
+      const r = el.getBoundingClientRect();
+      if (clientX >= r.left && clientX <= r.right && clientY >= r.top && clientY <= r.bottom) {
         return zone;
       }
     }
     return null;
-  }, [getZoneRects]);
+  };
 
-  // ── dialogue logic ───────────────────────────────────────────────────────
+  // ── dialogue ──────────────────────────────────────────────────────────────
 
-  const triggerDialogue = useCallback((type: 'first' | 'progression' | 'zone' | 'snap', zoneKey?: keyof typeof DIALOGUE_POOLS.zones) => {
-    if (cooldownRef.current) return;
-    
-    // Priority check: Lower priority must not override higher if a message is active
-    // 1. first, 2. progression (drag start), 3. zone, 4. snap
-    if (message) {
-       const priorities = { 'first': 4, 'progression': 3, 'zone': 2, 'snap': 1 };
-       // This is a simplified priority — basically if something is showing, don't interrupt
-       // unless it's a higher priority event. But since we have a hard cooldown, we just return.
-       return;
-    }
-
-    let pool: string[] = [];
-    let wasRare = false;
-    
-    // Step 1: Rare override (10% chance, no back-to-back)
-    if (Math.random() < 0.10 && !isRareRef.current) {
-      pool = DIALOGUE_POOLS.rare;
-      wasRare = true;
-    } else {
-      // Step 2: Normal selection
-      if (type === 'first') {
-        pool = DIALOGUE_POOLS.first;
-      } else if (type === 'progression') {
-        if (interactionCount < 3) pool = DIALOGUE_POOLS.mood.neutral;
-        else if (interactionCount < 6) pool = DIALOGUE_POOLS.mood.curious;
-        else pool = DIALOGUE_POOLS.mood.witty;
-      } else if (type === 'zone' && zoneKey) {
-        pool = DIALOGUE_POOLS.zones[zoneKey];
-      } else if (type === 'snap') {
-        pool = ["✦ Connection established"];
-      }
-    }
-
-    if (pool.length === 0) return;
-
-    // Selection rules
-    const filteredPool = pool.filter(msg => msg !== lastMessageRef.current);
-    const finalPool = filteredPool.length > 0 ? filteredPool : pool;
-    const selected = finalPool[Math.floor(Math.random() * finalPool.length)];
-
-    if (selected === lastMessageRef.current) return;
-
-    // First interaction special handling
-    if (type === 'first' && !hasInteracted) {
-      setMessage("Scanning...");
-      cooldownRef.current = true;
-      setTimeout(() => {
-        setMessage(selected);
-        lastMessageRef.current = selected;
-        setHasInteracted(true);
-        isRareRef.current = wasRare;
-        setTimeout(() => { cooldownRef.current = false; }, 1500);
-        if (messageTimerRef.current) clearTimeout(messageTimerRef.current);
-        messageTimerRef.current = setTimeout(() => setMessage(null), 1500);
-      }, 800);
-      return;
-    }
-
-    setMessage(selected);
-    lastMessageRef.current = selected;
-    isRareRef.current = wasRare;
-    cooldownRef.current = true;
-
+  /** Display a message and start auto-dismiss + post-dismiss cooldown. */
+  const showMessage = (text: string, duration = 1700) => {
     if (messageTimerRef.current) clearTimeout(messageTimerRef.current);
+    setMessage(text);
+    lastMessageRef.current = text;
     messageTimerRef.current = setTimeout(() => {
       setMessage(null);
-      setTimeout(() => { cooldownRef.current = false; }, 1000);
-    }, 1500);
-  }, [hasInteracted, interactionCount, message]);
+      setTimeout(() => { cooldownRef.current = false; }, 600);
+    }, duration);
+  };
 
-  // ── helpers ──────────────────────────────────────────────────────────────
+  /**
+   * Fire a dialogue line if cooldown allows.
+   * Cooldown acts as the priority gate: once anything is showing nothing else
+   * can interrupt, so call order (first > drag > zone > snap) is enforced by
+   * the caller.
+   */
+  const triggerDialogue = (
+    type: 'first' | 'drag' | 'zone' | 'snap' | 'recall',
+    zoneKey?: keyof typeof DIALOGUE.zones,
+  ) => {
+    if (cooldownRef.current) return;
+    cooldownRef.current = true;
+
+    let pool: string[] = [];
+
+    // Rare override — 8 %, never back-to-back (skip for recall, keep it grounded)
+    if (type !== 'recall' && !lastRareRef.current && Math.random() < 0.08) {
+      pool = DIALOGUE.rare;
+      lastRareRef.current = true;
+    } else {
+      lastRareRef.current = false;
+      const n = interactionRef.current;
+      if      (type === 'first')  pool = DIALOGUE.first;
+      else if (type === 'drag')   pool = DIALOGUE.progression[n < 4 ? 0 : n < 8 ? 1 : 2];
+      else if (type === 'zone' && zoneKey) pool = DIALOGUE.zones[zoneKey];
+      else if (type === 'snap')   pool = DIALOGUE.snap;
+      else if (type === 'recall') pool = DIALOGUE.recall;
+    }
+
+    if (!pool.length) { cooldownRef.current = false; return; }
+
+    const filtered = pool.filter(m => m !== lastMessageRef.current);
+    const src      = filtered.length ? filtered : pool;
+    const selected = src[Math.floor(Math.random() * src.length)];
+
+    if (type === 'first') {
+      // Two-phase: scanning → real line
+      showMessage('Scanning…', 750);
+      setTimeout(() => showMessage(selected, 1900), 950);
+    } else {
+      showMessage(selected, 1600);
+    }
+  };
+
+  // ── reset ─────────────────────────────────────────────────────────────────
 
   const doReset = useCallback(() => {
-    if (snapTimerRef.current) {
-      clearTimeout(snapTimerRef.current);
-      snapTimerRef.current = null;
-    }
-    posRef.current = { x: 0, y: 0 };
+    if (snapTimerRef.current) { clearTimeout(snapTimerRef.current); snapTimerRef.current = null; }
+    posRef.current            = { x: 0, y: 0 };
+    hasLeftThresholdRef.current = false;
+    draggingRef.current       = false;
+    lastZoneRef.current       = null;
+    pendingZoneRef.current    = null;
     setPosition({ x: 0, y: 0 });
     setPhase('returning');
-    setHasLeftThreshold(false);
-    draggingRef.current = false;
     document.body.classList.remove('porygon-dragging');
-    lastZoneRef.current = null;
-    pendingZoneRef.current = null;
-
     setTimeout(() => setPhase('idle'), 520);
   }, []);
 
-  // ── pointer events ────────────────────────────────────────────────────────
+  // ── single-mount pointer effect ───────────────────────────────────────────
+  // All mutable logic goes through refs — effect runs exactly once.
 
   useEffect(() => {
     const el = iconRef.current;
@@ -194,50 +165,45 @@ export default function DraggablePorygon() {
 
     const onDown = (e: PointerEvent) => {
       if (e.button !== 0) return;
-      
-      const rect = el.getBoundingClientRect();
-      clickOffset.current = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-      };
 
-      if (phase === 'snapped') {
-        if (snapTimerRef.current) {
-          clearTimeout(snapTimerRef.current);
-          snapTimerRef.current = null;
-        }
-      }
+      // Picking up while snapped cancels the auto-reset
+      if (snapTimerRef.current) { clearTimeout(snapTimerRef.current); snapTimerRef.current = null; }
 
       e.preventDefault();
       e.stopPropagation();
 
+      const rect = el.getBoundingClientRect();
+      // Cursor offset within the element — preserved throughout the drag
+      dragAnchorRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+      // Natural (untranslated) viewport position — fixed for this drag session
+      naturalPosRef.current = { x: rect.left - posRef.current.x, y: rect.top - posRef.current.y };
+
       draggingRef.current = true;
       setPhase('dragging');
       document.body.classList.add('porygon-dragging');
-      
-      setInteractionCount(prev => {
-        const next = prev + 1;
-        if (!hasInteracted) triggerDialogue('first');
-        else triggerDialogue('progression');
-        return next;
-      });
 
-      startPos.current = {
-        x: e.clientX - posRef.current.x,
-        y: e.clientY - posRef.current.y,
-      };
+      interactionRef.current += 1;
+
+      if (!hasInteractedRef.current) {
+        hasInteractedRef.current = true;
+        triggerDialogue('first');              // highest priority
+      } else if (interactionRef.current % 3 === 0) {
+        triggerDialogue('drag');               // every 3rd pick-up only
+      }
     };
 
     const onMove = (e: PointerEvent) => {
       if (!draggingRef.current) return;
 
-      const newX = e.clientX - startPos.current.x;
-      const newY = e.clientY - startPos.current.y;
+      // Pixel-accurate position: element top-left placed so cursor stays at dragAnchor
+      const newX = e.clientX - dragAnchorRef.current.x - naturalPosRef.current.x;
+      const newY = e.clientY - dragAnchorRef.current.y - naturalPosRef.current.y;
       const dist = Math.sqrt(newX * newX + newY * newY);
 
-      if (dist > 80) setHasLeftThreshold(true);
+      if (dist > 80) hasLeftThresholdRef.current = true;
 
-      if (dist < 50 && hasLeftThreshold) {
+      // Magnetic return: pulled close to origin after straying → auto-reset
+      if (dist < 50 && hasLeftThresholdRef.current) {
         doReset();
         return;
       }
@@ -245,25 +211,24 @@ export default function DraggablePorygon() {
       posRef.current = { x: newX, y: newY };
       setPosition({ x: newX, y: newY });
 
-      // Zone detection with stability threshold
-      const zone = detectZoneByRect(e.clientX, e.clientY);
-      
+      // Zone detection — 100 ms dwell before triggering to prevent flicker
+      const zone = detectZone(e.clientX, e.clientY);
       if (zone !== pendingZoneRef.current) {
         pendingZoneRef.current = zone;
-        if (zoneStabilityTimerRef.current) clearTimeout(zoneStabilityTimerRef.current);
-        
+        if (zoneTimerRef.current) clearTimeout(zoneTimerRef.current);
+
         if (zone && zone !== lastZoneRef.current && !zoneLockRef.current) {
-          zoneStabilityTimerRef.current = setTimeout(() => {
+          zoneTimerRef.current = setTimeout(() => {
             if (pendingZoneRef.current === zone) {
               lastZoneRef.current = zone;
-              triggerDialogue('zone', zone as keyof typeof DIALOGUE_POOLS.zones);
-              
-              // Zone Lock
+              triggerDialogue('zone', zone as keyof typeof DIALOGUE.zones);
+              // Brief lock so boundary jitter can't re-fire
               zoneLockRef.current = true;
               setTimeout(() => { zoneLockRef.current = false; }, 500);
             }
           }, 100);
         } else if (!zone) {
+          // Exited all zones — allow same zone to trigger again next entry
           lastZoneRef.current = null;
         }
       }
@@ -271,18 +236,15 @@ export default function DraggablePorygon() {
 
     const onUp = (e: PointerEvent) => {
       if (!draggingRef.current) return;
-
-      draggingRef.current = false;
-      document.body.classList.remove('porygon-dragging');
+      draggingRef.current    = false;
       pendingZoneRef.current = null;
+      document.body.classList.remove('porygon-dragging');
 
-      const zone = detectZoneByRect(e.clientX, e.clientY);
+      const zone = detectZone(e.clientX, e.clientY);
       if (zone === 'name') {
         setPhase('snapped');
         triggerDialogue('snap');
-        snapTimerRef.current = setTimeout(() => {
-          doReset();
-        }, 2000);
+        snapTimerRef.current = setTimeout(doReset, 1000);
       } else {
         setPhase('idle');
       }
@@ -297,8 +259,11 @@ export default function DraggablePorygon() {
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
       document.body.classList.remove('porygon-dragging');
+      // ⚠️ intentionally NOT clearing snapTimerRef here —
+      //    the cleanup runs on unmount only (single-mount effect),
+      //    and doReset() already owns the timer lifecycle.
     };
-  }, [phase, hasLeftThreshold, triggerDialogue, doReset, detectZoneByRect, hasInteracted]);
+  }, [doReset]); // doReset is stable via useCallback; effect mounts once.
 
   // ── derived ───────────────────────────────────────────────────────────────
 
@@ -311,37 +276,28 @@ export default function DraggablePorygon() {
     ? 'none'
     : isReturning
     ? 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-    : isSnapped
-    ? 'transform 0.2s ease'
-    : 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+    : 'transform 0.2s ease';
 
   // ── render ────────────────────────────────────────────────────────────────
 
   return (
     <div className="relative flex items-center justify-center w-24 h-24">
 
-      {/* Return button */}
+      {/* Return-to-origin button */}
       {hasMoved && !isSnapped && (
         <button
-          onClick={doReset}
+          onClick={() => { triggerDialogue('recall'); doReset(); }}
           className="absolute inset-0 m-auto w-10 h-10 rounded-full border border-dashed border-accent text-accent flex items-center justify-center bg-paper hover:bg-accent-light hover:border-solid transition-all z-0 group"
           title="Return Porygon"
         >
-          <RefreshCw
-            size={14}
-            className="group-hover:rotate-180 transition-transform duration-500"
-          />
+          <RefreshCw size={14} className="group-hover:rotate-180 transition-transform duration-500" />
         </button>
       )}
 
       {/* Porygon */}
       <div
         ref={iconRef}
-        style={{
-          transform: `translate(${position.x}px, ${position.y}px)`,
-          transition,
-          touchAction: 'none',
-        }}
+        style={{ transform: `translate(${position.x}px, ${position.y}px)`, transition, touchAction: 'none' }}
         className={[
           'w-24 h-24 relative select-none flex items-center justify-center pointer-events-auto',
           isDragging  ? 'z-[99999] drop-shadow-2xl cursor-grabbing' : '',
@@ -357,21 +313,17 @@ export default function DraggablePorygon() {
           draggable={false}
         />
 
-        {/* Dialogue Bubble */}
+        {/* Dialogue bubble */}
         {message && (
           <div
             className="absolute -top-10 left-1/2 -translate-x-1/2 font-mono text-[9px] text-accent border border-dashed border-accent bg-accent-light px-3 py-1.5 whitespace-nowrap pointer-events-none select-none z-[100000]"
-            style={{ 
-              borderRadius: 2, 
-              animation: 'fadein 0.2s ease forwards',
-              boxShadow: '0 4px 12px rgba(0,71,255,0.1)'
-            }}
+            style={{ borderRadius: 2, animation: 'fadein 0.2s ease forwards' }}
           >
             {message}
           </div>
         )}
 
-        {/* Spinning dashed ring while dragging */}
+        {/* Spinning ring while dragging */}
         {isDragging && (
           <div className="absolute inset-0 rounded-full border-2 border-dashed border-accent/30 animate-spin-slow scale-110 pointer-events-none" />
         )}
