@@ -120,7 +120,7 @@ export default function Home() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeDasharray="4 6"
+                strokeDasharray="5 10"
                 opacity="0.75"
               />
 
