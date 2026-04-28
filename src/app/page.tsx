@@ -88,6 +88,22 @@ export default function Home() {
 
         <div className="relative z-10 px-8 lg:px-14 py-12">
           
+          {/* Spotlight Quick-Trigger */}
+          <div className="absolute top-12 right-8 lg:right-14 z-[210] flex flex-col items-end">
+            <span 
+              className="text-accent/80 tracking-wide rotate-[-3deg] mb-1.5 text-[14px] select-none font-sans italic"
+              style={{ fontFamily: "'Caveat', 'Dancing Script', 'Segoe Print', cursive" }}
+            >
+              Need to find something fast?
+            </span>
+            <button 
+              onClick={() => window.dispatchEvent(new Event('toggle-terminal'))}
+              className="font-mono text-[10px] text-ink border border-dashed border-border-strong px-3.5 py-1.5 hover:text-accent hover:border-accent transition-all bg-paper/80 backdrop-blur-sm cursor-pointer rounded shadow-sm select-none"
+            >
+              [Ctrl + Space] search
+            </button>
+          </div>
+          
           {/* Introduction Section with Header and Meta Links */}
           <section className="fade-in flex flex-col md:flex-row justify-between items-center gap-8 md:gap-12 mb-8 pb-8 border-b border-dashed border-border-strong relative z-[200]">
             <div className="flex-1">
@@ -173,7 +189,7 @@ export default function Home() {
           {/* ─── FOOTER ─── */}
           <footer className="pt-20 pb-8 flex justify-between items-center border-t border-dashed border-border-strong mt-12">
             <div className="font-mono text-[10px] text-ink-faint uppercase tracking-widest flex items-center gap-4">
-              <button onClick={() => window.dispatchEvent(new Event('toggle-terminal'))} className="hover:text-ink transition-colors cursor-pointer">[⌘K] search</button>
+              <button onClick={() => window.dispatchEvent(new Event('toggle-terminal'))} className="hover:text-ink transition-colors cursor-pointer">[Ctrl+Space] search</button>
               <span className="text-border-strong">|</span>
               <button onClick={handleExit} className="hover:text-ink transition-colors cursor-pointer">$ exit</button>
               <span className="text-border-strong">|</span>

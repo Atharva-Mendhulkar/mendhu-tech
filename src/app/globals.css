@@ -78,14 +78,15 @@ body.modal-open { overflow: hidden; }
     display: block;
     position: fixed; width: 18px; height: 18px;
     border: 1px solid var(--ink); border-radius: 50%;
-    pointer-events: none; z-index: 99999;
+    pointer-events: none; z-index: 100000;
     transform: translate(-50%, -50%);
     transition: width .18s, height .18s, border-color .18s, border-style .18s, background-color .18s;
     mix-blend-mode: multiply;
   }
   .cursor-ring.on-accent { border-color: var(--accent); width: 26px; height: 26px; border-style: dashed; }
   .cursor-ring.on-terminal { border-color: #00FF88; }
-  body, body *, a, button, input, select, textarea, canvas, [role="button"], .cursor-pointer, .cursor-grab, .cursor-grabbing { cursor: none !important; }
+  body, body *:not(.mac-text-cursor), a, button, input, select, textarea, canvas, [role="button"], .cursor-pointer, .cursor-grab, .cursor-grabbing { cursor: none !important; }
+  .mac-text-cursor { cursor: text !important; }
 
   /* Porygon drag state — cursor becomes expanded blue ring */
   body.porygon-dragging .cursor-ring {

@@ -5,6 +5,7 @@ import {
   FolderOpen, BookOpen, Search, CornerDownLeft,
   ArrowUp, ArrowDown, Cpu, FlaskConical, Leaf, Layers,
 } from "lucide-react";
+import rawResearchData from "@/data/research.json";
 
 // ── Data ──────────────────────────────────────────────────────────────────
 
@@ -15,13 +16,12 @@ const PROJECTS = [
   { id: "floework",  name: "Floework",   desc: "Human-Aware SaaS Productivity Platform",    tag: "saas",     keywords: ["saas", "productivity", "node", "socket"] },
 ];
 
-const GARDEN_FILES = [
-  { id: "pinn_abstract",      name: "JointPINN Overview",       desc: "Abstract & motivation for the PINN system",     keywords: ["overview", "intro", "pinn"] },
-  { id: "pinn_pde",           name: "Advection-Diffusion PDE",  desc: "Core physics equation driving the model",       keywords: ["physics", "pde", "equation", "math"] },
-  { id: "avara_main",         name: "AVARA Architecture",       desc: "Agent security design and threat model",        keywords: ["security", "design", "architecture"] },
-  { id: "kphd",               name: "Kernel Hang Detection",    desc: "EMA + tracepoints approach in Linux kernel",   keywords: ["kernel", "linux", "tracepoint"] },
-  { id: "temporal_stability", name: "Temporal Stability",       desc: "Cross-project concept: stability over time",   keywords: ["stability", "time", "concept"] },
-];
+const GARDEN_FILES = rawResearchData.nodes.map((n: any) => ({
+  id: n.id,
+  name: n.name || n.label || n.id,
+  desc: n.description || "",
+  keywords: n.tags || [],
+}));
 
 // Tag icon map
 const TAG_ICON: Record<string, React.ReactNode> = {
@@ -85,19 +85,63 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
   const [query,  setQuery]  = useState("");
   const [cursor, setCursor] = useState(0);
   const [mode,   setMode]   = useState<"all" | "garden">("all");
+  
+  // Pagination limits for 'Show More'
+  const [visibleCount, setVisibleCount] = useState(5);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef  = useRef<HTMLDivElement>(null);
 
+  // ── Drag & Session Position ───────────────────────────────────────────────
+  const [position, setPosition] = useState<{ x: number; y: number }>(() => {
+    if (typeof window !== "undefined") {
+      const saved = sessionStorage.getItem("spotlight-pos");
+      if (saved) return JSON.parse(saved);
+    }
+    return { x: 0, y: 0 };
+  });
+
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStart = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).tagName === "INPUT" || (e.target as HTMLElement).tagName === "BUTTON") return;
+    setIsDragging(true);
+    dragStart.current = { x: e.clientX - position.x, y: e.clientY - position.y };
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return;
+      const newX = e.clientX - dragStart.current.x;
+      const newY = e.clientY - dragStart.current.y;
+      setPosition({ x: newX, y: newY });
+      sessionStorage.setItem("spotlight-pos", JSON.stringify({ x: newX, y: newY }));
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    if (isDragging) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    }
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDragging, position]);
+
   // ── Looping Placeholders ──────────────────────────────────────────────────
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const placeholders = useMemo(() => [
-    "Search projects...",
-    "knowledge garden",
+    "type 'avara' to goto avara",
+    "type 'garden' to enter knowledge garden",
+    "Ctrl + Space to search",
     "pinn overview",
-    "open avara",
     "temporal stability",
-    "type 'garden' + Tab",
   ], []);
 
   useEffect(() => {
@@ -108,12 +152,16 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
     return () => clearInterval(interval);
   }, [open, placeholders]);
 
+  // Reset pagination on query change
+  useEffect(() => {
+    setVisibleCount(5);
+  }, [query]);
+
   // ── Search ────────────────────────────────────────────────────────────────
 
   const { results, suggestions } = useMemo(() => {
     const q = query.trim();
 
-    // If query empty
     if (!q) {
       if (mode === "garden") {
         const results: ResultItem[] = GARDEN_FILES.map(item => ({ kind: "garden" as const, item }));
@@ -122,11 +170,9 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
       return { results: [], suggestions: [] };
     }
 
-    // Context scoping
     const availableProjects = mode === "all" ? PROJECTS : [];
     const availableGarden   = GARDEN_FILES;
 
-    // Scored search
     const scored: { r: ResultItem; s: number }[] = [
       ...availableProjects.map(item => ({
         r: { kind: "project" as const, item },
@@ -140,7 +186,6 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
 
     const hits = scored.filter(x => x.s > 0).sort((a, b) => b.s - a.s).map(x => x.r);
 
-    // Suggestions via Levenshtein
     let suggestions: string[] = [];
     if (hits.length === 0) {
       const allNames = [
@@ -166,7 +211,10 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") { e.preventDefault(); open ? close_() : open_(); }
+      if (e.ctrlKey && e.code === "Space") { 
+        e.preventDefault(); 
+        open ? close_() : open_(); 
+      }
       if (e.key === "Escape" && open) close_();
     };
     window.addEventListener("keydown", handler);
@@ -188,7 +236,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown") { 
       e.preventDefault(); 
-      setCursor(c => Math.min(c + 1, results.length - 1)); 
+      setCursor(c => Math.min(c + 1, Math.min(results.length, visibleCount) - 1)); 
     }
     else if (e.key === "ArrowUp") { 
       e.preventDefault(); 
@@ -248,11 +296,11 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
 
   return (
     <>
-      {/* Scrim */}
+      {/* Scrim (Translucent, NO BLUR) */}
       {open && (
         <div
           className="fixed inset-0 z-[99998]"
-          style={{ background: "rgba(10,10,10,0.2)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}
+          style={{ background: "rgba(10,10,10,0.15)" }}
           onClick={close_}
         />
       )}
@@ -261,15 +309,20 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
       {open && (
         <div
           className="fixed z-[99999] left-1/2"
-          style={{ top: "26%", transform: "translateX(-50%)", width: "min(640px, 92vw)" }}
+          style={{ 
+            top: "26%", 
+            left: "50%",
+            transform: `translate(calc(-50% + ${position.x}px), ${position.y}px)`, 
+            width: "min(640px, 92vw)",
+            cursor: isDragging ? "grabbing" : "grab",
+          }}
+          onMouseDown={handleMouseDown}
         >
           <div style={{
-            background: "rgba(253,253,251,0.5)",
-            backdropFilter: "blur(40px) saturate(210%)",
-            WebkitBackdropFilter: "blur(40px) saturate(210%)",
+            background: "rgba(253,253,251,0.96)",
             border: "1px dashed rgba(26,26,26,0.18)",
             borderRadius: 16,
-            boxShadow: "0 40px 100px rgba(0,0,0,0.16), 0 2px 8px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.95)",
+            boxShadow: "0 40px 100px rgba(0,0,0,0.16), 0 2px 8px rgba(0,0,0,0.05)",
             overflow: "hidden",
             animation: "spot-in 0.16s cubic-bezier(0.16,1,0.3,1) forwards",
           }}>
@@ -281,7 +334,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
               {mode === "garden" && (
                 <span className="flex items-center gap-1 font-mono text-[10px] text-accent border border-dashed border-accent/40 bg-accent/5 px-2 py-0.5 rounded shrink-0">
                   <Leaf size={11} /> garden
-                  <button onClick={() => setMode("all")} className="hover:text-ink ml-1 font-bold">×</button>
+                  <button onClick={() => setMode("all")} className="hover:text-ink ml-1 font-bold cursor-pointer">×</button>
                 </span>
               )}
 
@@ -291,7 +344,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
                 onChange={e => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder={placeholders[placeholderIndex]}
-                className="flex-1 bg-transparent outline-none font-mono text-[13px] text-ink placeholder:text-ink-faint"
+                className="mac-text-cursor flex-1 bg-transparent outline-none font-mono text-[13px] text-ink placeholder:text-ink-faint"
                 spellCheck={false}
                 autoComplete="off"
               />
@@ -311,7 +364,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
                 {projectResults.length > 0 && (
                   <>
                     <SectionHeader label="Projects" />
-                    {projectResults.map(r => (
+                    {projectResults.slice(0, visibleCount).map(r => (
                       <Row
                         key={r.item.id}
                         r={r}
@@ -322,6 +375,17 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
                         highlight={highlight}
                       />
                     ))}
+                    
+                    {projectResults.length > visibleCount && (
+                      <div className="flex justify-end px-5 py-2">
+                        <button 
+                          onClick={() => setVisibleCount(v => v + 5)}
+                          className="font-mono text-[10px] text-accent border border-dashed border-accent/30 bg-accent/5 px-2 py-1 rounded hover:bg-accent/10 cursor-pointer"
+                        >
+                          Show More
+                        </button>
+                      </div>
+                    )}
                   </>
                 )}
 
@@ -329,7 +393,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
                 {gardenResults.length > 0 && (
                   <>
                     <SectionHeader label="Garden" />
-                    {gardenResults.map(r => (
+                    {gardenResults.slice(0, visibleCount).map(r => (
                       <Row
                         key={r.item.id}
                         r={r}
@@ -340,6 +404,17 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
                         highlight={highlight}
                       />
                     ))}
+
+                    {gardenResults.length > visibleCount && (
+                      <div className="flex justify-end px-5 py-2">
+                        <button 
+                          onClick={() => setVisibleCount(v => v + 5)}
+                          className="font-mono text-[10px] text-accent border border-dashed border-accent/30 bg-accent/5 px-2 py-1 rounded hover:bg-accent/10 cursor-pointer"
+                        >
+                          Show More
+                        </button>
+                      </div>
+                    )}
                   </>
                 )}
 
@@ -364,7 +439,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
                         <button
                           key={s}
                           onClick={() => setQuery(s)}
-                          className="font-mono text-[11px] text-accent border border-dashed border-accent px-3 py-1 hover:bg-accent-light transition-colors"
+                          className="font-mono text-[11px] text-accent border border-dashed border-accent px-3 py-1 hover:bg-accent-light transition-colors cursor-pointer"
                           style={{ borderRadius: 6 }}
                         >
                           {s}
@@ -426,7 +501,7 @@ function Row({ r, idx, isActive, onClick, onHover, highlight }: {
       data-idx={idx}
       onClick={onClick}
       onMouseEnter={onHover}
-      className="w-full flex items-center gap-3 px-5 py-2.5 text-left transition-all"
+      className="w-full flex items-center gap-3 px-5 py-2.5 text-left transition-all cursor-pointer"
       style={{
         background:  isActive ? "rgba(0,71,255,0.055)" : "transparent",
         borderLeft:  `2px solid ${isActive ? "var(--accent)" : "transparent"}`,
