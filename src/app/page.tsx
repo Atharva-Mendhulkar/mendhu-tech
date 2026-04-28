@@ -90,40 +90,31 @@ export default function Home() {
         <div className="relative z-10 px-8 lg:px-14 py-12">
           
           {/* Spotlight Quick-Trigger */}
-          <div className="absolute top-12 right-8 lg:right-14 z-[210] flex flex-col items-end gap-1">
-            {/* Button */}
-            <button 
-              onClick={() => window.dispatchEvent(new Event('toggle-terminal'))}
-              className="flex flex-col items-center font-mono px-4 py-2 border border-dashed border-border-strong bg-paper/80 backdrop-blur-sm rounded shadow-sm hover:text-accent hover:border-accent transition-all cursor-pointer"
-            >
-              <span className="text-sm">Search</span>
-              <span className="text-[10px] text-gray-400 mt-0.5">Ctrl + `</span>
-            </button>
-
-            {/* Arrow + text */}
+          <div className="absolute top-10 right-8 lg:right-14 z-[210] flex flex-col items-end gap-1">
+            {/* Arrow + text ABOVE the button */}
             <svg 
               width="240" 
-              height="140" 
-              viewBox="0 0 240 140" 
+              height="110" 
+              viewBox="0 0 240 110" 
               xmlns="http://www.w3.org/2000/svg"
-              className="select-none pointer-events-none -mt-2 -mr-2"
+              className="select-none pointer-events-none mb-[-5px] mr-[-10px]"
             >
-              {/* Text */}
+              {/* Text at the top */}
               <text 
-                x="10" 
-                y="120" 
+                x="15" 
+                y="35" 
                 fill="var(--accent)" 
                 fontSize="16"
                 fontFamily="Caveat, cursive"
-                transform="rotate(-4 10,120)"
+                transform="rotate(-2 15,35)"
                 opacity="0.85"
               >
                 need to find something fast?
               </text>
 
-              {/* Multi-loop curved arrow */}
+              {/* Multi-loop curved arrow pointing DOWN */}
               <path 
-                d="M30,100 C60,60 90,140 120,80 S170,20 200,50"
+                d="M35,45 C65,85 95,5 125,55 S175,105 205,75"
                 fill="none" 
                 stroke="var(--accent)" 
                 strokeWidth="2"
@@ -133,9 +124,9 @@ export default function Home() {
                 opacity="0.7"
               />
 
-              {/* Arrow head */}
+              {/* Arrow head pointing DOWNWARDS */}
               <path 
-                d="M195,45 L205,50 L198,35" 
+                d="M195,73 L205,75 L202,63" 
                 fill="none" 
                 stroke="var(--accent)" 
                 strokeWidth="2"
@@ -143,6 +134,15 @@ export default function Home() {
                 opacity="0.7"
               />
             </svg>
+
+            {/* Pill Button */}
+            <button 
+              onClick={() => window.dispatchEvent(new Event('toggle-terminal'))}
+              className="flex items-center gap-3 px-5 py-2 border border-dashed border-border-strong bg-paper/80 backdrop-blur-sm rounded-full shadow-sm hover:text-accent hover:border-accent transition-all cursor-pointer font-mono select-none"
+            >
+              <span className="text-[12px] font-bold">Search</span>
+              <span className="text-[10px] text-ink-faint">Ctrl + `</span>
+            </button>
           </div>
           
           {/* Introduction Section with Header and Meta Links */}
@@ -230,7 +230,7 @@ export default function Home() {
           {/* ─── FOOTER ─── */}
           <footer className="pt-20 pb-8 flex justify-between items-center border-t border-dashed border-border-strong mt-12">
             <div className="font-mono text-[10px] text-ink-faint uppercase tracking-widest flex items-center gap-4">
-              <button onClick={() => window.dispatchEvent(new Event('toggle-terminal'))} className="hover:text-ink transition-colors cursor-pointer">[Ctrl+`] search</button>
+              <button onClick={() => window.dispatchEvent(new Event('toggle-terminal'))} className="hover:text-ink transition-colors cursor-pointer">$ search</button>
               <span className="text-border-strong">|</span>
               <button onClick={handleExit} className="hover:text-ink transition-colors cursor-pointer">$ exit</button>
               <span className="text-border-strong">|</span>

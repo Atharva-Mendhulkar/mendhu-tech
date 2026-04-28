@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import {
-  FolderOpen, BookOpen, Search, CornerDownLeft,
-  ArrowUp, ArrowDown, Cpu, FlaskConical, Leaf, Layers, Terminal as TermIcon, FileText
+  FolderOpen, BookOpen, Search,
+  Cpu, FlaskConical, Leaf, Layers, Terminal as TermIcon, FileText, X
 } from "lucide-react";
 import rawResearchData from "@/data/research.json";
 
@@ -25,12 +25,178 @@ const GARDEN_FILES = rawResearchData.nodes.map((n: any) => ({
 
 const COMMANDS = [
   { id: "garden",   name: "open garden",    desc: "Open knowledge garden interface" },
-  { id: "resume",   name: "open resume",    desc: "Renders resume profile data right here" },
+  { id: "resume",   name: "open resume",    desc: "Renders LaTeX resume source code directly" },
   { id: "linkedin", name: "goto linkedin",  desc: "Redirect to standard profile credentials" },
   { id: "github",   name: "goto github",    desc: "View public version control workspaces" },
   { id: "twitter",  name: "goto twitter",   desc: "Check research workflows online" },
   { id: "help",     name: "show commands",  desc: "List all active utility pointers" },
 ];
+
+const RESUME_TEX_SOURCE = `%-------------------------
+% Resume in Latex
+% Tailored for: Salesforce SWE Intern (AMTS) — Class of 2028
+%-------------------------
+
+\\documentclass[letterpaper,10pt]{article}
+
+\\usepackage{latexsym}
+\\usepackage[empty]{fullpage}
+\\usepackage{titlesec}
+\\usepackage{marvosym}
+\\usepackage[usenames,dvipsnames]{color}
+\\usepackage{verbatim}
+\\usepackage{enumitem}
+\\usepackage[hidelinks]{hyperref}
+\\usepackage{fancyhdr}
+\\usepackage[english]{babel}
+\\usepackage{tabularx}
+\\input{glyphtounicode}
+
+\\pagestyle{fancy}
+\\fancyhf{}
+\\fancyfoot{}
+\\renewcommand{\\headrulewidth}{0pt}
+\\renewcommand{\\footrulewidth}{0pt}
+
+\\addtolength{\\oddsidemargin}{-0.5in}
+\\addtolength{\\evensidemargin}{-0.5in}
+\\addtolength{\\textwidth}{1in}
+\\addtolength{\\topmargin}{-.6in}
+\\addtolength{\\textheight}{1.2in}
+
+\\urlstyle{same}
+\\raggedbottom
+\\raggedright
+\\setlength{\\tabcolsep}{0in}
+
+\\titleformat{\\section}{
+  \\vspace{-4pt}\\scshape\\raggedright\\large
+}{}{0em}{}[\\color{black}\\titlerule \\vspace{-5pt}]
+
+\\pdfgentounicode=1
+
+%-------------------------
+% Custom commands
+\\newcommand{\\resumeItem}[1]{
+  \\item\\small{#1 \\vspace{-2pt}}
+}
+
+\\newcommand{\\resumeSubheading}[4]{
+  \\vspace{-2pt}\\item
+    \\begin{tabular*}{0.97\\textwidth}[t]{l@{\\extracolsep{\\fill}}r}
+      \\textbf{#1} & #2 \\\\
+      \\textit{\\small#3} & \\textit{\\small #4} \\\\
+    \\end{tabular*}\\vspace{-7pt}
+}
+
+\\newcommand{\\resumeProjectHeading}[2]{
+    \\item
+    \\begin{tabular*}{0.97\\textwidth}{l@{\\extracolsep{\\fill}}r}
+      \\small#1 & #2 \\\\
+    \\end{tabular*}\\vspace{-7pt}
+}
+
+\\newcommand{\\resumeSubHeadingListStart}{\\begin{itemize}[leftmargin=0.15in, label={}]}
+\\newcommand{\\resumeSubHeadingListEnd}{\\end{itemize}}
+\\newcommand{\\resumeItemListStart}{\\begin{itemize}}
+\\newcommand{\\resumeItemListEnd}{\\end{itemize}\\vspace{-5pt}}
+
+%-------------------------------------------
+\\begin{document}
+
+%-----------HEADER-----------
+\\begin{center}
+    \\textbf{\\Huge \\scshape Atharva Mendhulkar} \\\\ \\vspace{1pt}
+    \\small +91 8591436357 $|$
+    \\href{mailto:mendhu36@outlook.com}{\\underline{mendhu36@outlook.com}} $|$
+    \\href{https://linkedin.com/in/mendhu36}{\\underline{LinkedIn}} $|$
+    \\href{https://github.com/Atharva-Mendhulkar}{\\underline{GitHub}} $|$
+    \\href{https://mendhu.tech}{\\underline{Portfolio}}
+\\end{center}
+
+%-----------EDUCATION-----------
+\\section{Education}
+  \\resumeSubHeadingListStart
+    \\resumeSubheading
+      {Vellore Institute of Technology, Vellore}{Jul. 2024 -- Aug. 2028}
+      {B.Tech in Information Technology}{}
+  \\resumeSubHeadingListEnd
+
+%-----------EXPERIENCE-----------
+\\section{Experience}
+  \\resumeSubHeadingListStart
+    \\resumeSubheading
+      {Indian Institute of Technology, Gandhinagar \\& Maker Bhavan Foundation, USA}{Gujarat, India}
+      {Summer Intern (InventX Scholar) — Embedded Systems and Assistive device}{May 2025 -- Jul. 2025}
+      \\resumeItemListStart
+        \\resumeItem{Selected in \\textbf{top 1\\%} of 2000+ applicants for a competitive embedded systems research program.}
+        \\resumeItem{Improved system responsiveness by \\textbf{22\\%} through optimized sensor data processing pipelines, reducing latency in the real-time telemetry loop.}
+        \\resumeItem{Designed algorithmic logic for a \\textbf{patented assistive device} and collaborated across a multi-disciplinary hardware/firmware/software team, mirroring an agile Scrum engineering environment.}
+      \\resumeItemListEnd
+  \\resumeSubHeadingListEnd
+
+%-----------PROJECTS-----------
+\\section{Projects}
+  \\resumeSubHeadingListStart
+
+    \\resumeProjectHeading
+      {\\textbf{floework — SaaS Productivity \\& Collaboration Platform} $|$
+       \\href{https://github.com/Atharva-Mendhulkar/floework}{\\small GitHub} $|$
+       \\href{https://floework.vercel.app/}{\\small Demo}}{Feb. 2026 -- Present}
+      \\resumeItemListStart
+        \\resumeItem{\\textbf{Developed} a real-time \\textbf{multi-tenant SaaS} platform with \\textbf{sub-100ms WebSocket} task synchronization via Socket.IO event-driven architecture, sustaining live collaboration for concurrent 3--15 member teams.}
+        \\resumeItem{Designed a dual-database backend (\\textbf{PostgreSQL + Redis}) with 15-min cache TTLs and \\textbf{BullMQ async job queues}, offloading compute-heavy analytics to background workers for low-latency critical API paths.}
+        \\resumeItem{\\textbf{Established} \\textbf{20+ RESTful API endpoints} enforcing \\textbf{JWT authentication} and \\textbf{RBAC} across Admin/Member roles, ensuring strict tenant data isolation across concurrent multi-workspace deployments.}
+        \\resumeItem{\\textbf{Skills:} React, Node.js, PostgreSQL, Redis, WebSockets, REST APIs, Docker, TypeScript}
+      \\resumeItemListEnd
+
+    \\resumeProjectHeading
+      {\\textbf{AVARA — Autonomous Validation \\& Agent Risk Authority} $|$
+       \\href{https://github.com/Atharva-Mendhulkar/AVARA}{\\small GitHub} $|$
+       \\href{https://drive.google.com/file/d/1TkBaTVRV62F2AURQg8SXpCerhrzlmO04/view?usp=sharing}{\\small Demo}}{Jan. 2026 -- Present}
+      \\resumeItemListStart
+        \\resumeItem{Architected a \\textbf{9-component runtime security authority} defending against \\textbf{9+ threat vectors} including indirect prompt injection, \\textbf{RAG-based permission} bypass, \\textbf{MCP supply-chain} attacks, and zero-click exploitation.}
+        \\resumeItem{\\textbf{Implemented} an async \\textbf{circuit breaker} with real-time webhook approval flow, halting high-risk agent actions and requiring explicit human authorization before execution via \\textbf{FastAPI REST endpoints}.}
+        \\resumeItem{\\textbf{Devised} an \\textbf{immutable SQLite audit ledger} capturing full replayable execution timelines across all agent decisions; developed a \\textbf{LangChain callback adapter} enabling 3-line developer integration.}
+        \\resumeItem{\\textbf{Skills:} Python, FastAPI, LangChain, SQLite, Docker, Security Architecture, REST APIs}
+      \\resumeItemListEnd
+
+  \\resumeSubHeadingListEnd
+
+%-----------PATENT-----------
+\\section{Patent}
+  \\resumeSubHeadingListStart
+    \\resumeProjectHeading
+      {\\textbf{UPRS — Universal Process Responsiveness System} $|$ \\textit{Patent Filed}}{Dec. 2025 -- Present}
+      \\resumeItemListStart
+        \\resumeItem{\\textbf{Engineered} a predictive background daemon in \\textbf{C and Swift} intercepting kernel telemetry to detect application hangs \\textbf{0.5--5 seconds before} manifestation — enabling pre-emptive mitigation over reactive recovery.}
+        \\resumeItem{\\textbf{Built} a \\textbf{$<$15ms} data pipeline powering an \\textbf{XGBoost} inference engine achieving \\textbf{92.5\\% precision} and reducing UI freezes by \\textbf{82\\%}, operating at \\textbf{$<$1\\% CPU overhead}.}
+        \\resumeItem{Ported core architecture across \\textbf{macOS (XNU kernel)} and \\textbf{Linux}, demonstrating cross-platform systems programming depth with thread-safe mitigation under real production workloads.}
+      \\resumeItemListEnd
+  \\resumeSubHeadingListEnd
+
+%-----------TECHNICAL SKILLS-----------
+\\section{Technical Skills}
+  \\begin{itemize}[leftmargin=0.15in, label={}]
+    \\small{\\item{
+      \\textbf{Languages}{: Java, Python, C/C++, JavaScript, TypeScript, SQL, Bash/Shell} \\\\
+      \\textbf{Frameworks \\& Libraries}{: React, Node.js, Express.js, FastAPI, LangChain, Redux Toolkit, Socket.IO} \\\\
+      \\textbf{Databases \\& Storage}{: PostgreSQL, Redis, SQLite --- relational modeling, schema design, query optimization} \\\\
+      \\textbf{Core CS}{: Data Structures \\& Algorithms, OOP, DBMS, Computer Networks, System Design, Distributed Systems} \\\\
+      \\textbf{Tools}{: Git, Docker, Kubernetes, Linux CLI, CI/CD}
+    }}
+  \\end{itemize}
+
+%-----------ACHIEVEMENTS-----------
+\\section{Achievements}
+  \\resumeSubHeadingListStart
+    \\resumeItem{\\textbf{Samsung PRISM Metaverse 2.0 2026 Finalist:} Top 20 of 450+ participants.}
+    \\resumeItem{\\textbf{CodechefVIT DevSoc'26 Winner} — Digital Economy track (among 500+ participants): Built CAPS, an Agentic-UPI payment platform. $|$ \\href{https://github.com/Atharva-Mendhulkar/CAPS}{\\small GitHub}}
+    \\resumeItem{\\textbf{Smart India Hackathon 2025 Semi-finalist} among 400+ competing teams nationally.}
+    \\resumeItem{\\textbf{Innovation Week 2025:} Pitched AI-based maternal health platform to a panel consisting of Investors and Scientists from ISRO and DRDO.}
+  \\resumeSubHeadingListEnd
+
+\\end{document}`;
 
 // Tag icon map
 const TAG_ICON: Record<string, React.ReactNode> = {
@@ -121,7 +287,9 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
   const dragStart = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    if ((e.target as HTMLElement).tagName === "INPUT" || (e.target as HTMLElement).tagName === "BUTTON") return;
+    // Prevent drag when clicking inputs, buttons, or actionable links
+    const target = e.target as HTMLElement;
+    if (target.tagName === "INPUT" || target.tagName === "BUTTON" || target.closest("a")) return;
     setIsDragging(true);
     dragStart.current = { x: e.clientX - position.x, y: e.clientY - position.y };
   };
@@ -192,9 +360,10 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
     const availableGarden   = GARDEN_FILES;
 
     // Filter commands directly
-    const matchedCommands: ResultItem[] = COMMANDS.filter(cmd => 
-      cmd.name.toLowerCase().includes(q) || cmd.desc.toLowerCase().includes(q)
-    ).map(item => ({ kind: "command" as const, item }));
+    const matchedCommands: ResultItem[] = COMMANDS.filter(cmd => {
+      if (q === "show commands" || q === "show" || q === "commands" || q === "help") return true;
+      return cmd.name.toLowerCase().includes(q) || cmd.desc.toLowerCase().includes(q);
+    }).map(item => ({ kind: "command" as const, item }));
 
     // Scored search
     const scored: { r: ResultItem; s: number }[] = [
@@ -362,8 +531,28 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
         />
       )}
 
-      {/* Panel */}
-      {open && (
+      {/* LaTeX Fullscreen Overlay */}
+      {isShowingResume && (
+        <div className="fixed inset-0 z-[100000] bg-paper/95 backdrop-blur-md p-8 overflow-y-auto flex flex-col items-center">
+          <div className="w-full max-w-3xl flex justify-between items-center pb-4 mb-6 border-b border-dashed border-border-strong">
+            <h2 className="font-mono text-base font-bold text-ink flex items-center gap-2">
+              <FileText size={18} className="text-accent" /> resume.tex
+            </h2>
+            <button 
+              onClick={() => setIsShowingResume(false)}
+              className="flex items-center gap-2 font-mono text-[11px] text-ink border border-dashed border-border-strong px-3 py-1.5 hover:text-accent hover:border-accent transition-all rounded cursor-pointer select-none"
+            >
+              <X size={14} /> Close
+            </button>
+          </div>
+          <pre className="w-full max-w-3xl font-mono text-[12px] text-ink-muted leading-relaxed bg-paper-light p-6 rounded-lg border border-dashed border-border-strong overflow-x-auto whitespace-pre">
+            {RESUME_TEX_SOURCE}
+          </pre>
+        </div>
+      )}
+
+      {/* Panel with Glassmorphism */}
+      {open && !isShowingResume && (
         <div
           className="fixed z-[99999] left-1/2"
           style={{ 
@@ -376,10 +565,12 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
           onMouseDown={handleMouseDown}
         >
           <div style={{
-            background: "rgba(253,253,251,0.98)",
-            border: "1px dashed rgba(26,26,26,0.18)",
+            background: "rgba(253, 253, 251, 0.72)",
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            border: "1px dashed rgba(26, 26, 26, 0.18)",
             borderRadius: 16,
-            boxShadow: "0 40px 100px rgba(0,0,0,0.16), 0 2px 8px rgba(0,0,0,0.05)",
+            boxShadow: "0 40px 100px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.04)",
             overflow: "hidden",
             animation: "spot-in 0.16s cubic-bezier(0.16,1,0.3,1) forwards",
           }}>
@@ -398,7 +589,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
               <input
                 ref={inputRef}
                 value={query}
-                onChange={e => { setQuery(e.target.value); if (isShowingResume) setIsShowingResume(false); }}
+                onChange={e => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder={placeholders[placeholderIndex]}
                 className="mac-text-cursor flex-1 bg-transparent outline-none font-mono text-[13px] text-ink placeholder:text-ink-faint"
@@ -413,42 +604,8 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
               )}
             </div>
 
-            {/* Resume View */}
-            {isShowingResume && (
-              <div className="p-6 overflow-y-auto" style={{ maxHeight: 360, scrollbarWidth: "none" }}>
-                <div className="flex justify-between items-center pb-4 mb-4 border-b border-dashed border-border-strong">
-                  <div className="font-mono text-[14px] font-bold text-ink flex items-center gap-2">
-                    <FileText size={16} className="text-accent" /> Atharva Mendhulkar
-                  </div>
-                  <button 
-                    onClick={() => setIsShowingResume(false)} 
-                    className="font-mono text-[10px] text-ink-faint hover:text-ink border border-dashed px-2 py-1 rounded cursor-pointer"
-                  >
-                    Close
-                  </button>
-                </div>
-                <div className="font-mono text-[11px] text-ink space-y-4">
-                  <div>
-                    <span className="text-accent font-bold uppercase tracking-wider">[Education]</span>
-                    <p className="mt-1 font-bold">Vellore Institute of Technology, Vellore (Jul. 2024 - Aug. 2028)</p>
-                    <p className="text-ink-muted">B.Tech in Information Technology</p>
-                  </div>
-                  <div>
-                    <span className="text-accent font-bold uppercase tracking-wider">[Patent]</span>
-                    <p className="mt-1 font-bold">UPRS - Universal Process Responsiveness System</p>
-                    <p className="text-ink-muted">Predictive XGBoost model intercepting background telemetry.</p>
-                  </div>
-                  <div>
-                    <span className="text-accent font-bold uppercase tracking-wider">[Experience]</span>
-                    <p className="mt-1 font-bold">IIT Gandhinagar - InventX Scholar</p>
-                    <p className="text-ink-muted">Algorithmic device optimization targeting latency loops.</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* Body */}
-            {!isShowingResume && (hasResults || (mode === "garden" && !query)) && (
+            {(hasResults || (mode === "garden" && !query)) && (
               <div ref={listRef} className="overflow-y-auto" style={{ maxHeight: 360, scrollbarWidth: "none" }}>
 
                 {/* Commands section */}
@@ -532,7 +689,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
             )}
 
             {/* Empty state while searching */}
-            {!isShowingResume && !hasResults && query && (
+            {!hasResults && query && (
               <div className="px-5 py-8">
                 <p className="font-mono text-[11px] text-ink-faint text-center mb-4">
                   No results for <span className="text-ink">&ldquo;{query}&rdquo;</span>
@@ -569,22 +726,6 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
               <Hint keys={["↑", "↓"]}  label="navigate" />
               {mode === "all" && query.toLowerCase().includes("gar") && <Hint keys={["⇥"]} label="lock mode" />}
               <Hint keys={["esc"]}      label="close"    />
-            </div>
-
-            {/* Drag Zone at Bottom */}
-            <div 
-              className="w-full h-10 border-t border-dashed border-border-strong relative flex items-center justify-center select-none"
-              style={{
-                background: "rgba(10,10,10,0.06)",
-                backgroundImage: "linear-gradient(135deg, rgba(10,10,10,0.06) 25%, transparent 25%, transparent 50%, rgba(10,10,10,0.06) 50%, rgba(10,10,10,0.06) 75%, transparent 75%, transparent)",
-                backgroundSize: "16px 16px"
-              }}
-            >
-              <div 
-                className="bg-white border border-dashed border-border-strong px-3 py-1 rounded font-mono text-[9px] text-ink-faint pointer-events-none shadow-sm"
-              >
-                drag search over this region
-              </div>
             </div>
 
           </div>
