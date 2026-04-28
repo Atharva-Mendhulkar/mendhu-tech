@@ -10,14 +10,35 @@ import rawResearchData from '@/data/research.json';
 
 // ── Mermaid ────────────────────────────────────────────────────────────────
 if (typeof window !== 'undefined') {
-  mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'loose' });
+  mermaid.initialize({ 
+    startOnLoad: false, 
+    theme: 'base', 
+    themeVariables: {
+      primaryColor: '#F0EFE8',
+      primaryTextColor: '#1A1A1A',
+      primaryBorderColor: 'rgba(0,71,255,0.2)',
+      lineColor: '#555555',
+      secondaryColor: '#FFFFFF',
+      tertiaryColor: '#FDFDFB'
+    },
+    securityLevel: 'loose' 
+  });
 }
 
 const MermaidBlock = ({ chart }: { chart: string }) => {
   const [svg, setSvg] = useState('');
   const id = useRef(`mmd-${Math.random().toString(36).slice(2)}`);
   useEffect(() => {
-    mermaid.render(id.current, chart).then(r => setSvg(r.svg)).catch(() => {});
+    mermaid.render(id.current, chart)
+      .then(r => setSvg(r.svg))
+      .catch((err) => {
+        console.error('Failed to render Mermaid chart:', err);
+        setSvg(`<div class="p-4 border border-dashed border-red-500/30 text-red-500 font-mono text-[10px] bg-red-500/5 my-4">
+          <strong>Mermaid Render Error:</strong>
+          <pre class="mt-2 text-[9px] text-ink-muted select-all overflow-x-auto whitespace-pre-wrap">${String(err)}</pre>
+          <pre class="mt-2 text-[9px] text-ink-muted border-t border-dashed border-red-500/20 pt-2 select-all overflow-x-auto whitespace-pre-wrap">${chart}</pre>
+        </div>`);
+      });
   }, [chart]);
   return (
     <div className="my-8 p-6 border border-dashed border-accent/20 overflow-x-auto"
@@ -53,6 +74,20 @@ const TAG_COLORS: Record<string, string> = {
   saas:'#F97316', kernel:'#EF4444', pinn:'#3B82F6',
 };
 const tagColor = (t: string) => TAG_COLORS[t.replace('#','')] ?? '#888888';
+
+const getAlphaColor = (color: string, alpha: string) => {
+  if (color.startsWith('#')) {
+    let hex = color.slice(1);
+    if (hex.length === 3) {
+      hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+    } else if (hex.length === 4) {
+      hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2]+hex[3]+hex[3];
+    }
+    if (hex.length === 6) return `#${hex}${alpha}`;
+    if (hex.length === 8) return `#${hex.slice(0,6)}${alpha}`;
+  }
+  return color;
+};
 
 const DEFAULT: GraphSettings = {
   nodeSize:1.0, linkThickness:1.0, centerForce:0.003,
@@ -98,6 +133,74 @@ function buildSimGraph(raw: ResearchData, groupByTags: boolean, W: number, H: nu
   });
   return { nodes:[...tagNodes,...fileNodes], links:[...fileLinks,...tagLinks] };
 }
+
+interface SliderRowProps {
+  label: string;
+  k: keyof GraphSettings;
+  min: number;
+  max: number;
+  step: number;
+  fmt: (v: number) => string;
+  settings: GraphSettings;
+  updateSetting: (k: keyof GraphSettings, v: any) => void;
+}
+
+const SliderRow = ({ label, k, min, max, step, fmt, settings, updateSetting }: SliderRowProps) => (
+  <div>
+    {k === 'nodeSize' ? (
+      <div className="flex items-center justify-between font-mono text-[10px] text-ink-muted">
+        <span className="tracking-wider uppercase text-[9px]">{label}</span>
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => updateSetting(k, Math.max(min, (settings[k] as number) - step))}
+            className="w-8 h-8 flex items-center justify-center bg-paper hover:bg-accent-light text-ink border border-dashed border-border-strong hover:border-accent hover:text-accent font-bold text-[16px] rounded-[2px] transition-all select-none"
+          >
+            -
+          </button>
+          <span className="text-accent font-bold text-[13px] min-w-[32px] text-center">
+            {fmt(settings[k] as number)}
+          </span>
+          <button 
+            onClick={() => updateSetting(k, Math.min(max, (settings[k] as number) + step))}
+            className="w-8 h-8 flex items-center justify-center bg-paper hover:bg-accent-light text-ink border border-dashed border-border-strong hover:border-accent hover:text-accent font-bold text-[16px] rounded-[2px] transition-all select-none"
+          >
+            +
+          </button>
+        </div>
+      </div>
+    ) : (
+      <>
+        <div className="flex justify-between font-mono text-[9.5px] text-ink-muted mb-1 items-center">
+          <span>{label}</span>
+          <span className="text-accent">{fmt(settings[k] as number)}</span>
+        </div>
+        <input type="range" min={min} max={max} step={step} value={settings[k] as number}
+          onChange={e=>updateSetting(k,parseFloat(e.target.value))}
+          className="w-full accent-accent h-1"/>
+      </>
+    )}
+  </div>
+);
+
+interface ToggleProps {
+  label: string;
+  k: keyof GraphSettings;
+  onToggle?: (v: boolean) => void;
+  settings: GraphSettings;
+  updateSetting: (k: keyof GraphSettings, v: any) => void;
+}
+
+const Toggle = ({ label, k, onToggle, settings, updateSetting }: ToggleProps) => (
+  <label className="flex items-center justify-between font-mono text-[10px] text-ink-muted cursor-pointer">
+    <span>{label}</span>
+    <button
+      onClick={()=>{const nv=!settings[k];onToggle?onToggle(nv as boolean):updateSetting(k,nv);}}
+      className={`w-9 h-5 rounded-full border border-dashed transition-all relative ${settings[k]?'bg-accent border-accent':'border-border-strong'}`}
+    >
+      <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${settings[k]?'left-4':'left-0.5'}`}/>
+    </button>
+  </label>
+);
 
 interface Props { isOpen:boolean; onClose:()=>void; onMinimize:(id:string,title:string)=>void }
 
@@ -323,7 +426,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: Props) {
         if(active) ctx.strokeStyle='rgba(0,71,255,0.85)';
         else if(l.source.isTag||l.target.isTag){
           const hub=l.source.isTag?l.source:l.target;
-          ctx.strokeStyle=hub.color+'44';
+          ctx.strokeStyle=getAlphaColor(hub.color, '44');
         } else ctx.strokeStyle='rgba(26,26,26,0.3)';
         ctx.beginPath();ctx.moveTo(l.source.x,l.source.y);ctx.lineTo(l.target.x,l.target.y);ctx.stroke();
       });
@@ -347,13 +450,13 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: Props) {
         // Glow
         if(isActive||isConn||node.isTag){
           ctx.shadowBlur=isActive?30:node.isTag?18:10;
-          ctx.shadowColor=node.isTag?node.color+'BB':isActive?'rgba(0,71,255,0.5)':''+node.color+'55';
+          ctx.shadowColor=node.isTag?getAlphaColor(node.color, 'BB'):isActive?'rgba(0,71,255,0.5)':getAlphaColor(node.color, '55');
         } else ctx.shadowBlur=0;
 
         // Outer ring (wireframe)
         const pulse=isActive?Math.sin(now/280)*2.5:0;
         ctx.beginPath();ctx.setLineDash([2,4]);
-        ctx.strokeStyle=node.color+'80';
+        ctx.strokeStyle=getAlphaColor(node.color, '80');
         ctx.lineWidth=node.isTag?2:1.2;
         ctx.arc(node.x,node.y,nr+7+pulse,0,Math.PI*2);ctx.stroke();
         ctx.setLineDash([]);
@@ -365,7 +468,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: Props) {
         else {
           const g=ctx.createRadialGradient(node.x-1,node.y-1,0,node.x,node.y,nr);
           g.addColorStop(0,'#FFFFFF');
-          g.addColorStop(1,isConn?node.color+'44':'#F0EFE8');
+          g.addColorStop(1,isConn?getAlphaColor(node.color, '44'):'#F0EFE8');
           ctx.fillStyle=g;
         }
         ctx.strokeStyle=node.isTag?'rgba(255,255,255,0.25)':isActive?node.color:(isConn?node.color:'rgba(26,26,26,0.35)');
@@ -403,7 +506,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: Props) {
   },[showGraph,isOpen]); // intentionally minimal — all live values via refs
 
   const activeFile=data.files[activeFileId];
-  const renderContent=()=>{
+  const renderedContent = useMemo(() => {
     if(!activeFile) return null;
     const raw=activeFile.markdown??activeFile.html??'';
     const content=raw.replace(/\[\[([^|\]]+)(?:\|([^\]]+))?\]\]/g,(_,id,label)=>
@@ -437,32 +540,11 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: Props) {
         td:({children}:any)=><td className="px-4 py-2 text-ink-muted border-b border-dashed border-border-strong/40">{children}</td>,
       } as any}>{content}</ReactMarkdown>
     );
-  };
+  }, [activeFileId, activeFile]);
 
   if(!isOpen) return null;
 
-  const SliderRow = ({label,k,min,max,step,fmt}:{label:string,k:keyof GraphSettings,min:number,max:number,step:number,fmt:(v:number)=>string}) => (
-    <div>
-      <div className="flex justify-between font-mono text-[9.5px] text-ink-muted mb-1">
-        <span>{label}</span><span className="text-accent">{fmt(settings[k] as number)}</span>
-      </div>
-      <input type="range" min={min} max={max} step={step} value={settings[k] as number}
-        onChange={e=>updateSetting(k,parseFloat(e.target.value))}
-        className="w-full accent-accent h-1"/>
-    </div>
-  );
 
-  const Toggle = ({label,k,onToggle}:{label:string,k:keyof GraphSettings,onToggle?:(v:boolean)=>void}) => (
-    <label className="flex items-center justify-between font-mono text-[10px] text-ink-muted cursor-pointer">
-      <span>{label}</span>
-      <button
-        onClick={()=>{const nv=!settings[k];onToggle?onToggle(nv as boolean):updateSetting(k,nv);}}
-        className={`w-9 h-5 rounded-full border border-dashed transition-all relative ${settings[k]?'bg-accent border-accent':'border-border-strong'}`}
-      >
-        <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${settings[k]?'left-4':'left-0.5'}`}/>
-      </button>
-    </label>
-  );
 
   return (
     <div className={`fixed inset-0 z-[9999] flex items-center justify-center p-2 md:p-6 transition-opacity duration-300 ${isMounted?'opacity-100':'opacity-0'}`}>
@@ -526,7 +608,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: Props) {
                   <div className="flex-1 h-px bg-accent/20"/>
                   <Share2 size={12} className="text-ink-faint"/>
                 </div>
-                {renderContent()}
+                {renderedContent}
               </div>
             </div>
           )}
@@ -553,14 +635,14 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: Props) {
                     <Settings size={11} className="text-accent"/><span className="font-mono text-[9px] uppercase tracking-widest text-accent font-bold">Graph Controls</span>
                   </div>
                   <div className="p-3 space-y-3 max-h-[75vh] overflow-y-auto">
-                    <Toggle label="Group by tags" k="groupByTags" onToggle={handleGroupToggle}/>
-                    <div className="border-t border-dashed border-border-strong pt-3 space-y-3">
-                      <SliderRow label="Node size"      k="nodeSize"      min={0.4} max={2.5}   step={0.1}    fmt={v=>v.toFixed(1)+'×'}/>
-                      <SliderRow label="Link thickness" k="linkThickness" min={0.3} max={3.5}   step={0.1}    fmt={v=>v.toFixed(1)+'×'}/>
-                      <SliderRow label="Link distance"  k="linkDistance"  min={80}  max={450}   step={10}     fmt={v=>v+'px'}/>
-                      <SliderRow label="Repel force"    k="repelForce"    min={500} max={20000} step={500}    fmt={v=>''+v}/>
-                      <SliderRow label="Center force"   k="centerForce"   min={0.0005} max={0.02} step={0.0005} fmt={v=>v.toFixed(4)}/>
-                      <SliderRow label="Link force"     k="linkForce"     min={0.002} max={0.08} step={0.002}  fmt={v=>v.toFixed(3)}/>
+                     <Toggle label="Group by tags" k="groupByTags" onToggle={handleGroupToggle} settings={settings} updateSetting={updateSetting}/>
+                     <div className="border-t border-dashed border-border-strong pt-3 space-y-3">
+                       <SliderRow label="Node size"      k="nodeSize"      min={0.4} max={2.5}   step={0.1}    fmt={v=>v.toFixed(1)+'×'} settings={settings} updateSetting={updateSetting}/>
+                       <SliderRow label="Link thickness" k="linkThickness" min={0.3} max={3.5}   step={0.1}    fmt={v=>v.toFixed(1)+'×'} settings={settings} updateSetting={updateSetting}/>
+                       <SliderRow label="Link distance"  k="linkDistance"  min={80}  max={450}   step={10}     fmt={v=>v+'px'}           settings={settings} updateSetting={updateSetting}/>
+                       <SliderRow label="Repel force"    k="repelForce"    min={500} max={20000} step={500}    fmt={v=>''+v}             settings={settings} updateSetting={updateSetting}/>
+                       <SliderRow label="Center force"   k="centerForce"   min={0.0005} max={0.02} step={0.0005} fmt={v=>v.toFixed(4)}   settings={settings} updateSetting={updateSetting}/>
+                       <SliderRow label="Link force"     k="linkForce"     min={0.002} max={0.08} step={0.002}  fmt={v=>v.toFixed(3)}    settings={settings} updateSetting={updateSetting}/>
                     </div>
                     <div className="border-t border-dashed border-border-strong pt-3">
                       <button onClick={triggerAnimate} className="w-full font-mono text-[9px] py-1.5 border border-dashed border-border-strong text-ink-muted hover:border-accent hover:text-accent transition-all uppercase tracking-wider font-bold">Animate Making</button>

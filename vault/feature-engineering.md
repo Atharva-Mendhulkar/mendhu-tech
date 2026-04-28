@@ -23,7 +23,7 @@ Used in:
 
 ```mermaid
 flowchart LR
-    Raw Data --> Transform --> Features
+    RawData[Raw Data] --> Transform --> Features
 ```
 
 See also

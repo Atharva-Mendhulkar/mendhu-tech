@@ -23,7 +23,7 @@ Used in:
 
 ```mermaid
 flowchart LR
-    Normal Data --> Model --> Boundary --> Outlier?
+    NormalData[Normal Data] --> Model --> Boundary --> Outlier?
 ```
 
 See also

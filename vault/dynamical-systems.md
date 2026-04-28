@@ -23,7 +23,7 @@ Used in:
 
 ```mermaid
 flowchart LR
-    State --> Update --> New State
+    State --> Update --> NewState[New State]
 ```
 
 See also

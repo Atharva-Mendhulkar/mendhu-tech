@@ -29,7 +29,7 @@ Seen in:
 
 ```mermaid
 flowchart LR
-    Task --> Agent --> Extra Actions --> Risk
+    Task --> Agent --> ExtraActions[Extra Actions] --> Risk
 ```
 
 See also
