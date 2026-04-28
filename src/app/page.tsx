@@ -97,7 +97,7 @@ export default function Home() {
               height="110" 
               viewBox="0 0 240 110" 
               xmlns="http://www.w3.org/2000/svg"
-              className="hidden md:block select-none pointer-events-none mb-[-12px] mr-[-35px]"
+              className="select-none pointer-events-none mb-[-12px] md:mr-[-35px]"
             >
               {/* Text at the top */}
               <text 
@@ -228,14 +228,14 @@ export default function Home() {
           </div>
 
           {/* ─── FOOTER ─── */}
-          <footer className="pt-20 pb-8 flex justify-between items-center border-t border-dashed border-border-strong mt-12">
-            <div className="font-mono text-[10px] text-ink-faint uppercase tracking-widest flex items-center gap-4">
+          <footer className="pt-20 pb-8 flex flex-col md:flex-row gap-6 justify-between items-center border-t border-dashed border-border-strong mt-12">
+            <div className="font-mono text-[10px] text-ink-faint uppercase tracking-widest flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
               <button onClick={() => window.dispatchEvent(new Event('toggle-terminal'))} className="hover:text-ink transition-colors cursor-pointer">$ search</button>
-              <span className="text-border-strong">|</span>
+              <span className="hidden sm:inline text-border-strong">|</span>
               <button onClick={handleExit} className="hover:text-ink transition-colors cursor-pointer">$ exit</button>
-              <span className="text-border-strong">|</span>
+              <span className="hidden sm:inline text-border-strong">|</span>
               <span>v2.0.4-stable</span>
-              <span className="text-border-strong">|</span>
+              <span className="hidden sm:inline text-border-strong">|</span>
               <span>© Atharva Mendhulkar {new Date().getFullYear()}</span>
             </div>
             <div className="font-mono text-[10px] text-ink-faint uppercase tracking-widest">

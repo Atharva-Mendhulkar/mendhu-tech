@@ -361,7 +361,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
       {open && (
         <div
           className="fixed inset-0 z-[99998]"
-          style={{ background: "rgba(10,10,10,0.15)" }}
+          style={{ background: "transparent" }}
           onClick={close_}
         />
       )}
