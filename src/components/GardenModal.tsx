@@ -222,6 +222,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: Props) {
   const updateSetting = <K extends keyof GraphSettings>(k: K, v: GraphSettings[K]) => {
     settingsRef.current = {...settingsRef.current, [k]:v};
     setSettings(s => ({...s,[k]:v}));
+    energyRef.current = 1.0;
   };
 
   const canvasRef    = useRef<HTMLCanvasElement>(null);
@@ -229,6 +230,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: Props) {
   const simNodesRef  = useRef<SimNode[]>([]);
   const simLinksRef  = useRef<SimLink[]>([]);
   const dragNodeRef  = useRef<SimNode|null>(null);
+  const energyRef    = useRef<number>(1.0);
   const transformRef = useRef({scale:1,x:0,y:0});
   const isPanRef     = useRef(false);
   const panStartRef  = useRef({x:0,y:0});
@@ -285,6 +287,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: Props) {
     simNodesRef.current.forEach((n, i) => {
       n.revealAt = now + (n.isTag ? 0 : i * 50);
     });
+    energyRef.current = 1.0;
   };
 
   // ── SIMULATION ───────────────────────────────────────────────────────────
@@ -318,6 +321,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: Props) {
     };
 
     const onDown=(e:MouseEvent)=>{
+      energyRef.current = 1.0;
       const r=canvas.getBoundingClientRect();
       const {gx,gy}=getGraph(e.clientX-r.left,e.clientY-r.top);
       const s=settingsRef.current;
@@ -336,12 +340,13 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: Props) {
     const onMove=(e:MouseEvent)=>{
       const r=canvas.getBoundingClientRect();
       const {gx,gy}=getGraph(e.clientX-r.left,e.clientY-r.top);
-      if(dragNodeRef.current){dragNodeRef.current.x=gx;dragNodeRef.current.y=gy;dragNodeRef.current.vx=0;dragNodeRef.current.vy=0;}
-      else if(isPanRef.current){const mx=e.clientX-r.left,my=e.clientY-r.top;transformRef.current.x=mx-panStartRef.current.x;transformRef.current.y=my-panStartRef.current.y;}
+      if(dragNodeRef.current){dragNodeRef.current.x=gx;dragNodeRef.current.y=gy;dragNodeRef.current.vx=0;dragNodeRef.current.vy=0; energyRef.current = 1.0;}
+      else if(isPanRef.current){const mx=e.clientX-r.left,my=e.clientY-r.top;transformRef.current.x=mx-panStartRef.current.x;transformRef.current.y=my-panStartRef.current.y; energyRef.current = 1.0;}
     };
-    const onUp=()=>{dragNodeRef.current=null;isPanRef.current=false;};
+    const onUp=()=>{dragNodeRef.current=null;isPanRef.current=false; energyRef.current = 1.0;};
     const onWheel=(e:WheelEvent)=>{
       e.preventDefault();
+      energyRef.current = 1.0;
       const r=canvas.getBoundingClientRect();
       const mx=e.clientX-r.left,my=e.clientY-r.top;
       const t=transformRef.current;
@@ -370,38 +375,41 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: Props) {
       const t=transformRef.current;
       ctx.translate(t.x,t.y);ctx.scale(t.scale,t.scale);
 
-      const cx=W/2,cy=H/2;
-      for(let i=0;i<nodes.length;i++){
-        const n1=nodes[i];
-        if(n1===dragNodeRef.current) continue;
-        n1.vx+=(cx-n1.x)*s.centerForce*(n1.isTag?4:1);
-        n1.vy+=(cy-n1.y)*s.centerForce*(n1.isTag?4:1);
-        for(let j=i+1;j<nodes.length;j++){
-          const n2=nodes[j];
-          const dx=n1.x-n2.x,dy=n1.y-n2.y;
-          const d2=dx*dx+dy*dy+1,d=Math.sqrt(d2);
-          const f=s.repelForce/d2;
-          const fx=(dx/d)*f,fy=(dy/d)*f;
-          n1.vx+=fx;n1.vy+=fy;n2.vx-=fx;n2.vy-=fy;
+      if (energyRef.current > 0.005) {
+        energyRef.current *= 0.96;
+        const cx=W/2,cy=H/2;
+        for(let i=0;i<nodes.length;i++){
+          const n1=nodes[i];
+          if(n1===dragNodeRef.current) continue;
+          n1.vx+=(cx-n1.x)*s.centerForce*(n1.isTag?4:1);
+          n1.vy+=(cy-n1.y)*s.centerForce*(n1.isTag?4:1);
+          for(let j=i+1;j<nodes.length;j++){
+            const n2=nodes[j];
+            const dx=n1.x-n2.x,dy=n1.y-n2.y;
+            const d2=dx*dx+dy*dy+1,d=Math.sqrt(d2);
+            const f=s.repelForce/d2;
+            const fx=(dx/d)*f,fy=(dy/d)*f;
+            n1.vx+=fx;n1.vy+=fy;n2.vx-=fx;n2.vy-=fy;
+          }
         }
+        links.forEach(l=>{
+          const dx=l.source.x-l.target.x,dy=l.source.y-l.target.y;
+          const d=Math.sqrt(dx*dx+dy*dy)||1;
+          const f=(d-s.linkDistance)*s.linkForce;
+          const fx=(dx/d)*f,fy=(dy/d)*f;
+          if(l.source!==dragNodeRef.current){l.source.vx-=fx;l.source.vy-=fy;}
+          if(l.target!==dragNodeRef.current){l.target.vx+=fx;l.target.vy+=fy;}
+        });
+        const damp=0.82,maxV=12;
+        nodes.forEach(n=>{
+          if(n===dragNodeRef.current) return;
+          n.vx=Math.max(-maxV,Math.min(maxV,n.vx*damp));
+          n.vy=Math.max(-maxV,Math.min(maxV,n.vy*damp));
+          n.x+=n.vx;n.y+=n.vy;
+          n.x=Math.max(24,Math.min(W-24,n.x));
+          n.y=Math.max(24,Math.min(H-24,n.y));
+        });
       }
-      links.forEach(l=>{
-        const dx=l.source.x-l.target.x,dy=l.source.y-l.target.y;
-        const d=Math.sqrt(dx*dx+dy*dy)||1;
-        const f=(d-s.linkDistance)*s.linkForce;
-        const fx=(dx/d)*f,fy=(dy/d)*f;
-        if(l.source!==dragNodeRef.current){l.source.vx-=fx;l.source.vy-=fy;}
-        if(l.target!==dragNodeRef.current){l.target.vx+=fx;l.target.vy+=fy;}
-      });
-      const damp=0.82,maxV=12;
-      nodes.forEach(n=>{
-        if(n===dragNodeRef.current) return;
-        n.vx=Math.max(-maxV,Math.min(maxV,n.vx*damp));
-        n.vy=Math.max(-maxV,Math.min(maxV,n.vy*damp));
-        n.x+=n.vx;n.y+=n.vy;
-        n.x=Math.max(24,Math.min(W-24,n.x));
-        n.y=Math.max(24,Math.min(H-24,n.y));
-      });
 
       const activeId=activeIdRef.current;
       const q=s.searchQuery.toLowerCase();
@@ -616,7 +624,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: Props) {
           {/* Graph */}
           {showGraph&&(
             <div className={`relative flex flex-col shrink-0 overflow-hidden border-l border-dashed border-border-strong transition-all duration-300 ${isMaxGraph?'flex-1':'w-[380px] hidden lg:flex'}`}>
-              <canvas ref={canvasRef} className="w-full h-full block cursor-crosshair relative z-10"/>
+              <canvas ref={canvasRef} className="w-full h-full block cursor-none relative z-10"/>
 
               {/* Settings Toggle Icon — only visible when graph is maximised */}
               {isMaxGraph && (
