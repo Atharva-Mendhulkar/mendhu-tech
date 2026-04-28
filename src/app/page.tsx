@@ -90,7 +90,7 @@ export default function Home() {
         <div className="relative z-10 px-8 lg:px-14 py-12">
           
           {/* Spotlight Quick-Trigger */}
-          <div className="absolute top-10 right-8 lg:right-14 z-[210] flex flex-col items-end gap-1">
+          <div className="absolute top-1 right-8 lg:right-14 z-[210] flex flex-col items-end gap-1">
             {/* Arrow + text ABOVE the button */}
             <svg 
               width="240" 
@@ -140,8 +140,8 @@ export default function Home() {
               onClick={() => window.dispatchEvent(new Event('toggle-terminal'))}
               className="flex items-center gap-3 px-5 py-2 border border-dashed border-border-strong bg-paper/80 backdrop-blur-sm rounded-full shadow-sm hover:text-accent hover:border-accent transition-all cursor-pointer font-mono select-none"
             >
-              <span className="text-[12px] font-bold">Search</span>
-              <span className="text-[10px] text-ink-faint">Ctrl + `</span>
+              <span className="text-[12px] font-normal text-ink">Search</span>
+              <span className="text-[11px] font-bold text-accent">[Ctrl + `]</span>
             </button>
           </div>
           

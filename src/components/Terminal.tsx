@@ -25,178 +25,12 @@ const GARDEN_FILES = rawResearchData.nodes.map((n: any) => ({
 
 const COMMANDS = [
   { id: "garden",   name: "open garden",    desc: "Open knowledge garden interface" },
-  { id: "resume",   name: "open resume",    desc: "Renders LaTeX resume source code directly" },
+  { id: "resume",   name: "open resume",    desc: "View official credentials in PDF viewer" },
   { id: "linkedin", name: "goto linkedin",  desc: "Redirect to standard profile credentials" },
   { id: "github",   name: "goto github",    desc: "View public version control workspaces" },
   { id: "twitter",  name: "goto twitter",   desc: "Check research workflows online" },
   { id: "help",     name: "show commands",  desc: "List all active utility pointers" },
 ];
-
-const RESUME_TEX_SOURCE = `%-------------------------
-% Resume in Latex
-% Tailored for: Salesforce SWE Intern (AMTS) — Class of 2028
-%-------------------------
-
-\\documentclass[letterpaper,10pt]{article}
-
-\\usepackage{latexsym}
-\\usepackage[empty]{fullpage}
-\\usepackage{titlesec}
-\\usepackage{marvosym}
-\\usepackage[usenames,dvipsnames]{color}
-\\usepackage{verbatim}
-\\usepackage{enumitem}
-\\usepackage[hidelinks]{hyperref}
-\\usepackage{fancyhdr}
-\\usepackage[english]{babel}
-\\usepackage{tabularx}
-\\input{glyphtounicode}
-
-\\pagestyle{fancy}
-\\fancyhf{}
-\\fancyfoot{}
-\\renewcommand{\\headrulewidth}{0pt}
-\\renewcommand{\\footrulewidth}{0pt}
-
-\\addtolength{\\oddsidemargin}{-0.5in}
-\\addtolength{\\evensidemargin}{-0.5in}
-\\addtolength{\\textwidth}{1in}
-\\addtolength{\\topmargin}{-.6in}
-\\addtolength{\\textheight}{1.2in}
-
-\\urlstyle{same}
-\\raggedbottom
-\\raggedright
-\\setlength{\\tabcolsep}{0in}
-
-\\titleformat{\\section}{
-  \\vspace{-4pt}\\scshape\\raggedright\\large
-}{}{0em}{}[\\color{black}\\titlerule \\vspace{-5pt}]
-
-\\pdfgentounicode=1
-
-%-------------------------
-% Custom commands
-\\newcommand{\\resumeItem}[1]{
-  \\item\\small{#1 \\vspace{-2pt}}
-}
-
-\\newcommand{\\resumeSubheading}[4]{
-  \\vspace{-2pt}\\item
-    \\begin{tabular*}{0.97\\textwidth}[t]{l@{\\extracolsep{\\fill}}r}
-      \\textbf{#1} & #2 \\\\
-      \\textit{\\small#3} & \\textit{\\small #4} \\\\
-    \\end{tabular*}\\vspace{-7pt}
-}
-
-\\newcommand{\\resumeProjectHeading}[2]{
-    \\item
-    \\begin{tabular*}{0.97\\textwidth}{l@{\\extracolsep{\\fill}}r}
-      \\small#1 & #2 \\\\
-    \\end{tabular*}\\vspace{-7pt}
-}
-
-\\newcommand{\\resumeSubHeadingListStart}{\\begin{itemize}[leftmargin=0.15in, label={}]}
-\\newcommand{\\resumeSubHeadingListEnd}{\\end{itemize}}
-\\newcommand{\\resumeItemListStart}{\\begin{itemize}}
-\\newcommand{\\resumeItemListEnd}{\\end{itemize}\\vspace{-5pt}}
-
-%-------------------------------------------
-\\begin{document}
-
-%-----------HEADER-----------
-\\begin{center}
-    \\textbf{\\Huge \\scshape Atharva Mendhulkar} \\\\ \\vspace{1pt}
-    \\small +91 8591436357 $|$
-    \\href{mailto:mendhu36@outlook.com}{\\underline{mendhu36@outlook.com}} $|$
-    \\href{https://linkedin.com/in/mendhu36}{\\underline{LinkedIn}} $|$
-    \\href{https://github.com/Atharva-Mendhulkar}{\\underline{GitHub}} $|$
-    \\href{https://mendhu.tech}{\\underline{Portfolio}}
-\\end{center}
-
-%-----------EDUCATION-----------
-\\section{Education}
-  \\resumeSubHeadingListStart
-    \\resumeSubheading
-      {Vellore Institute of Technology, Vellore}{Jul. 2024 -- Aug. 2028}
-      {B.Tech in Information Technology}{}
-  \\resumeSubHeadingListEnd
-
-%-----------EXPERIENCE-----------
-\\section{Experience}
-  \\resumeSubHeadingListStart
-    \\resumeSubheading
-      {Indian Institute of Technology, Gandhinagar \\& Maker Bhavan Foundation, USA}{Gujarat, India}
-      {Summer Intern (InventX Scholar) — Embedded Systems and Assistive device}{May 2025 -- Jul. 2025}
-      \\resumeItemListStart
-        \\resumeItem{Selected in \\textbf{top 1\\%} of 2000+ applicants for a competitive embedded systems research program.}
-        \\resumeItem{Improved system responsiveness by \\textbf{22\\%} through optimized sensor data processing pipelines, reducing latency in the real-time telemetry loop.}
-        \\resumeItem{Designed algorithmic logic for a \\textbf{patented assistive device} and collaborated across a multi-disciplinary hardware/firmware/software team, mirroring an agile Scrum engineering environment.}
-      \\resumeItemListEnd
-  \\resumeSubHeadingListEnd
-
-%-----------PROJECTS-----------
-\\section{Projects}
-  \\resumeSubHeadingListStart
-
-    \\resumeProjectHeading
-      {\\textbf{floework — SaaS Productivity \\& Collaboration Platform} $|$
-       \\href{https://github.com/Atharva-Mendhulkar/floework}{\\small GitHub} $|$
-       \\href{https://floework.vercel.app/}{\\small Demo}}{Feb. 2026 -- Present}
-      \\resumeItemListStart
-        \\resumeItem{\\textbf{Developed} a real-time \\textbf{multi-tenant SaaS} platform with \\textbf{sub-100ms WebSocket} task synchronization via Socket.IO event-driven architecture, sustaining live collaboration for concurrent 3--15 member teams.}
-        \\resumeItem{Designed a dual-database backend (\\textbf{PostgreSQL + Redis}) with 15-min cache TTLs and \\textbf{BullMQ async job queues}, offloading compute-heavy analytics to background workers for low-latency critical API paths.}
-        \\resumeItem{\\textbf{Established} \\textbf{20+ RESTful API endpoints} enforcing \\textbf{JWT authentication} and \\textbf{RBAC} across Admin/Member roles, ensuring strict tenant data isolation across concurrent multi-workspace deployments.}
-        \\resumeItem{\\textbf{Skills:} React, Node.js, PostgreSQL, Redis, WebSockets, REST APIs, Docker, TypeScript}
-      \\resumeItemListEnd
-
-    \\resumeProjectHeading
-      {\\textbf{AVARA — Autonomous Validation \\& Agent Risk Authority} $|$
-       \\href{https://github.com/Atharva-Mendhulkar/AVARA}{\\small GitHub} $|$
-       \\href{https://drive.google.com/file/d/1TkBaTVRV62F2AURQg8SXpCerhrzlmO04/view?usp=sharing}{\\small Demo}}{Jan. 2026 -- Present}
-      \\resumeItemListStart
-        \\resumeItem{Architected a \\textbf{9-component runtime security authority} defending against \\textbf{9+ threat vectors} including indirect prompt injection, \\textbf{RAG-based permission} bypass, \\textbf{MCP supply-chain} attacks, and zero-click exploitation.}
-        \\resumeItem{\\textbf{Implemented} an async \\textbf{circuit breaker} with real-time webhook approval flow, halting high-risk agent actions and requiring explicit human authorization before execution via \\textbf{FastAPI REST endpoints}.}
-        \\resumeItem{\\textbf{Devised} an \\textbf{immutable SQLite audit ledger} capturing full replayable execution timelines across all agent decisions; developed a \\textbf{LangChain callback adapter} enabling 3-line developer integration.}
-        \\resumeItem{\\textbf{Skills:} Python, FastAPI, LangChain, SQLite, Docker, Security Architecture, REST APIs}
-      \\resumeItemListEnd
-
-  \\resumeSubHeadingListEnd
-
-%-----------PATENT-----------
-\\section{Patent}
-  \\resumeSubHeadingListStart
-    \\resumeProjectHeading
-      {\\textbf{UPRS — Universal Process Responsiveness System} $|$ \\textit{Patent Filed}}{Dec. 2025 -- Present}
-      \\resumeItemListStart
-        \\resumeItem{\\textbf{Engineered} a predictive background daemon in \\textbf{C and Swift} intercepting kernel telemetry to detect application hangs \\textbf{0.5--5 seconds before} manifestation — enabling pre-emptive mitigation over reactive recovery.}
-        \\resumeItem{\\textbf{Built} a \\textbf{$<$15ms} data pipeline powering an \\textbf{XGBoost} inference engine achieving \\textbf{92.5\\% precision} and reducing UI freezes by \\textbf{82\\%}, operating at \\textbf{$<$1\\% CPU overhead}.}
-        \\resumeItem{Ported core architecture across \\textbf{macOS (XNU kernel)} and \\textbf{Linux}, demonstrating cross-platform systems programming depth with thread-safe mitigation under real production workloads.}
-      \\resumeItemListEnd
-  \\resumeSubHeadingListEnd
-
-%-----------TECHNICAL SKILLS-----------
-\\section{Technical Skills}
-  \\begin{itemize}[leftmargin=0.15in, label={}]
-    \\small{\\item{
-      \\textbf{Languages}{: Java, Python, C/C++, JavaScript, TypeScript, SQL, Bash/Shell} \\\\
-      \\textbf{Frameworks \\& Libraries}{: React, Node.js, Express.js, FastAPI, LangChain, Redux Toolkit, Socket.IO} \\\\
-      \\textbf{Databases \\& Storage}{: PostgreSQL, Redis, SQLite --- relational modeling, schema design, query optimization} \\\\
-      \\textbf{Core CS}{: Data Structures \\& Algorithms, OOP, DBMS, Computer Networks, System Design, Distributed Systems} \\\\
-      \\textbf{Tools}{: Git, Docker, Kubernetes, Linux CLI, CI/CD}
-    }}
-  \\end{itemize}
-
-%-----------ACHIEVEMENTS-----------
-\\section{Achievements}
-  \\resumeSubHeadingListStart
-    \\resumeItem{\\textbf{Samsung PRISM Metaverse 2.0 2026 Finalist:} Top 20 of 450+ participants.}
-    \\resumeItem{\\textbf{CodechefVIT DevSoc'26 Winner} — Digital Economy track (among 500+ participants): Built CAPS, an Agentic-UPI payment platform. $|$ \\href{https://github.com/Atharva-Mendhulkar/CAPS}{\\small GitHub}}
-    \\resumeItem{\\textbf{Smart India Hackathon 2025 Semi-finalist} among 400+ competing teams nationally.}
-    \\resumeItem{\\textbf{Innovation Week 2025:} Pitched AI-based maternal health platform to a panel consisting of Investors and Scientists from ISRO and DRDO.}
-  \\resumeSubHeadingListEnd
-
-\\end{document}`;
 
 // Tag icon map
 const TAG_ICON: Record<string, React.ReactNode> = {
@@ -267,6 +101,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
   const [cursor, setCursor] = useState(0);
   const [mode,   setMode]   = useState<"all" | "garden">("all");
   const [isShowingResume, setIsShowingResume] = useState(false);
+  const [isShowingCommands, setIsShowingCommands] = useState(false);
   
   // Pagination limits for 'Show More'
   const [visibleCount, setVisibleCount] = useState(5);
@@ -287,7 +122,6 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
   const dragStart = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    // Prevent drag when clicking inputs, buttons, or actionable links
     const target = e.target as HTMLElement;
     if (target.tagName === "INPUT" || target.tagName === "BUTTON" || target.closest("a")) return;
     setIsDragging(true);
@@ -346,7 +180,6 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
   const { results, suggestions } = useMemo(() => {
     const q = query.trim().toLowerCase();
 
-    // If query empty
     if (!q) {
       if (mode === "garden") {
         const results: ResultItem[] = GARDEN_FILES.map(item => ({ kind: "garden" as const, item }));
@@ -355,21 +188,18 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
       return { results: [], suggestions: [] };
     }
 
-    // Context scoping
     const availableProjects = mode === "all" ? PROJECTS : [];
     const availableGarden   = GARDEN_FILES;
 
-    // Filter commands directly
     const matchedCommands: ResultItem[] = COMMANDS.filter(cmd => {
       if (q === "show commands" || q === "show" || q === "commands" || q === "help") return true;
       return cmd.name.toLowerCase().includes(q) || cmd.desc.toLowerCase().includes(q);
     }).map(item => ({ kind: "command" as const, item }));
 
-    // Scored search
     const scored: { r: ResultItem; s: number }[] = [
       ...availableProjects.map(item => ({
         r: { kind: "project" as const, item },
-        s: scoreItem(q, item.name, item.desc, item.keywords),
+        s: q.includes("project") ? 500 : scoreItem(q, item.name, item.desc, item.keywords),
       })),
       ...availableGarden.map(item => ({
         r: { kind: "garden" as const, item },
@@ -382,7 +212,6 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
       ...scored.filter(x => x.s > 0).sort((a, b) => b.s - a.s).map(x => x.r)
     ];
 
-    // Suggestions via Levenshtein
     let suggestions: string[] = [];
     if (hits.length === 0) {
       const allNames = [
@@ -405,11 +234,13 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
   // ── Open / close ──────────────────────────────────────────────────────────
 
   const open_ = useCallback(() => { 
-    setOpen(true); setQuery(""); setMode("all"); setCursor(0); setIsShowingResume(false); 
+    setOpen(true); setQuery(""); setMode("all"); setCursor(0); 
+    setIsShowingResume(false); setIsShowingCommands(false);
   }, []);
   
   const close_ = useCallback(() => { 
-    setOpen(false); setQuery(""); setMode("all"); setCursor(0); setIsShowingResume(false); 
+    setOpen(false); setQuery(""); setMode("all"); setCursor(0); 
+    setIsShowingResume(false); setIsShowingCommands(false);
   }, []);
 
   useEffect(() => {
@@ -493,7 +324,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
         window.open("https://x.com/atharvarta", "_blank");
         close_();
       } else if (r.item.id === "help") {
-        setQuery("show");
+        setIsShowingCommands(true);
       }
     }
   };
@@ -507,7 +338,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
     return (
       <>
         {text.slice(0, idx)}
-        <span className="text-accent">{text.slice(idx, idx + query.trim().length)}</span>
+        <span className="text-accent font-bold">{text.slice(idx, idx + query.trim().length)}</span>
         {text.slice(idx + query.trim().length)}
       </>
     );
@@ -522,7 +353,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
 
   return (
     <>
-      {/* Scrim (Translucent, NO BLUR) */}
+      {/* Scrim (Translucent) */}
       {open && (
         <div
           className="fixed inset-0 z-[99998]"
@@ -531,12 +362,12 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
         />
       )}
 
-      {/* LaTeX Fullscreen Overlay */}
+      {/* PDF Viewer Overlay */}
       {isShowingResume && (
-        <div className="fixed inset-0 z-[100000] bg-paper/95 backdrop-blur-md p-8 overflow-y-auto flex flex-col items-center">
-          <div className="w-full max-w-3xl flex justify-between items-center pb-4 mb-6 border-b border-dashed border-border-strong">
+        <div className="fixed inset-0 z-[100000] bg-paper/95 backdrop-blur-md p-8 flex flex-col items-center justify-center">
+          <div className="w-full max-w-4xl flex justify-between items-center pb-4 mb-4 border-b border-dashed border-border-strong">
             <h2 className="font-mono text-base font-bold text-ink flex items-center gap-2">
-              <FileText size={18} className="text-accent" /> resume.tex
+              <FileText size={18} className="text-accent" /> Atharva Mendhulkar Resume.pdf
             </h2>
             <button 
               onClick={() => setIsShowingResume(false)}
@@ -545,14 +376,40 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
               <X size={14} /> Close
             </button>
           </div>
-          <pre className="w-full max-w-3xl font-mono text-[12px] text-ink-muted leading-relaxed bg-paper-light p-6 rounded-lg border border-dashed border-border-strong overflow-x-auto whitespace-pre">
-            {RESUME_TEX_SOURCE}
-          </pre>
+          <iframe 
+            src="/Atharva%20Mendhulkar%20Resume.pdf" 
+            className="w-full max-w-4xl h-[78vh] border border-dashed border-border-strong rounded shadow-xl"
+          />
         </div>
       )}
 
-      {/* Panel with Glassmorphism */}
-      {open && !isShowingResume && (
+      {/* Commands List Overlay Box */}
+      {isShowingCommands && (
+        <div className="fixed inset-0 z-[100000] bg-paper/95 backdrop-blur-md flex items-center justify-center p-6">
+          <div className="bg-paper-light border border-dashed border-border-strong rounded-xl p-6 w-full max-w-md shadow-2xl relative font-mono">
+            <button 
+              onClick={() => setIsShowingCommands(false)}
+              className="absolute top-4 right-4 text-ink-faint hover:text-ink cursor-pointer"
+            >
+              <X size={16} />
+            </button>
+            <h3 className="text-accent font-bold text-[13px] uppercase tracking-wider mb-4 pb-2 border-b border-dashed border-border-strong flex items-center gap-2">
+              <TermIcon size={16} /> Utility Commands
+            </h3>
+            <div className="space-y-3.5 text-[11px]">
+              {COMMANDS.map(cmd => (
+                <div key={cmd.id} className="flex flex-col gap-0.5 border-b border-dashed border-border-strong/40 pb-2">
+                  <div className="text-ink font-bold">{cmd.name}</div>
+                  <div className="text-ink-faint text-[10px]">{cmd.desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Panel with 20% Glassmorphism */}
+      {open && !isShowingResume && !isShowingCommands && (
         <div
           className="fixed z-[99999] left-1/2"
           style={{ 
@@ -565,19 +422,19 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
           onMouseDown={handleMouseDown}
         >
           <div style={{
-            background: "rgba(253, 253, 251, 0.72)",
-            backdropFilter: "blur(20px)",
-            WebkitBackdropFilter: "blur(20px)",
-            border: "1px dashed rgba(26, 26, 26, 0.18)",
+            background: "rgba(253, 253, 251, 0.22)",
+            backdropFilter: "blur(24px)",
+            WebkitBackdropFilter: "blur(24px)",
+            border: "1px border-dashed rgba(26, 26, 26, 0.2)",
             borderRadius: 16,
-            boxShadow: "0 40px 100px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.04)",
+            boxShadow: "0 40px 100px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.06)",
             overflow: "hidden",
             animation: "spot-in 0.16s cubic-bezier(0.16,1,0.3,1) forwards",
           }}>
 
             {/* Input */}
-            <div className="flex items-center gap-3 px-5 py-4" style={{ borderBottom: "1px dashed rgba(26,26,26,0.1)" }}>
-              <Search size={15} className="text-ink-faint shrink-0" strokeWidth={1.5} />
+            <div className="flex items-center gap-3 px-5 py-4" style={{ borderBottom: "1px dashed rgba(26,26,26,0.12)" }}>
+              <Search size={15} className="text-ink shrink-0 opacity-60" strokeWidth={1.5} />
               
               {mode === "garden" && (
                 <span className="flex items-center gap-1 font-mono text-[10px] text-accent border border-dashed border-accent/40 bg-accent/5 px-2 py-0.5 rounded shrink-0">
@@ -598,7 +455,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
               />
               
               {query && (
-                <span className="font-mono text-[9px] text-ink-faint border border-dashed border-border-strong px-1.5 py-0.5" style={{ borderRadius: 4 }}>
+                <span className="font-mono text-[9px] text-ink border border-dashed border-border-strong px-1.5 py-0.5 rounded opacity-60">
                   {results.length} hit{results.length !== 1 ? "s" : ""}
                 </span>
               )}
@@ -691,13 +548,13 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
             {/* Empty state while searching */}
             {!hasResults && query && (
               <div className="px-5 py-8">
-                <p className="font-mono text-[11px] text-ink-faint text-center mb-4">
-                  No results for <span className="text-ink">&ldquo;{query}&rdquo;</span>
+                <p className="font-mono text-[11px] text-ink text-center mb-4 opacity-75">
+                  No results for <span className="text-accent">&ldquo;{query}&rdquo;</span>
                 </p>
 
                 {suggestions.length > 0 && (
                   <div className="flex flex-col gap-1.5">
-                    <p className="font-mono text-[9px] text-ink-faint uppercase tracking-widest text-center mb-2">
+                    <p className="font-mono text-[9px] text-ink uppercase tracking-widest text-center mb-2 opacity-60">
                       Did you mean?
                     </p>
                     <div className="flex flex-wrap gap-2 justify-center">
@@ -705,8 +562,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
                         <button
                           key={s}
                           onClick={() => setQuery(s)}
-                          className="font-mono text-[11px] text-accent border border-dashed border-accent px-3 py-1 hover:bg-accent-light transition-colors cursor-pointer"
-                          style={{ borderRadius: 6 }}
+                          className="font-mono text-[11px] text-accent border border-dashed border-accent px-3 py-1 hover:bg-accent-light transition-colors cursor-pointer rounded-md"
                         >
                           {s}
                         </button>
@@ -720,7 +576,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
             {/* Footer hints */}
             <div
               className="flex items-center gap-4 px-5 py-2.5"
-              style={{ borderTop: "1px dashed rgba(26,26,26,0.08)", background: "rgba(26,26,26,0.02)" }}
+              style={{ borderTop: "1px dashed rgba(26,26,26,0.12)", background: "rgba(26,26,26,0.03)" }}
             >
               <Hint keys={["↵"]}       label="open"     />
               <Hint keys={["↑", "↓"]}  label="navigate" />
@@ -748,7 +604,7 @@ function SectionHeader({ label }: { label: string }) {
   return (
     <div className="px-5 pt-3 pb-1 font-mono text-[9px] text-ink-faint uppercase tracking-widest flex items-center gap-2">
       <span>{label}</span>
-      <span className="flex-1 border-t border-dashed" style={{ borderColor: "rgba(26,26,26,0.1)" }} />
+      <span className="flex-1 border-t border-dashed" style={{ borderColor: "rgba(26,26,26,0.12)" }} />
     </div>
   );
 }
@@ -770,19 +626,19 @@ function Row({ r, idx, isActive, onClick, onHover, highlight }: {
       onMouseEnter={onHover}
       className="w-full flex items-center gap-3 px-5 py-2.5 text-left transition-all cursor-pointer"
       style={{
-        background:  isActive ? "rgba(0,71,255,0.055)" : "transparent",
+        background:  isActive ? "rgba(0,71,255,0.07)" : "transparent",
         borderLeft:  `2px solid ${isActive ? "var(--accent)" : "transparent"}`,
       }}
     >
       <div
         className="w-8 h-8 shrink-0 rounded-lg flex items-center justify-center transition-colors"
         style={{
-          background:   isActive ? "rgba(0,71,255,0.1)"  : "rgba(26,26,26,0.04)",
+          background:   isActive ? "rgba(0,71,255,0.12)" : "rgba(26,26,26,0.06)",
           border:       "1px dashed",
-          borderColor:  isActive ? "rgba(0,71,255,0.28)" : "rgba(26,26,26,0.13)",
+          borderColor:  isActive ? "rgba(0,71,255,0.3)"  : "rgba(26,26,26,0.15)",
         }}
       >
-        <span className={isActive ? "text-accent" : "text-ink-faint"}>
+        <span className={isActive ? "text-accent" : "text-ink opacity-70"}>
           {r.kind === "project"
             ? <FolderOpen size={14} strokeWidth={1.5} />
             : r.kind === "garden"
@@ -793,14 +649,14 @@ function Row({ r, idx, isActive, onClick, onHover, highlight }: {
 
       <div className="flex-1 min-w-0">
         <div className="font-mono text-[12px] text-ink truncate">{highlight(r.item.name)}</div>
-        <div className="font-mono text-[10px] text-ink-faint truncate">{highlight(r.item.desc)}</div>
+        <div className="font-mono text-[10px] text-ink-muted truncate">{highlight(r.item.desc)}</div>
       </div>
 
       <div
         className="shrink-0 flex items-center gap-1 font-mono text-[8px] px-2 py-0.5 border border-dashed transition-colors"
         style={{
           color:       isActive ? "var(--accent)"           : "var(--ink-faint)",
-          borderColor: isActive ? "rgba(0,71,255,0.28)"     : "rgba(26,26,26,0.14)",
+          borderColor: isActive ? "rgba(0,71,255,0.3)"      : "rgba(26,26,26,0.15)",
           background:  isActive ? "rgba(0,71,255,0.06)"     : "transparent",
           borderRadius: 4,
         }}
@@ -814,23 +670,23 @@ function Row({ r, idx, isActive, onClick, onHover, highlight }: {
 
 function Hint({ keys, label }: { keys: string[]; label: string }) {
   return (
-    <div className="flex items-center gap-1.5">
+    <div className="flex items-center gap-1.5 opacity-80">
       {keys.map(k => (
         <kbd
           key={k}
-          className="font-mono text-[9px] text-ink-faint flex items-center justify-center"
+          className="font-mono text-[9px] text-ink flex items-center justify-center"
           style={{
-            border: "1px dashed rgba(26,26,26,0.18)",
+            border: "1px dashed rgba(26,26,26,0.2)",
             borderRadius: 4,
             padding: "1px 5px",
-            background: "rgba(26,26,26,0.04)",
+            background: "rgba(26,26,26,0.06)",
             minWidth: 20,
           }}
         >
           {k}
         </kbd>
       ))}
-      <span className="font-mono text-[9px] text-ink-faint">{label}</span>
+      <span className="font-mono text-[9px] text-ink opacity-60">{label}</span>
     </div>
   );
 }
