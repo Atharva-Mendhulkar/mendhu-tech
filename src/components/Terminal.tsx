@@ -10,10 +10,10 @@ import rawResearchData from "@/data/research.json";
 // ── Data ──────────────────────────────────────────────────────────────────
 
 const PROJECTS = [
-  { id: "jointpinn", name: "JointPINN",  desc: "PM2.5 Source Identification via PINNs",     tag: "research", keywords: ["ml", "physics", "pinn", "air", "pollution"] },
-  { id: "avara",     name: "AVARA",      desc: "Agent Runtime Security Authority",           tag: "systems",  keywords: ["agent", "security", "runtime", "llm"] },
-  { id: "kphd",      name: "K-PHD",      desc: "Kernel Predictive Hang Detector",            tag: "kernel",   keywords: ["linux", "kernel", "hang", "ema", "c"] },
-  { id: "floework",  name: "Floework",   desc: "Human-Aware SaaS Productivity Platform",    tag: "saas",     keywords: ["saas", "productivity", "node", "socket"] },
+  { id: "caps",     name: "CAPS",         desc: "CAPS",                                         tag: "ai agent", keywords: ["ml", "agentic ai", "agentic UPI", "fintech"] },
+  { id: "avara",    name: "AVARA",        desc: "Agent Runtime Security Authority",             tag: "systems",  keywords: ["agent", "security", "runtime", "llm"] },
+  { id: "kphd",     name: "K-PHD",        desc: "Kernel Predictive Hang Detector",              tag: "kernel",   keywords: ["linux", "kernel", "hang", "ema", "c"] },
+  { id: "floework", name: "Floework",     desc: "Human-Aware SaaS Productivity Platform",       tag: "saas",     keywords: ["saas", "productivity", "node", "socket"] },
 ];
 
 const GARDEN_FILES = rawResearchData.nodes.map((n: any) => ({
@@ -380,7 +380,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
           onMouseDown={handleMouseDown}
         >
           <div style={{
-            background: "rgba(253, 253, 251, 0.12)",
+            background: "rgba(253, 253, 251, 0.05)",
             backdropFilter: "blur(24px)",
             WebkitBackdropFilter: "blur(24px)",
             border: "1px dashed rgba(26, 26, 26, 0.15)",
