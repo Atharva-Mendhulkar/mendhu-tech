@@ -114,7 +114,7 @@ export default function Home() {
 
               {/* Multi-loop curved arrow pointing DOWN from middle of text to middle of button */}
               <path 
-                d="M45,45 C75,85 95,5 115,55 S130,115 135,100"
+                d="M55,50 C80,85 100,10 115,55 S130,115 135,100"
                 fill="none" 
                 stroke="var(--accent)" 
                 strokeWidth="2"
