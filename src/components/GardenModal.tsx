@@ -113,6 +113,23 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: GardenModal
     "Intelligence": true,
     "General": true
   });
+
+  const [panelConfig, setPanelConfig] = useState({
+    nodeSize: 1.2,
+    linkThickness: 1.5,
+    centerForce: 0.004,
+    repelForce: 7500,
+    linkForce: 0.02,
+    linkDistance: 260,
+    groupByTags: false,
+    searchQuery: '',
+    showArrows: false,
+    showTags: true,
+  });
+
+  const transformRef = useRef({ scale: 1, x: 0, y: 0 });
+  const isPanningRef = useRef(false);
+  const panStartRef = useRef({ x: 0, y: 0 });
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const simulationRef = useRef<number | null>(null);

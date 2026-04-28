@@ -4,17 +4,39 @@
     "type": "split",
     "children": [
       {
-        "id": "2952d7fd740f38ed",
+        "id": "7a6dd601f2ef6668",
         "type": "tabs",
+        "dimension": 69.9279711884754,
         "children": [
           {
-            "id": "0182cba1bcd727ca",
+            "id": "85d3edf21fd671d8",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "agent-identity-iam.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "New tab"
+              "title": "agent-identity-iam"
+            }
+          }
+        ]
+      },
+      {
+        "id": "ff1d98182c9ea72a",
+        "type": "tabs",
+        "dimension": 30.07202881152461,
+        "children": [
+          {
+            "id": "7b7648a5ad3d9e04",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
             }
           }
         ]
@@ -49,7 +71,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "tag:#security",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -70,11 +92,13 @@
               "title": "Bookmarks"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "right": {
     "id": "2a9a4a3f31ff0c15",
@@ -190,10 +214,12 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "5dab72ca6b9a64b8",
+  "active": "7b7648a5ad3d9e04",
   "lastOpenFiles": [
-    "atharva.md",
+    "agent-identity-iam.md",
     "agent-systems.md",
+    "deterministic-control-plane.md",
+    "atharva.md",
     "multi-agent-systems.md",
     "autonomous-agents.md",
     "approval-workflows.md",
