@@ -1,114 +1,1249 @@
 {
   "nodes": [
     {
-      "id": "avara",
-      "name": "AVARA — Autonomous Validation & Agent Risk Authority",
-      "group": "ai",
-      "description": "Runtime security and governance layer for autonomous AI agents.",
-      "tags": [
-        "agent",
-        "security",
-        "ai"
-      ]
-    },
-    {
-      "id": "caps",
-      "name": "CAPS — Context-Aware Agentic Payment System",
-      "group": "ai",
-      "description": "A deterministic payment kernel for autonomous agents.",
-      "tags": [
-        "agent",
-        "security",
-        "systems",
-        "ai"
-      ]
-    },
-    {
-      "id": "floework",
-      "name": "Floework — Real-time Behavioral Telemetry",
-      "group": "systems",
-      "color": "#534AB7",
-      "description": "Distributed tracing for human interaction patterns.",
-      "tags": [
-        "systems",
-        "product"
-      ]
-    },
-    {
-      "id": "k-phd",
-      "name": "K-PHD — Kernel-level Predictive Hang Detector",
-      "group": "systems",
-      "color": "#534AB7",
-      "description": "Predictive CPU starvation monitoring inside the Linux scheduler.",
-      "tags": [
-        "systems",
-        "kernel"
-      ]
-    },
-    {
-      "id": "shield",
-      "name": "SHIELD — Adaptive Fraud Detection",
+      "id": "agent-identity-iam",
+      "name": "Agent Identity & IAM",
       "group": "security",
       "color": "#3B6D11",
-      "description": "Behavioral biometrics for secure mobile banking.",
+      "description": "Identity and access management for autonomous agents.",
+      "tags": [
+        "security",
+        "identity"
+      ]
+    },
+    {
+      "id": "agent-overreach",
+      "name": "Agent Overreach",
+      "group": "ai",
+      "description": "When agents exceed intended scope or authority.",
+      "tags": [
+        "ai",
+        "security"
+      ]
+    },
+    {
+      "id": "agent-runtime-authority",
+      "name": "Agent Runtime Authority",
+      "group": "security",
+      "color": "#3B6D11",
+      "description": "Central control layer governing all agent actions.",
+      "tags": [
+        "security",
+        "ai"
+      ]
+    },
+    {
+      "id": "agent-systems",
+      "name": "Agent Systems",
+      "group": "ai",
+      "description": "Foundations of systems built using autonomous agents.",
+      "tags": [
+        "ai",
+        "agents",
+        "systems"
+      ]
+    },
+    {
+      "id": "anomaly-detection-security",
+      "name": "Anomaly Detection (Security)",
+      "group": "security",
+      "color": "#3B6D11",
+      "description": "Detecting abnormal patterns indicating threats.",
       "tags": [
         "security",
         "ml"
+      ]
+    },
+    {
+      "id": "anomaly-detection",
+      "name": "Anomaly Detection",
+      "group": "ml",
+      "color": "#0047FF",
+      "description": "Identifying deviations from normal patterns in data.",
+      "tags": [
+        "ml",
+        "security"
+      ]
+    },
+    {
+      "id": "api-gateway-pattern",
+      "name": "API Gateway Pattern",
+      "group": "systems",
+      "color": "#534AB7",
+      "description": "Central entry point for managing and routing requests.",
+      "tags": [
+        "systems"
+      ]
+    },
+    {
+      "id": "approval-workflows",
+      "name": "Approval Workflows",
+      "group": "security",
+      "color": "#3B6D11",
+      "description": "Human-in-the-loop control for high-risk actions.",
+      "tags": [
+        "security",
+        "governance"
+      ]
+    },
+    {
+      "id": "async-systems",
+      "name": "Asynchronous Systems",
+      "group": "systems",
+      "color": "#534AB7",
+      "description": "Systems where tasks execute independently of request-response cycles.",
+      "tags": [
+        "systems"
+      ]
+    },
+    {
+      "id": "audit-ledger",
+      "name": "Audit Ledger",
+      "group": "security",
+      "color": "#3B6D11",
+      "description": "Immutable record of system actions and decisions.",
+      "tags": [
+        "security",
+        "systems"
+      ]
+    },
+    {
+      "id": "autonomous-agents",
+      "name": "Autonomous Agents",
+      "group": "ai",
+      "description": "Agents capable of independent decision-making and execution.",
+      "tags": [
+        "ai",
+        "agents"
+      ]
+    },
+    {
+      "id": "backpressure",
+      "name": "Backpressure",
+      "group": "systems",
+      "color": "#534AB7",
+      "description": "Mechanism to control system overload by limiting input rate.",
+      "tags": [
+        "systems"
+      ]
+    },
+    {
+      "id": "behavioral-biometrics",
+      "name": "Behavioral Biometrics",
+      "group": "ml",
+      "color": "#0047FF",
+      "description": "Identifying users based on behavior rather than credentials.",
+      "tags": [
+        "ml",
+        "security"
+      ]
+    },
+    {
+      "id": "circuit-breaker-pattern",
+      "name": "Circuit Breaker Pattern",
+      "group": "security",
+      "color": "#3B6D11",
+      "description": "Mechanism to halt risky or anomalous actions.",
+      "tags": [
+        "security",
+        "systems"
+      ]
+    },
+    {
+      "id": "consent-token",
+      "name": "Consent Token",
+      "group": "security",
+      "color": "#3B6D11",
+      "description": "Secure authorization mechanism for executing actions.",
+      "tags": [
+        "security"
+      ]
+    },
+    {
+      "id": "control-plane-vs-data-plane",
+      "name": "Control Plane vs Data Plane",
+      "group": "systems",
+      "color": "#534AB7",
+      "description": "Separation between decision-making and execution layers.",
+      "tags": [
+        "systems"
+      ]
+    },
+    {
+      "id": "distributed-systems",
+      "name": "Distributed Systems",
+      "group": "systems",
+      "color": "#534AB7",
+      "description": "Systems composed of multiple independent components communicating over a network.",
+      "tags": [
+        "systems",
+        "infrastructure"
+      ]
+    },
+    {
+      "id": "dynamical-systems",
+      "name": "Dynamical Systems",
+      "group": "physics",
+      "color": "#0F6E56",
+      "description": "Systems that evolve over time based on internal rules.",
+      "tags": [
+        "physics",
+        "systems"
+      ]
+    },
+    {
+      "id": "event-driven-architecture",
+      "name": "Event Driven Architecture",
+      "group": "systems",
+      "color": "#534AB7",
+      "description": "Systems that react to events rather than direct requests.",
+      "tags": [
+        "systems",
+        "architecture"
+      ]
+    },
+    {
+      "id": "failure-cascades",
+      "name": "Failure Cascades",
+      "group": "systems",
+      "color": "#534AB7",
+      "description": "Chain reactions of failures in distributed systems.",
+      "tags": [
+        "systems"
+      ]
+    },
+    {
+      "id": "feature-engineering",
+      "name": "Feature Engineering",
+      "group": "ml",
+      "color": "#0047FF",
+      "description": "Transforming raw data into meaningful inputs for models.",
+      "tags": [
+        "ml"
+      ]
+    },
+    {
+      "id": "intent-validation",
+      "name": "Intent Validation",
+      "group": "security",
+      "color": "#3B6D11",
+      "description": "Ensuring alignment between user intent and agent actions.",
+      "tags": [
+        "security",
+        "ai"
+      ]
+    },
+    {
+      "id": "llm-as-untrusted-component",
+      "name": "LLM as Untrusted Component",
+      "group": "ai",
+      "description": "Treating LLMs as non-authoritative reasoning layers.",
+      "tags": [
+        "ai",
+        "security"
+      ]
+    },
+    {
+      "id": "lstm-autoencoder",
+      "name": "LSTM Autoencoder",
+      "group": "ml",
+      "color": "#0047FF",
+      "description": "Neural network model for sequence anomaly detection.",
+      "tags": [
+        "ml"
+      ]
+    },
+    {
+      "id": "multi-agent-systems",
+      "name": "Multi-Agent Systems",
+      "group": "ai",
+      "description": "Systems composed of interacting autonomous agents.",
+      "tags": [
+        "ai",
+        "systems"
+      ]
+    },
+    {
+      "id": "observability",
+      "name": "Observability",
+      "group": "systems",
+      "color": "#534AB7",
+      "description": "Ability to understand system behavior via logs, metrics, and traces.",
+      "tags": [
+        "systems"
+      ]
+    },
+    {
+      "id": "one-class-svm",
+      "name": "One-Class SVM",
+      "group": "ml",
+      "color": "#0047FF",
+      "description": "Model for detecting anomalies using only normal data.",
+      "tags": [
+        "ml"
+      ]
+    },
+    {
+      "id": "policy-engine",
+      "name": "Policy Engine",
+      "group": "security",
+      "color": "#3B6D11",
+      "description": "Deterministic system that evaluates actions against rules.",
+      "tags": [
+        "security",
+        "systems"
+      ]
+    },
+    {
+      "id": "prompt-injection",
+      "name": "Prompt Injection",
+      "group": "security",
+      "color": "#3B6D11",
+      "description": "Attacks that manipulate LLM behavior through input.",
+      "tags": [
+        "security",
+        "ai"
+      ]
+    },
+    {
+      "id": "rag-security",
+      "name": "RAG Security",
+      "group": "security",
+      "color": "#3B6D11",
+      "description": "Securing retrieval-augmented generation pipelines.",
+      "tags": [
+        "security",
+        "ai"
+      ]
+    },
+    {
+      "id": "rag-systems",
+      "name": "RAG Systems",
+      "group": "ai",
+      "description": "Retrieval-Augmented Generation systems combining LLMs with external knowledge.",
+      "tags": [
+        "ai",
+        "rag"
+      ]
+    },
+    {
+      "id": "reasoning-vs-execution",
+      "name": "Reasoning vs Execution",
+      "group": "ai",
+      "description": "Separation of AI reasoning from system execution authority.",
+      "tags": [
+        "ai",
+        "systems"
+      ]
+    },
+    {
+      "id": "runtime-governance",
+      "name": "Runtime Governance",
+      "group": "security",
+      "color": "#3B6D11",
+      "description": "Enforcing control over AI systems during execution.",
+      "tags": [
+        "security",
+        "ai",
+        "governance"
+      ]
+    },
+    {
+      "id": "signal-vs-noise",
+      "name": "Signal vs Noise",
+      "group": "ml",
+      "color": "#0047FF",
+      "description": "Distinguishing meaningful patterns from randomness.",
+      "tags": [
+        "ml",
+        "physics"
+      ]
+    },
+    {
+      "id": "state-machines",
+      "name": "State Machines",
+      "group": "systems",
+      "color": "#534AB7",
+      "description": "Systems modeled as transitions between defined states.",
+      "tags": [
+        "systems"
+      ]
+    },
+    {
+      "id": "statistical-learning",
+      "name": "Statistical Learning",
+      "group": "ml",
+      "color": "#0047FF",
+      "description": "Learning patterns from data using statistical methods.",
+      "tags": [
+        "ml"
+      ]
+    },
+    {
+      "id": "time-series-modeling",
+      "name": "Time Series Modeling",
+      "group": "ml",
+      "color": "#0047FF",
+      "description": "Modeling data that evolves over time.",
+      "tags": [
+        "ml"
+      ]
+    },
+    {
+      "id": "tool-augmented-agents",
+      "name": "Tool-Augmented Agents",
+      "group": "ai",
+      "description": "Agents enhanced with external tool capabilities.",
+      "tags": [
+        "ai",
+        "agents",
+        "tools"
+      ]
+    },
+    {
+      "id": "tool-execution-guard",
+      "name": "Tool Execution Guard",
+      "group": "security",
+      "color": "#3B6D11",
+      "description": "Control layer for validating tool usage by agents.",
+      "tags": [
+        "security",
+        "tools"
+      ]
+    },
+    {
+      "id": "zero-trust-architecture",
+      "name": "Zero Trust Architecture",
+      "group": "security",
+      "color": "#3B6D11",
+      "description": "Security model where nothing is trusted by default.",
+      "tags": [
+        "security"
       ]
     }
   ],
   "links": [
     {
-      "source": "avara",
-      "target": "caps"
+      "source": "agent-identity-iam",
+      "target": "agent-runtime-authority"
     },
     {
-      "source": "caps",
+      "source": "agent-identity-iam",
+      "target": "tool-execution-guard"
+    },
+    {
+      "source": "agent-identity-iam",
+      "target": "consent-token"
+    },
+    {
+      "source": "agent-identity-iam",
+      "target": "audit-ledger"
+    },
+    {
+      "source": "agent-overreach",
+      "target": "autonomous-agents"
+    },
+    {
+      "source": "agent-overreach",
+      "target": "multi-agent-systems"
+    },
+    {
+      "source": "agent-overreach",
+      "target": "prompt-injection"
+    },
+    {
+      "source": "agent-overreach",
+      "target": "llm-as-untrusted-component"
+    },
+    {
+      "source": "agent-runtime-authority",
       "target": "avara"
     },
     {
-      "source": "floework",
-      "target": "k-phd"
+      "source": "agent-runtime-authority",
+      "target": "runtime-governance"
     },
     {
-      "source": "k-phd",
-      "target": "floework"
+      "source": "agent-runtime-authority",
+      "target": "intent-validation"
     },
     {
-      "source": "shield",
-      "target": "caps"
+      "source": "agent-runtime-authority",
+      "target": "tool-execution-guard"
+    },
+    {
+      "source": "agent-runtime-authority",
+      "target": "circuit-breaker-pattern"
+    },
+    {
+      "source": "agent-systems",
+      "target": "autonomous-agents"
+    },
+    {
+      "source": "agent-systems",
+      "target": "tool-augmented-agents"
+    },
+    {
+      "source": "agent-systems",
+      "target": "multi-agent-systems"
+    },
+    {
+      "source": "anomaly-detection-security",
+      "target": "behavioral-biometrics"
+    },
+    {
+      "source": "anomaly-detection-security",
+      "target": "audit-ledger"
+    },
+    {
+      "source": "anomaly-detection-security",
+      "target": "agent-overreach"
+    },
+    {
+      "source": "anomaly-detection",
+      "target": "anomaly-detection-security"
+    },
+    {
+      "source": "anomaly-detection",
+      "target": "behavioral-biometrics"
+    },
+    {
+      "source": "anomaly-detection",
+      "target": "statistical-learning"
+    },
+    {
+      "source": "anomaly-detection",
+      "target": "signal-vs-noise"
+    },
+    {
+      "source": "api-gateway-pattern",
+      "target": "agent-runtime-authority"
+    },
+    {
+      "source": "api-gateway-pattern",
+      "target": "tool-execution-guard"
+    },
+    {
+      "source": "api-gateway-pattern",
+      "target": "observability"
+    },
+    {
+      "source": "approval-workflows",
+      "target": "circuit-breaker-pattern"
+    },
+    {
+      "source": "approval-workflows",
+      "target": "policy-engine"
+    },
+    {
+      "source": "approval-workflows",
+      "target": "consent-token"
+    },
+    {
+      "source": "async-systems",
+      "target": "event-driven-architecture"
+    },
+    {
+      "source": "async-systems",
+      "target": "distributed-systems"
+    },
+    {
+      "source": "async-systems",
+      "target": "backpressure"
+    },
+    {
+      "source": "audit-ledger",
+      "target": "agent-runtime-authority"
+    },
+    {
+      "source": "audit-ledger",
+      "target": "policy-engine"
+    },
+    {
+      "source": "audit-ledger",
+      "target": "anomaly-detection-security"
+    },
+    {
+      "source": "autonomous-agents",
+      "target": "agent-systems"
+    },
+    {
+      "source": "autonomous-agents",
+      "target": "multi-agent-systems"
+    },
+    {
+      "source": "autonomous-agents",
+      "target": "agent-overreach"
+    },
+    {
+      "source": "autonomous-agents",
+      "target": "reasoning-vs-execution"
+    },
+    {
+      "source": "backpressure",
+      "target": "async-systems"
+    },
+    {
+      "source": "backpressure",
+      "target": "event-driven-architecture"
+    },
+    {
+      "source": "backpressure",
+      "target": "failure-cascades"
+    },
+    {
+      "source": "behavioral-biometrics",
+      "target": "anomaly-detection"
+    },
+    {
+      "source": "behavioral-biometrics",
+      "target": "session-risk-scoring"
+    },
+    {
+      "source": "behavioral-biometrics",
+      "target": "feature-engineering"
+    },
+    {
+      "source": "circuit-breaker-pattern",
+      "target": "agent-runtime-authority"
+    },
+    {
+      "source": "circuit-breaker-pattern",
+      "target": "event-driven-architecture"
+    },
+    {
+      "source": "circuit-breaker-pattern",
+      "target": "approval-workflows"
+    },
+    {
+      "source": "circuit-breaker-pattern",
+      "target": "agent-overreach"
+    },
+    {
+      "source": "consent-token",
+      "target": "policy-engine"
+    },
+    {
+      "source": "consent-token",
+      "target": "approval-workflows"
+    },
+    {
+      "source": "consent-token",
+      "target": "agent-identity-iam"
+    },
+    {
+      "source": "control-plane-vs-data-plane",
+      "target": "policy-engine"
+    },
+    {
+      "source": "control-plane-vs-data-plane",
+      "target": "reasoning-vs-execution"
+    },
+    {
+      "source": "control-plane-vs-data-plane",
+      "target": "deterministic-control-plane"
+    },
+    {
+      "source": "distributed-systems",
+      "target": "multi-agent-systems"
+    },
+    {
+      "source": "distributed-systems",
+      "target": "event-driven-architecture"
+    },
+    {
+      "source": "distributed-systems",
+      "target": "failure-cascades"
+    },
+    {
+      "source": "distributed-systems",
+      "target": "observability"
+    },
+    {
+      "source": "dynamical-systems",
+      "target": "time-series-modeling"
+    },
+    {
+      "source": "dynamical-systems",
+      "target": "multi-agent-systems"
+    },
+    {
+      "source": "dynamical-systems",
+      "target": "failure-cascades"
+    },
+    {
+      "source": "event-driven-architecture",
+      "target": "distributed-systems"
+    },
+    {
+      "source": "event-driven-architecture",
+      "target": "circuit-breaker-pattern"
+    },
+    {
+      "source": "event-driven-architecture",
+      "target": "async-systems"
+    },
+    {
+      "source": "event-driven-architecture",
+      "target": "backpressure"
+    },
+    {
+      "source": "failure-cascades",
+      "target": "multi-agent-systems"
+    },
+    {
+      "source": "failure-cascades",
+      "target": "agent-overreach"
+    },
+    {
+      "source": "failure-cascades",
+      "target": "circuit-breaker-pattern"
+    },
+    {
+      "source": "failure-cascades",
+      "target": "backpressure"
+    },
+    {
+      "source": "feature-engineering",
+      "target": "behavioral-biometrics"
+    },
+    {
+      "source": "feature-engineering",
+      "target": "statistical-learning"
+    },
+    {
+      "source": "feature-engineering",
+      "target": "signal-vs-noise"
+    },
+    {
+      "source": "intent-validation",
+      "target": "prompt-injection"
+    },
+    {
+      "source": "intent-validation",
+      "target": "agent-overreach"
+    },
+    {
+      "source": "intent-validation",
+      "target": "agent-runtime-authority"
+    },
+    {
+      "source": "intent-validation",
+      "target": "policy-engine"
+    },
+    {
+      "source": "intent-validation",
+      "target": "rag-security"
+    },
+    {
+      "source": "intent-validation",
+      "target": "approval-workflows"
+    },
+    {
+      "source": "llm-as-untrusted-component",
+      "target": "reasoning-vs-execution"
+    },
+    {
+      "source": "llm-as-untrusted-component",
+      "target": "prompt-injection"
+    },
+    {
+      "source": "llm-as-untrusted-component",
+      "target": "agent-overreach"
+    },
+    {
+      "source": "llm-as-untrusted-component",
+      "target": "rag-systems"
+    },
+    {
+      "source": "lstm-autoencoder",
+      "target": "time-series-modeling"
+    },
+    {
+      "source": "lstm-autoencoder",
+      "target": "anomaly-detection"
+    },
+    {
+      "source": "lstm-autoencoder",
+      "target": "dynamical-systems"
+    },
+    {
+      "source": "multi-agent-systems",
+      "target": "agent-systems"
+    },
+    {
+      "source": "multi-agent-systems",
+      "target": "autonomous-agents"
+    },
+    {
+      "source": "multi-agent-systems",
+      "target": "agent-overreach"
+    },
+    {
+      "source": "multi-agent-systems",
+      "target": "reasoning-vs-execution"
+    },
+    {
+      "source": "observability",
+      "target": "audit-ledger"
+    },
+    {
+      "source": "observability",
+      "target": "anomaly-detection-security"
+    },
+    {
+      "source": "observability",
+      "target": "failure-cascades"
+    },
+    {
+      "source": "one-class-svm",
+      "target": "anomaly-detection"
+    },
+    {
+      "source": "one-class-svm",
+      "target": "behavioral-biometrics"
+    },
+    {
+      "source": "one-class-svm",
+      "target": "statistical-learning"
+    },
+    {
+      "source": "policy-engine",
+      "target": "runtime-governance"
+    },
+    {
+      "source": "policy-engine",
+      "target": "reasoning-vs-execution"
+    },
+    {
+      "source": "policy-engine",
+      "target": "consent-token"
+    },
+    {
+      "source": "policy-engine",
+      "target": "circuit-breaker-pattern"
+    },
+    {
+      "source": "prompt-injection",
+      "target": "rag-systems"
+    },
+    {
+      "source": "prompt-injection",
+      "target": "llm-as-untrusted-component"
+    },
+    {
+      "source": "prompt-injection",
+      "target": "agent-overreach"
+    },
+    {
+      "source": "prompt-injection",
+      "target": "reasoning-vs-execution"
+    },
+    {
+      "source": "rag-security",
+      "target": "prompt-injection"
+    },
+    {
+      "source": "rag-security",
+      "target": "agent-overreach"
+    },
+    {
+      "source": "rag-security",
+      "target": "rag-systems"
+    },
+    {
+      "source": "rag-security",
+      "target": "tool-augmented-agents"
+    },
+    {
+      "source": "rag-security",
+      "target": "intent-validation"
+    },
+    {
+      "source": "rag-systems",
+      "target": "tool-augmented-agents"
+    },
+    {
+      "source": "rag-systems",
+      "target": "llm-as-untrusted-component"
+    },
+    {
+      "source": "rag-systems",
+      "target": "prompt-injection"
+    },
+    {
+      "source": "rag-systems",
+      "target": "agent-overreach"
+    },
+    {
+      "source": "reasoning-vs-execution",
+      "target": "llm-as-untrusted-component"
+    },
+    {
+      "source": "reasoning-vs-execution",
+      "target": "agent-systems"
+    },
+    {
+      "source": "reasoning-vs-execution",
+      "target": "agent-overreach"
+    },
+    {
+      "source": "reasoning-vs-execution",
+      "target": "prompt-injection"
+    },
+    {
+      "source": "runtime-governance",
+      "target": "agent-systems"
+    },
+    {
+      "source": "runtime-governance",
+      "target": "autonomous-agents"
+    },
+    {
+      "source": "runtime-governance",
+      "target": "agent-runtime-authority"
+    },
+    {
+      "source": "runtime-governance",
+      "target": "policy-engine"
+    },
+    {
+      "source": "signal-vs-noise",
+      "target": "feature-engineering"
+    },
+    {
+      "source": "signal-vs-noise",
+      "target": "statistical-learning"
+    },
+    {
+      "source": "signal-vs-noise",
+      "target": "anomaly-detection"
+    },
+    {
+      "source": "state-machines",
+      "target": "policy-engine"
+    },
+    {
+      "source": "state-machines",
+      "target": "approval-workflows"
+    },
+    {
+      "source": "state-machines",
+      "target": "control-plane-vs-data-plane"
+    },
+    {
+      "source": "statistical-learning",
+      "target": "one-class-svm"
+    },
+    {
+      "source": "statistical-learning",
+      "target": "anomaly-detection"
+    },
+    {
+      "source": "statistical-learning",
+      "target": "signal-vs-noise"
+    },
+    {
+      "source": "time-series-modeling",
+      "target": "lstm-autoencoder"
+    },
+    {
+      "source": "time-series-modeling",
+      "target": "anomaly-detection"
+    },
+    {
+      "source": "time-series-modeling",
+      "target": "dynamical-systems"
+    },
+    {
+      "source": "tool-augmented-agents",
+      "target": "agent-systems"
+    },
+    {
+      "source": "tool-augmented-agents",
+      "target": "rag-systems"
+    },
+    {
+      "source": "tool-augmented-agents",
+      "target": "prompt-injection"
+    },
+    {
+      "source": "tool-augmented-agents",
+      "target": "agent-overreach"
+    },
+    {
+      "source": "tool-execution-guard",
+      "target": "agent-runtime-authority"
+    },
+    {
+      "source": "tool-execution-guard",
+      "target": "tool-augmented-agents"
+    },
+    {
+      "source": "tool-execution-guard",
+      "target": "prompt-injection"
+    },
+    {
+      "source": "tool-execution-guard",
+      "target": "agent-overreach"
+    },
+    {
+      "source": "zero-trust-architecture",
+      "target": "llm-as-untrusted-component"
+    },
+    {
+      "source": "zero-trust-architecture",
+      "target": "runtime-governance"
+    },
+    {
+      "source": "zero-trust-architecture",
+      "target": "intent-validation"
+    },
+    {
+      "source": "zero-trust-architecture",
+      "target": "policy-engine"
     }
   ],
   "files": {
-    "avara": {
-      "title": "AVARA — Autonomous Validation & Agent Risk Authority",
-      "header": "AVARA.md",
-      "markdown": "\n# AVARA (Autonomous Validation & Agent Risk Authority)\n\nAVARA is a **runtime security layer** that enforces intent, permissions, provenance, and safety at execution time, not training time.\n\n## Core Features\n- **Intent Validation**: Verifies that the agent's action aligns with the user's original goal.\n- **Circuit Breakers**: Automatically halts agent loops if anomalous behavior is detected.\n- **Audit Ledger**: Immutable record of every decision and tool call.\n\n## Integration\nAVARA acts as a shim between the Agent Framework (LangChain/CrewAI) and the World.\n\n```mermaid\nsequenceDiagram\n    Agent->>AVARA: Intent: Pay ₹200 to Merchant X\n    AVARA->>CAPS: Check Policy\n    CAPS-->>AVARA: Approved\n    AVARA->>Agent: Proceed\n```\n\nSee also: [[CAPS]] for the payment implementation.\n",
-      "html": "\n# AVARA (Autonomous Validation & Agent Risk Authority)\n\nAVARA is a **runtime security layer** that enforces intent, permissions, provenance, and safety at execution time, not training time.\n\n## Core Features\n- **Intent Validation**: Verifies that the agent's action aligns with the user's original goal.\n- **Circuit Breakers**: Automatically halts agent loops if anomalous behavior is detected.\n- **Audit Ledger**: Immutable record of every decision and tool call.\n\n## Integration\nAVARA acts as a shim between the Agent Framework (LangChain/CrewAI) and the World.\n\n```mermaid\nsequenceDiagram\n    Agent->>AVARA: Intent: Pay ₹200 to Merchant X\n    AVARA->>CAPS: Check Policy\n    CAPS-->>AVARA: Approved\n    AVARA->>Agent: Proceed\n```\n\nSee also: <span class=\"wiki-link\" data-id=\"caps\">CAPS</span> for the payment implementation.\n"
+    "agent-identity-iam": {
+      "title": "Agent Identity & IAM",
+      "header": "agent-identity-iam.md",
+      "markdown": "\n# Agent Identity & IAM\n\nAgents must have identities, roles, and permissions.\n\nCore Features\n\n* Unique identity\n* Scoped permissions\n* Access control\n\nIntegration\n\nCritical for:\n\n* [[agent-runtime-authority]]\n* [[tool-execution-guard]]\n\n```mermaid\nflowchart LR\n    Agent --> Identity --> Permissions --> Access\n```\n\nSee also\n\n* [[consent-token]]\n* [[audit-ledger]]\n",
+      "html": "\n# Agent Identity & IAM\n\nAgents must have identities, roles, and permissions.\n\nCore Features\n\n* Unique identity\n* Scoped permissions\n* Access control\n\nIntegration\n\nCritical for:\n\n* <span class=\"wiki-link\" data-id=\"agent-runtime-authority\">agent-runtime-authority</span>\n* <span class=\"wiki-link\" data-id=\"tool-execution-guard\">tool-execution-guard</span>\n\n```mermaid\nflowchart LR\n    Agent --> Identity --> Permissions --> Access\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"consent-token\">consent-token</span>\n* <span class=\"wiki-link\" data-id=\"audit-ledger\">audit-ledger</span>\n"
     },
-    "caps": {
-      "title": "CAPS — Context-Aware Agentic Payment System",
-      "header": "CAPS.md",
-      "markdown": "\n# CAPS (Context-Aware Agentic Payment System)\n\nCAPS is a **deterministic payment kernel** designed for autonomous agents. It decouples reasoning (LLMs) from execution (UPI Lite) using policy-based safety gates.\n\n## The Problem\nAI agents in 2026 are increasingly autonomous but lack a safe way to handle money. Giving an LLM direct access to a bank account is a catastrophic security risk.\n\n## The Solution\nCAPS treats the LLM as an **untrusted intent source**. \n1. The LLM expresses a desire to pay.\n2. The CAPS **Policy Engine** intercepts the request.\n3. The request is validated against deterministic rules (e.g., max ₹500/txn, merchant reputation).\n4. Execution happens via **UPI Lite Google ADK**.\n\n```mermaid\ngraph TD\n    A[User Intent] --> B[LLM Agent]\n    B --> C{CAPS Policy Engine}\n    C -- Valid --> D[UPI Lite Execution]\n    C -- Invalid --> E[Rejection / Human in loop]\n    D --> F[Merchant VPA]\n```\n\n## Tech Stack\n- **Reasoning**: Ollama (Local) / Gemini\n- **Safety**: Python-based Deterministic Guardrails\n- **Payment**: UPI Lite / Google Pay ADK\n- **Monitoring**: Real-time Fraud Intelligence Loop\n\n[[AVARA]] provides the runtime governance for the agents using CAPS.\n",
-      "html": "\n# CAPS (Context-Aware Agentic Payment System)\n\nCAPS is a **deterministic payment kernel** designed for autonomous agents. It decouples reasoning (LLMs) from execution (UPI Lite) using policy-based safety gates.\n\n## The Problem\nAI agents in 2026 are increasingly autonomous but lack a safe way to handle money. Giving an LLM direct access to a bank account is a catastrophic security risk.\n\n## The Solution\nCAPS treats the LLM as an **untrusted intent source**. \n1. The LLM expresses a desire to pay.\n2. The CAPS **Policy Engine** intercepts the request.\n3. The request is validated against deterministic rules (e.g., max ₹500/txn, merchant reputation).\n4. Execution happens via **UPI Lite Google ADK**.\n\n```mermaid\ngraph TD\n    A[User Intent] --> B[LLM Agent]\n    B --> C{CAPS Policy Engine}\n    C -- Valid --> D[UPI Lite Execution]\n    C -- Invalid --> E[Rejection / Human in loop]\n    D --> F[Merchant VPA]\n```\n\n## Tech Stack\n- **Reasoning**: Ollama (Local) / Gemini\n- **Safety**: Python-based Deterministic Guardrails\n- **Payment**: UPI Lite / Google Pay ADK\n- **Monitoring**: Real-time Fraud Intelligence Loop\n\n<span class=\"wiki-link\" data-id=\"avara\">AVARA</span> provides the runtime governance for the agents using CAPS.\n"
+    "agent-overreach": {
+      "title": "Agent Overreach",
+      "header": "agent-overreach.md",
+      "markdown": "\n# Agent Overreach\n\nAgent overreach occurs when agents act beyond intended boundaries.\n\nCore Features\n\n* Scope expansion\n* Uncontrolled chaining\n* Implicit assumptions\n\nImpact\n\n* System misuse\n* Data exposure\n* Financial or operational damage\n\nIntegration\n\nSeen in:\n\n* [[autonomous-agents]]\n* [[multi-agent-systems]]\n\n```mermaid\nflowchart LR\n    Task --> Agent --> Extra Actions --> Risk\n```\n\nSee also\n\n* [[prompt-injection]]\n* [[llm-as-untrusted-component]]\n",
+      "html": "\n# Agent Overreach\n\nAgent overreach occurs when agents act beyond intended boundaries.\n\nCore Features\n\n* Scope expansion\n* Uncontrolled chaining\n* Implicit assumptions\n\nImpact\n\n* System misuse\n* Data exposure\n* Financial or operational damage\n\nIntegration\n\nSeen in:\n\n* <span class=\"wiki-link\" data-id=\"autonomous-agents\">autonomous-agents</span>\n* <span class=\"wiki-link\" data-id=\"multi-agent-systems\">multi-agent-systems</span>\n\n```mermaid\nflowchart LR\n    Task --> Agent --> Extra Actions --> Risk\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"prompt-injection\">prompt-injection</span>\n* <span class=\"wiki-link\" data-id=\"llm-as-untrusted-component\">llm-as-untrusted-component</span>\n"
     },
-    "floework": {
-      "title": "Floework — Real-time Behavioral Telemetry",
-      "header": "Floework.md",
-      "markdown": "\n# Floework (Real-time Behavioral Telemetry)\n\nFloework is a distributed tracing system designed to capture and analyze **human interaction sequences** in real-time.\n\n## The Objective\nStandard APM (Application Performance Monitoring) tracks CPU and Memory. Floework tracks **Flow**. \n- Where does the user hesitate?\n- Which interaction sequence leads to a \"Predictive Hang\"?\n\n## Integration\nFloework hooks into the UI event loop and streams high-fidelity telemetry to a Go-based ingestion engine.\n\n```mermaid\ngraph LR\n    A[Client UI] -- Protocol Buffers --> B[Ingestion Engine]\n    B --> C[Stream Processor]\n    C --> D[K-PHD Analysis]\n    D --> E[Real-time Feedback]\n```\n\nRelated: [[K-PHD]] uses Floework signals to predict kernel-level stalls.\n",
-      "html": "\n# Floework (Real-time Behavioral Telemetry)\n\nFloework is a distributed tracing system designed to capture and analyze **human interaction sequences** in real-time.\n\n## The Objective\nStandard APM (Application Performance Monitoring) tracks CPU and Memory. Floework tracks **Flow**. \n- Where does the user hesitate?\n- Which interaction sequence leads to a \"Predictive Hang\"?\n\n## Integration\nFloework hooks into the UI event loop and streams high-fidelity telemetry to a Go-based ingestion engine.\n\n```mermaid\ngraph LR\n    A[Client UI] -- Protocol Buffers --> B[Ingestion Engine]\n    B --> C[Stream Processor]\n    C --> D[K-PHD Analysis]\n    D --> E[Real-time Feedback]\n```\n\nRelated: <span class=\"wiki-link\" data-id=\"k-phd\">K-PHD</span> uses Floework signals to predict kernel-level stalls.\n"
+    "agent-runtime-authority": {
+      "title": "Agent Runtime Authority",
+      "header": "agent-runtime-authority.md",
+      "markdown": "\n# Agent Runtime Authority\n\nA system that sits between agents and the external world, controlling all actions.\n\nCore Features\n\n* Interception of actions\n* Permission enforcement\n* Risk evaluation\n\nIntegration\n\nImplemented in:\n\n* [[AVARA]]\n    Connected to:\n* [[runtime-governance]]\n* [[intent-validation]]\n\n```mermaid\nsequenceDiagram\n    Agent->>Authority: Request Action\n    Authority->>Policy: Validate\n    Policy-->>Authority: Decision\n    Authority->>Tool: Execute\n```\n\nSee also\n\n* [[tool-execution-guard]]\n* [[circuit-breaker-pattern]]\n",
+      "html": "\n# Agent Runtime Authority\n\nA system that sits between agents and the external world, controlling all actions.\n\nCore Features\n\n* Interception of actions\n* Permission enforcement\n* Risk evaluation\n\nIntegration\n\nImplemented in:\n\n* <span class=\"wiki-link\" data-id=\"avara\">AVARA</span>\n    Connected to:\n* <span class=\"wiki-link\" data-id=\"runtime-governance\">runtime-governance</span>\n* <span class=\"wiki-link\" data-id=\"intent-validation\">intent-validation</span>\n\n```mermaid\nsequenceDiagram\n    Agent->>Authority: Request Action\n    Authority->>Policy: Validate\n    Policy-->>Authority: Decision\n    Authority->>Tool: Execute\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"tool-execution-guard\">tool-execution-guard</span>\n* <span class=\"wiki-link\" data-id=\"circuit-breaker-pattern\">circuit-breaker-pattern</span>\n"
     },
-    "k-phd": {
-      "title": "K-PHD — Kernel-level Predictive Hang Detector",
-      "header": "K-PHD.md",
-      "markdown": "\n# K-PHD (Kernel-level Predictive Hang Detector)\n\nK-PHD is a Linux kernel module that embeds into the scheduler hot-path to measure nanosecond-level process wait times.\n\n## Mechanics\nBy hooking into `sched_switch` and `sched_wakeup` tracepoints, K-PHD computes an Exponential Moving Average (EMA) of wait latencies for every PID.\n\n## Prediction\nIf the EMA exceeds a threshold (e.g., 5ms), K-PHD signals a **Predictive Hang** via Netlink to userspace before the application actually freezes.\n\n```c\n// Example tracepoint hook\nTRACE_EVENT(sched_switch,\n    TP_PROTO(bool preempt, struct task_struct *prev, struct task_struct *next),\n    ...\n);\n```\n\nRelated: [[Floework]] uses similar behavioral signals but at the application layer.\n",
-      "html": "\n# K-PHD (Kernel-level Predictive Hang Detector)\n\nK-PHD is a Linux kernel module that embeds into the scheduler hot-path to measure nanosecond-level process wait times.\n\n## Mechanics\nBy hooking into `sched_switch` and `sched_wakeup` tracepoints, K-PHD computes an Exponential Moving Average (EMA) of wait latencies for every PID.\n\n## Prediction\nIf the EMA exceeds a threshold (e.g., 5ms), K-PHD signals a **Predictive Hang** via Netlink to userspace before the application actually freezes.\n\n```c\n// Example tracepoint hook\nTRACE_EVENT(sched_switch,\n    TP_PROTO(bool preempt, struct task_struct *prev, struct task_struct *next),\n    ...\n);\n```\n\nRelated: <span class=\"wiki-link\" data-id=\"floework\">Floework</span> uses similar behavioral signals but at the application layer.\n"
+    "agent-systems": {
+      "title": "Agent Systems",
+      "header": "agent-systems.md",
+      "markdown": "\n# Agent Systems\n\nAgent systems are architectures where autonomous entities perceive, decide, and act.\n\nCore Features\n\n* Autonomy: Agents operate without constant human control\n* Decision Loops: Observe → Reason → Act\n* Tool Usage: Interact with external systems\n\nIntegration\n\nAgent systems typically sit above infrastructure and interact via tools and APIs.\n\n```mermaid\nsequenceDiagram\n    User->>Agent: Task\n    Agent->>Tools: Execute actions\n    Tools-->>Agent: Results\n    Agent->>User: Output\n```\n\nSee also\n\n* [[autonomous-agents]]\n* [[tool-augmented-agents]]\n* [[multi-agent-systems]]\n",
+      "html": "\n# Agent Systems\n\nAgent systems are architectures where autonomous entities perceive, decide, and act.\n\nCore Features\n\n* Autonomy: Agents operate without constant human control\n* Decision Loops: Observe → Reason → Act\n* Tool Usage: Interact with external systems\n\nIntegration\n\nAgent systems typically sit above infrastructure and interact via tools and APIs.\n\n```mermaid\nsequenceDiagram\n    User->>Agent: Task\n    Agent->>Tools: Execute actions\n    Tools-->>Agent: Results\n    Agent->>User: Output\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"autonomous-agents\">autonomous-agents</span>\n* <span class=\"wiki-link\" data-id=\"tool-augmented-agents\">tool-augmented-agents</span>\n* <span class=\"wiki-link\" data-id=\"multi-agent-systems\">multi-agent-systems</span>\n"
     },
-    "shield": {
-      "title": "SHIELD — Adaptive Fraud Detection",
-      "header": "SHIELD.md",
-      "markdown": "\n# SHIELD (Adaptive Fraud Detection)\n\nSHIELD is a behavioral biometrics engine that identifies users based on how they interact with their devices, rather than what they know or have.\n\n## Key Vectors\n- **Touch Dynamics**: Pressure, area, and curvature of swipes.\n- **Sensor Fusion**: Accelerometer and Gyroscope patterns during interaction.\n- **Sequence Analysis**: The order and timing of menu navigation.\n\n## Performance\nSHIELD achieves a **99.2% Accuracy** in identifying unauthorized session takeovers by analyzing the first 5 seconds of interaction.\n\n```mermaid\npie title Feature Importance\n    \"Touch Dynamics\" : 45\n    \"Sensor Fusion\" : 30\n    \"Navigation Sequence\" : 25\n```\n\nSee also: [[CAPS]] uses SHIELD scores to authorize high-value transactions.\n",
-      "html": "\n# SHIELD (Adaptive Fraud Detection)\n\nSHIELD is a behavioral biometrics engine that identifies users based on how they interact with their devices, rather than what they know or have.\n\n## Key Vectors\n- **Touch Dynamics**: Pressure, area, and curvature of swipes.\n- **Sensor Fusion**: Accelerometer and Gyroscope patterns during interaction.\n- **Sequence Analysis**: The order and timing of menu navigation.\n\n## Performance\nSHIELD achieves a **99.2% Accuracy** in identifying unauthorized session takeovers by analyzing the first 5 seconds of interaction.\n\n```mermaid\npie title Feature Importance\n    \"Touch Dynamics\" : 45\n    \"Sensor Fusion\" : 30\n    \"Navigation Sequence\" : 25\n```\n\nSee also: <span class=\"wiki-link\" data-id=\"caps\">CAPS</span> uses SHIELD scores to authorize high-value transactions.\n"
+    "anomaly-detection-security": {
+      "title": "Anomaly Detection (Security)",
+      "header": "anomaly-detection-security.md",
+      "markdown": "\n# Anomaly Detection (Security)\n\nIdentifies unusual behavior in systems.\n\nCore Features\n\n* Pattern deviation\n* Behavior monitoring\n* Risk scoring\n\nIntegration\n\nUsed in:\n\n* [[behavioral-biometrics]]\n* [[audit-ledger]]\n\n```mermaid\nflowchart LR\n    Data --> Model --> Score --> Alert\n```\n\nSee also\n\n* [[agent-overreach]]\n",
+      "html": "\n# Anomaly Detection (Security)\n\nIdentifies unusual behavior in systems.\n\nCore Features\n\n* Pattern deviation\n* Behavior monitoring\n* Risk scoring\n\nIntegration\n\nUsed in:\n\n* <span class=\"wiki-link\" data-id=\"behavioral-biometrics\">behavioral-biometrics</span>\n* <span class=\"wiki-link\" data-id=\"audit-ledger\">audit-ledger</span>\n\n```mermaid\nflowchart LR\n    Data --> Model --> Score --> Alert\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"agent-overreach\">agent-overreach</span>\n"
+    },
+    "anomaly-detection": {
+      "title": "Anomaly Detection",
+      "header": "anomaly-detection.md",
+      "markdown": "\n# Anomaly Detection\n\nAnomaly detection identifies behavior that deviates from learned norms.\n\nCore Features\n\n* Baseline modeling\n* Deviation scoring\n* Threshold-based decisions\n\nWhy it matters\n\nUsed to detect:\n\n* fraud\n* attacks\n* system failures\n\nIntegration\n\nUsed in:\n\n* [[anomaly-detection-security]]\n* [[behavioral-biometrics]]\n\n```mermaid\nflowchart LR\n    Data --> Model --> Score --> Decision\n```\n\nSee also\n\n* [[statistical-learning]]\n* [[signal-vs-noise]]\n",
+      "html": "\n# Anomaly Detection\n\nAnomaly detection identifies behavior that deviates from learned norms.\n\nCore Features\n\n* Baseline modeling\n* Deviation scoring\n* Threshold-based decisions\n\nWhy it matters\n\nUsed to detect:\n\n* fraud\n* attacks\n* system failures\n\nIntegration\n\nUsed in:\n\n* <span class=\"wiki-link\" data-id=\"anomaly-detection-security\">anomaly-detection-security</span>\n* <span class=\"wiki-link\" data-id=\"behavioral-biometrics\">behavioral-biometrics</span>\n\n```mermaid\nflowchart LR\n    Data --> Model --> Score --> Decision\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"statistical-learning\">statistical-learning</span>\n* <span class=\"wiki-link\" data-id=\"signal-vs-noise\">signal-vs-noise</span>\n"
+    },
+    "api-gateway-pattern": {
+      "title": "API Gateway Pattern",
+      "header": "api-gateway-pattern.md",
+      "markdown": "\n# API Gateway Pattern\n\nActs as a single entry point for clients.\n\nCore Features\n\n* request routing\n* authentication\n* rate limiting\n\nIntegration\n\nUsed in:\n\n* [[agent-runtime-authority]]\n* [[tool-execution-guard]]\n\n```mermaid\nflowchart LR\n    Client --> Gateway --> Services\n```\n\nSee also\n\n* [[observability]]\n",
+      "html": "\n# API Gateway Pattern\n\nActs as a single entry point for clients.\n\nCore Features\n\n* request routing\n* authentication\n* rate limiting\n\nIntegration\n\nUsed in:\n\n* <span class=\"wiki-link\" data-id=\"agent-runtime-authority\">agent-runtime-authority</span>\n* <span class=\"wiki-link\" data-id=\"tool-execution-guard\">tool-execution-guard</span>\n\n```mermaid\nflowchart LR\n    Client --> Gateway --> Services\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"observability\">observability</span>\n"
+    },
+    "approval-workflows": {
+      "title": "Approval Workflows",
+      "header": "approval-workflows.md",
+      "markdown": "\n# Approval Workflows\n\nHigh-risk actions require explicit approval before execution.\n\nCore Features\n\n* Manual approval\n* Escalation paths\n* Decision tracking\n\nIntegration\n\nUsed with:\n\n* [[circuit-breaker-pattern]]\n* [[policy-engine]]\n\n```mermaid\nflowchart LR\n    Risk --> Pending --> Human --> Approve/Deny\n```\n\nSee also\n\n* [[consent-token]]\n",
+      "html": "\n# Approval Workflows\n\nHigh-risk actions require explicit approval before execution.\n\nCore Features\n\n* Manual approval\n* Escalation paths\n* Decision tracking\n\nIntegration\n\nUsed with:\n\n* <span class=\"wiki-link\" data-id=\"circuit-breaker-pattern\">circuit-breaker-pattern</span>\n* <span class=\"wiki-link\" data-id=\"policy-engine\">policy-engine</span>\n\n```mermaid\nflowchart LR\n    Risk --> Pending --> Human --> Approve/Deny\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"consent-token\">consent-token</span>\n"
+    },
+    "async-systems": {
+      "title": "Asynchronous Systems",
+      "header": "async-systems.md",
+      "markdown": "\n# Asynchronous Systems\n\nTasks execute without blocking the main flow.\n\nCore Features\n\n* non-blocking execution\n* concurrency\n* scalability\n\nIntegration\n\nUsed in:\n\n* [[event-driven-architecture]]\n* [[distributed-systems]]\n\n```mermaid\nflowchart LR\n    Request --> Queue --> Worker --> Result\n```\n\nSee also\n\n* [[backpressure]]\n",
+      "html": "\n# Asynchronous Systems\n\nTasks execute without blocking the main flow.\n\nCore Features\n\n* non-blocking execution\n* concurrency\n* scalability\n\nIntegration\n\nUsed in:\n\n* <span class=\"wiki-link\" data-id=\"event-driven-architecture\">event-driven-architecture</span>\n* <span class=\"wiki-link\" data-id=\"distributed-systems\">distributed-systems</span>\n\n```mermaid\nflowchart LR\n    Request --> Queue --> Worker --> Result\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"backpressure\">backpressure</span>\n"
+    },
+    "audit-ledger": {
+      "title": "Audit Ledger",
+      "header": "audit-ledger.md",
+      "markdown": "\n# Audit Ledger\n\nRecords every action and decision in a system.\n\nCore Features\n\n* Immutable logs\n* Traceability\n* Replay capability\n\nWhy it matters\n\nEnables:\n\n* debugging\n* compliance\n* forensic analysis\n\nIntegration\n\nUsed in:\n\n* [[agent-runtime-authority]]\n* [[policy-engine]]\n\n```mermaid\nflowchart LR\n    Action --> Log --> Storage\n```\n\nSee also\n\n* [[anomaly-detection-security]]\n",
+      "html": "\n# Audit Ledger\n\nRecords every action and decision in a system.\n\nCore Features\n\n* Immutable logs\n* Traceability\n* Replay capability\n\nWhy it matters\n\nEnables:\n\n* debugging\n* compliance\n* forensic analysis\n\nIntegration\n\nUsed in:\n\n* <span class=\"wiki-link\" data-id=\"agent-runtime-authority\">agent-runtime-authority</span>\n* <span class=\"wiki-link\" data-id=\"policy-engine\">policy-engine</span>\n\n```mermaid\nflowchart LR\n    Action --> Log --> Storage\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"anomaly-detection-security\">anomaly-detection-security</span>\n"
+    },
+    "autonomous-agents": {
+      "title": "Autonomous Agents",
+      "header": "autonomous-agents.md",
+      "markdown": "\n# Autonomous Agents\n\nAutonomous agents operate independently to complete tasks over time.\n\nCore Features\n\n* Goal-driven behavior\n* State persistence\n* Iterative reasoning\n\nRisks\n\n* Unbounded execution\n* Goal drift\n* Resource misuse\n\nIntegration\n\nUsed in:\n\n* [[agent-systems]]\n* [[multi-agent-systems]]\n\n```mermaid\nflowchart LR\n    Goal --> Reasoning --> Action --> Feedback --> Reasoning\n```\n\nSee also\n\n* [[agent-overreach]]\n* [[reasoning-vs-execution]]\n",
+      "html": "\n# Autonomous Agents\n\nAutonomous agents operate independently to complete tasks over time.\n\nCore Features\n\n* Goal-driven behavior\n* State persistence\n* Iterative reasoning\n\nRisks\n\n* Unbounded execution\n* Goal drift\n* Resource misuse\n\nIntegration\n\nUsed in:\n\n* <span class=\"wiki-link\" data-id=\"agent-systems\">agent-systems</span>\n* <span class=\"wiki-link\" data-id=\"multi-agent-systems\">multi-agent-systems</span>\n\n```mermaid\nflowchart LR\n    Goal --> Reasoning --> Action --> Feedback --> Reasoning\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"agent-overreach\">agent-overreach</span>\n* <span class=\"wiki-link\" data-id=\"reasoning-vs-execution\">reasoning-vs-execution</span>\n"
+    },
+    "backpressure": {
+      "title": "Backpressure",
+      "header": "backpressure.md",
+      "markdown": "\n# Backpressure\n\nControls the rate of incoming requests to prevent overload.\n\nCore Features\n\n* flow control\n* load regulation\n* system stability\n\nIntegration\n\nUsed in:\n\n* [[async-systems]]\n* [[event-driven-architecture]]\n\n```mermaid\nflowchart LR\n    Producer --> Queue --> Consumer\n    Queue --> Limit\n```\n\nSee also\n\n* [[failure-cascades]]\n",
+      "html": "\n# Backpressure\n\nControls the rate of incoming requests to prevent overload.\n\nCore Features\n\n* flow control\n* load regulation\n* system stability\n\nIntegration\n\nUsed in:\n\n* <span class=\"wiki-link\" data-id=\"async-systems\">async-systems</span>\n* <span class=\"wiki-link\" data-id=\"event-driven-architecture\">event-driven-architecture</span>\n\n```mermaid\nflowchart LR\n    Producer --> Queue --> Consumer\n    Queue --> Limit\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"failure-cascades\">failure-cascades</span>\n"
+    },
+    "behavioral-biometrics": {
+      "title": "Behavioral Biometrics",
+      "header": "behavioral-biometrics.md",
+      "markdown": "\n# Behavioral Biometrics\n\nUsers are identified by how they behave, not what they know.\n\nCore Features\n\n* typing patterns\n* touch dynamics\n* navigation behavior\n\nWhy it matters\n\nPrevents:\n\n* SIM swap fraud\n* account takeover\n* bot attacks\n\nIntegration\n\nCore to:\n\n* [[anomaly-detection]]\n* [[session-risk-scoring]]\n\n```mermaid\nflowchart LR\n    Behavior --> Features --> Model --> Identity Score\n```\n\nSee also\n\n* [[feature-engineering]]\n",
+      "html": "\n# Behavioral Biometrics\n\nUsers are identified by how they behave, not what they know.\n\nCore Features\n\n* typing patterns\n* touch dynamics\n* navigation behavior\n\nWhy it matters\n\nPrevents:\n\n* SIM swap fraud\n* account takeover\n* bot attacks\n\nIntegration\n\nCore to:\n\n* <span class=\"wiki-link\" data-id=\"anomaly-detection\">anomaly-detection</span>\n* <span class=\"wiki-link\" data-id=\"session-risk-scoring\">session-risk-scoring</span>\n\n```mermaid\nflowchart LR\n    Behavior --> Features --> Model --> Identity Score\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"feature-engineering\">feature-engineering</span>\n"
+    },
+    "circuit-breaker-pattern": {
+      "title": "Circuit Breaker Pattern",
+      "header": "circuit-breaker-pattern.md",
+      "markdown": "\n# Circuit Breaker Pattern\n\nStops execution when risk exceeds acceptable thresholds.\n\nCore Features\n\n* Automatic halting\n* Threshold-based triggers\n* Recovery mechanisms\n\nIntegration\n\nUsed in:\n\n* [[agent-runtime-authority]]\n* [[event-driven-architecture]]\n\n```mermaid\nflowchart LR\n    Action --> Check --> Safe? --> Execute\n    Check --> Risk --> Halt\n```\n\nSee also\n\n* [[approval-workflows]]\n* [[agent-overreach]]\n",
+      "html": "\n# Circuit Breaker Pattern\n\nStops execution when risk exceeds acceptable thresholds.\n\nCore Features\n\n* Automatic halting\n* Threshold-based triggers\n* Recovery mechanisms\n\nIntegration\n\nUsed in:\n\n* <span class=\"wiki-link\" data-id=\"agent-runtime-authority\">agent-runtime-authority</span>\n* <span class=\"wiki-link\" data-id=\"event-driven-architecture\">event-driven-architecture</span>\n\n```mermaid\nflowchart LR\n    Action --> Check --> Safe? --> Execute\n    Check --> Risk --> Halt\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"approval-workflows\">approval-workflows</span>\n* <span class=\"wiki-link\" data-id=\"agent-overreach\">agent-overreach</span>\n"
+    },
+    "consent-token": {
+      "title": "Consent Token",
+      "header": "consent-token.md",
+      "markdown": "\n# Consent Token\n\nA token representing user-approved actions.\n\nCore Features\n\n* Scoped permissions\n* Single-use\n* Time-bound validity\n\nIntegration\n\nUsed in:\n\n* [[policy-engine]]\n* [[approval-workflows]]\n\n```mermaid\nflowchart LR\n    User --> Approve --> Token --> Execute\n```\n\nSee also\n\n* [[agent-identity-iam]]\n",
+      "html": "\n# Consent Token\n\nA token representing user-approved actions.\n\nCore Features\n\n* Scoped permissions\n* Single-use\n* Time-bound validity\n\nIntegration\n\nUsed in:\n\n* <span class=\"wiki-link\" data-id=\"policy-engine\">policy-engine</span>\n* <span class=\"wiki-link\" data-id=\"approval-workflows\">approval-workflows</span>\n\n```mermaid\nflowchart LR\n    User --> Approve --> Token --> Execute\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"agent-identity-iam\">agent-identity-iam</span>\n"
+    },
+    "control-plane-vs-data-plane": {
+      "title": "Control Plane vs Data Plane",
+      "header": "control-plane-vs-data-plane.md",
+      "markdown": "\n# Control Plane vs Data Plane\n\nSystems separate:\n\n* Control Plane → decisions, policies\n* Data Plane → execution\n\nCore Features\n\n* clear separation of concerns\n* scalable execution\n* centralized decision logic\n\nIntegration\n\nCore to:\n\n* [[policy-engine]]\n* [[reasoning-vs-execution]]\n\n```mermaid\nflowchart LR\n    Control --> Decision --> Data --> Execution\n```\n\nSee also\n\n* [[deterministic-control-plane]]\n",
+      "html": "\n# Control Plane vs Data Plane\n\nSystems separate:\n\n* Control Plane → decisions, policies\n* Data Plane → execution\n\nCore Features\n\n* clear separation of concerns\n* scalable execution\n* centralized decision logic\n\nIntegration\n\nCore to:\n\n* <span class=\"wiki-link\" data-id=\"policy-engine\">policy-engine</span>\n* <span class=\"wiki-link\" data-id=\"reasoning-vs-execution\">reasoning-vs-execution</span>\n\n```mermaid\nflowchart LR\n    Control --> Decision --> Data --> Execution\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"deterministic-control-plane\">deterministic-control-plane</span>\n"
+    },
+    "distributed-systems": {
+      "title": "Distributed Systems",
+      "header": "distributed-systems.md",
+      "markdown": "\n# Distributed Systems\n\nA distributed system consists of multiple nodes working together to achieve a common goal.\n\nCore Features\n\n* Partial failure\n* Network communication\n* Scalability\n\nChallenges\n\n* consistency\n* latency\n* fault tolerance\n\nIntegration\n\nFoundation for:\n\n* [[multi-agent-systems]]\n* [[event-driven-architecture]]\n\n```mermaid\ngraph TD\n    A[Node A] --> B[Node B]\n    B --> C[Node C]\n    C --> A\n```\n\nSee also\n\n* [[failure-cascades]]\n* [[observability]]\n",
+      "html": "\n# Distributed Systems\n\nA distributed system consists of multiple nodes working together to achieve a common goal.\n\nCore Features\n\n* Partial failure\n* Network communication\n* Scalability\n\nChallenges\n\n* consistency\n* latency\n* fault tolerance\n\nIntegration\n\nFoundation for:\n\n* <span class=\"wiki-link\" data-id=\"multi-agent-systems\">multi-agent-systems</span>\n* <span class=\"wiki-link\" data-id=\"event-driven-architecture\">event-driven-architecture</span>\n\n```mermaid\ngraph TD\n    A[Node A] --> B[Node B]\n    B --> C[Node C]\n    C --> A\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"failure-cascades\">failure-cascades</span>\n* <span class=\"wiki-link\" data-id=\"observability\">observability</span>\n"
+    },
+    "dynamical-systems": {
+      "title": "Dynamical Systems",
+      "header": "dynamical-systems.md",
+      "markdown": "\n# Dynamical Systems\n\nSystems evolve based on state and time.\n\nCore Features\n\n* state evolution\n* feedback loops\n* stability vs chaos\n\nIntegration\n\nUsed in:\n\n* [[time-series-modeling]]\n* [[multi-agent-systems]]\n\n```mermaid\nflowchart LR\n    State --> Update --> New State\n```\n\nSee also\n\n* [[failure-cascades]]\n",
+      "html": "\n# Dynamical Systems\n\nSystems evolve based on state and time.\n\nCore Features\n\n* state evolution\n* feedback loops\n* stability vs chaos\n\nIntegration\n\nUsed in:\n\n* <span class=\"wiki-link\" data-id=\"time-series-modeling\">time-series-modeling</span>\n* <span class=\"wiki-link\" data-id=\"multi-agent-systems\">multi-agent-systems</span>\n\n```mermaid\nflowchart LR\n    State --> Update --> New State\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"failure-cascades\">failure-cascades</span>\n"
+    },
+    "event-driven-architecture": {
+      "title": "Event Driven Architecture",
+      "header": "event-driven-architecture.md",
+      "markdown": "\n# Event Driven Architecture\n\nComponents communicate via events instead of direct calls.\n\nCore Features\n\n* Loose coupling\n* Asynchronous execution\n* Scalability\n\nIntegration\n\nUsed in:\n\n* [[distributed-systems]]\n* [[circuit-breaker-pattern]]\n\n```mermaid\nflowchart LR\n    Producer --> Event --> Consumer\n```\n\nSee also\n\n* [[async-systems]]\n* [[backpressure]]\n",
+      "html": "\n# Event Driven Architecture\n\nComponents communicate via events instead of direct calls.\n\nCore Features\n\n* Loose coupling\n* Asynchronous execution\n* Scalability\n\nIntegration\n\nUsed in:\n\n* <span class=\"wiki-link\" data-id=\"distributed-systems\">distributed-systems</span>\n* <span class=\"wiki-link\" data-id=\"circuit-breaker-pattern\">circuit-breaker-pattern</span>\n\n```mermaid\nflowchart LR\n    Producer --> Event --> Consumer\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"async-systems\">async-systems</span>\n* <span class=\"wiki-link\" data-id=\"backpressure\">backpressure</span>\n"
+    },
+    "failure-cascades": {
+      "title": "Failure Cascades",
+      "header": "failure-cascades.md",
+      "markdown": "\n# Failure Cascades\n\nFailures in one component propagate to others.\n\nCore Features\n\n* dependency chains\n* amplification effects\n* systemic risk\n\nIntegration\n\nSeen in:\n\n* [[multi-agent-systems]]\n* [[agent-overreach]]\n\n```mermaid\nflowchart LR\n    FailureA --> FailureB --> FailureC\n```\n\nSee also\n\n* [[circuit-breaker-pattern]]\n* [[backpressure]]\n",
+      "html": "\n# Failure Cascades\n\nFailures in one component propagate to others.\n\nCore Features\n\n* dependency chains\n* amplification effects\n* systemic risk\n\nIntegration\n\nSeen in:\n\n* <span class=\"wiki-link\" data-id=\"multi-agent-systems\">multi-agent-systems</span>\n* <span class=\"wiki-link\" data-id=\"agent-overreach\">agent-overreach</span>\n\n```mermaid\nflowchart LR\n    FailureA --> FailureB --> FailureC\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"circuit-breaker-pattern\">circuit-breaker-pattern</span>\n* <span class=\"wiki-link\" data-id=\"backpressure\">backpressure</span>\n"
+    },
+    "feature-engineering": {
+      "title": "Feature Engineering",
+      "header": "feature-engineering.md",
+      "markdown": "\n# Feature Engineering\n\nRaw signals must be converted into structured features.\n\nCore Features\n\n* transformation\n* normalization\n* dimensional representation\n\nIntegration\n\nUsed in:\n\n* [[behavioral-biometrics]]\n* [[statistical-learning]]\n\n```mermaid\nflowchart LR\n    Raw Data --> Transform --> Features\n```\n\nSee also\n\n* [[signal-vs-noise]]\n",
+      "html": "\n# Feature Engineering\n\nRaw signals must be converted into structured features.\n\nCore Features\n\n* transformation\n* normalization\n* dimensional representation\n\nIntegration\n\nUsed in:\n\n* <span class=\"wiki-link\" data-id=\"behavioral-biometrics\">behavioral-biometrics</span>\n* <span class=\"wiki-link\" data-id=\"statistical-learning\">statistical-learning</span>\n\n```mermaid\nflowchart LR\n    Raw Data --> Transform --> Features\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"signal-vs-noise\">signal-vs-noise</span>\n"
+    },
+    "intent-validation": {
+      "title": "Intent Validation",
+      "header": "intent-validation.md",
+      "markdown": "\n# Intent Validation\n\nValidates that an agent’s action matches the original user goal.\n\nCore Features\n\n* Semantic comparison\n* Drift detection\n* Instruction consistency\n\nRisks addressed\n\n* [[prompt-injection]]\n* [[agent-overreach]]\n\nIntegration\n\nUsed in:\n\n* [[agent-runtime-authority]]\n* [[policy-engine]]\n\n```mermaid\nflowchart LR\n    UserIntent --> Compare --> AgentAction --> Match?\n```\n\nSee also\n\n* [[rag-security]]\n* [[approval-workflows]]\n",
+      "html": "\n# Intent Validation\n\nValidates that an agent’s action matches the original user goal.\n\nCore Features\n\n* Semantic comparison\n* Drift detection\n* Instruction consistency\n\nRisks addressed\n\n* <span class=\"wiki-link\" data-id=\"prompt-injection\">prompt-injection</span>\n* <span class=\"wiki-link\" data-id=\"agent-overreach\">agent-overreach</span>\n\nIntegration\n\nUsed in:\n\n* <span class=\"wiki-link\" data-id=\"agent-runtime-authority\">agent-runtime-authority</span>\n* <span class=\"wiki-link\" data-id=\"policy-engine\">policy-engine</span>\n\n```mermaid\nflowchart LR\n    UserIntent --> Compare --> AgentAction --> Match?\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"rag-security\">rag-security</span>\n* <span class=\"wiki-link\" data-id=\"approval-workflows\">approval-workflows</span>\n"
+    },
+    "llm-as-untrusted-component": {
+      "title": "LLM as Untrusted Component",
+      "header": "llm-as-untrusted-component.md",
+      "markdown": "\n# LLM as Untrusted Component\n\nLLMs generate outputs probabilistically and must not be trusted with execution authority.\n\nCore Features\n\n* Non-deterministic outputs\n* Prompt sensitivity\n* No inherent safety guarantees\n\nPrinciple\n\nLLM = Suggestion engine, not decision engine\n\nIntegration\n\nUsed in:\n\n* [[reasoning-vs-execution]]\n* [[prompt-injection]]\n\n```mermaid\nsequenceDiagram\n    User->>LLM: Input\n    LLM-->>System: Suggested action\n    System->>Policy: Validate\n    Policy-->>System: Approve/Deny\n```\n\nSee also\n\n* [[agent-overreach]]\n* [[rag-systems]]\n",
+      "html": "\n# LLM as Untrusted Component\n\nLLMs generate outputs probabilistically and must not be trusted with execution authority.\n\nCore Features\n\n* Non-deterministic outputs\n* Prompt sensitivity\n* No inherent safety guarantees\n\nPrinciple\n\nLLM = Suggestion engine, not decision engine\n\nIntegration\n\nUsed in:\n\n* <span class=\"wiki-link\" data-id=\"reasoning-vs-execution\">reasoning-vs-execution</span>\n* <span class=\"wiki-link\" data-id=\"prompt-injection\">prompt-injection</span>\n\n```mermaid\nsequenceDiagram\n    User->>LLM: Input\n    LLM-->>System: Suggested action\n    System->>Policy: Validate\n    Policy-->>System: Approve/Deny\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"agent-overreach\">agent-overreach</span>\n* <span class=\"wiki-link\" data-id=\"rag-systems\">rag-systems</span>\n"
+    },
+    "lstm-autoencoder": {
+      "title": "LSTM Autoencoder",
+      "header": "lstm-autoencoder.md",
+      "markdown": "\n# LSTM Autoencoder\n\nModels sequential data and detects anomalies via reconstruction error.\n\nCore Features\n\n* sequence learning\n* reconstruction error\n* temporal modeling\n\nIntegration\n\nUsed in:\n\n* [[time-series-modeling]]\n* [[anomaly-detection]]\n\n```mermaid\nflowchart LR\n    Sequence --> Encoder --> Decoder --> Reconstruction --> Error\n```\n\nSee also\n\n* [[dynamical-systems]]\n",
+      "html": "\n# LSTM Autoencoder\n\nModels sequential data and detects anomalies via reconstruction error.\n\nCore Features\n\n* sequence learning\n* reconstruction error\n* temporal modeling\n\nIntegration\n\nUsed in:\n\n* <span class=\"wiki-link\" data-id=\"time-series-modeling\">time-series-modeling</span>\n* <span class=\"wiki-link\" data-id=\"anomaly-detection\">anomaly-detection</span>\n\n```mermaid\nflowchart LR\n    Sequence --> Encoder --> Decoder --> Reconstruction --> Error\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"dynamical-systems\">dynamical-systems</span>\n"
+    },
+    "multi-agent-systems": {
+      "title": "Multi-Agent Systems",
+      "header": "multi-agent-systems.md",
+      "markdown": "\n# Multi-Agent Systems\n\nMultiple agents collaborate or compete to solve tasks.\n\nCore Features\n\n* Agent-to-agent communication\n* Distributed reasoning\n* Emergent behavior\n\nRisks\n\n* Coordination failure\n* Cascading errors\n* Assumption propagation\n\nIntegration\n\nBuilt on:\n\n* [[agent-systems]]\n* [[autonomous-agents]]\n\n```mermaid\ngraph TD\n    A1[Agent 1] --> A2[Agent 2]\n    A2 --> A3[Agent 3]\n    A3 --> A1\n```\n\nSee also\n\n* [[agent-overreach]]\n* [[reasoning-vs-execution]]\n",
+      "html": "\n# Multi-Agent Systems\n\nMultiple agents collaborate or compete to solve tasks.\n\nCore Features\n\n* Agent-to-agent communication\n* Distributed reasoning\n* Emergent behavior\n\nRisks\n\n* Coordination failure\n* Cascading errors\n* Assumption propagation\n\nIntegration\n\nBuilt on:\n\n* <span class=\"wiki-link\" data-id=\"agent-systems\">agent-systems</span>\n* <span class=\"wiki-link\" data-id=\"autonomous-agents\">autonomous-agents</span>\n\n```mermaid\ngraph TD\n    A1[Agent 1] --> A2[Agent 2]\n    A2 --> A3[Agent 3]\n    A3 --> A1\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"agent-overreach\">agent-overreach</span>\n* <span class=\"wiki-link\" data-id=\"reasoning-vs-execution\">reasoning-vs-execution</span>\n"
+    },
+    "observability": {
+      "title": "Observability",
+      "header": "observability.md",
+      "markdown": "\n# Observability\n\nObservability enables insight into system behavior.\n\nCore Features\n\n* Logs\n* Metrics\n* Traces\n\nWhy it matters\n\n* debugging\n* performance monitoring\n* anomaly detection\n\nIntegration\n\nUsed in:\n\n* [[audit-ledger]]\n* [[anomaly-detection-security]]\n\n```mermaid\nflowchart LR\n    System --> Logs\n    System --> Metrics\n    System --> Traces\n```\n\nSee also\n\n* [[failure-cascades]]\n",
+      "html": "\n# Observability\n\nObservability enables insight into system behavior.\n\nCore Features\n\n* Logs\n* Metrics\n* Traces\n\nWhy it matters\n\n* debugging\n* performance monitoring\n* anomaly detection\n\nIntegration\n\nUsed in:\n\n* <span class=\"wiki-link\" data-id=\"audit-ledger\">audit-ledger</span>\n* <span class=\"wiki-link\" data-id=\"anomaly-detection-security\">anomaly-detection-security</span>\n\n```mermaid\nflowchart LR\n    System --> Logs\n    System --> Metrics\n    System --> Traces\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"failure-cascades\">failure-cascades</span>\n"
+    },
+    "one-class-svm": {
+      "title": "One-Class SVM",
+      "header": "one-class-svm.md",
+      "markdown": "\n# One-Class SVM\n\nLearns the boundary of normal data and flags outliers.\n\nCore Features\n\n* unsupervised learning\n* boundary detection\n* anomaly scoring\n\nIntegration\n\nUsed in:\n\n* [[anomaly-detection]]\n* [[behavioral-biometrics]]\n\n```mermaid\nflowchart LR\n    Normal Data --> Model --> Boundary --> Outlier?\n```\n\nSee also\n\n* [[statistical-learning]]\n",
+      "html": "\n# One-Class SVM\n\nLearns the boundary of normal data and flags outliers.\n\nCore Features\n\n* unsupervised learning\n* boundary detection\n* anomaly scoring\n\nIntegration\n\nUsed in:\n\n* <span class=\"wiki-link\" data-id=\"anomaly-detection\">anomaly-detection</span>\n* <span class=\"wiki-link\" data-id=\"behavioral-biometrics\">behavioral-biometrics</span>\n\n```mermaid\nflowchart LR\n    Normal Data --> Model --> Boundary --> Outlier?\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"statistical-learning\">statistical-learning</span>\n"
+    },
+    "policy-engine": {
+      "title": "Policy Engine",
+      "header": "policy-engine.md",
+      "markdown": "\n# Policy Engine\n\nPolicy Engine\n\nA rule-based system that decides whether actions are allowed.\n\nCore Features\n\n* Deterministic evaluation\n* Rule enforcement\n* Risk scoring\n\nIntegration\n\nCore to:\n\n* [[runtime-governance]]\n* [[reasoning-vs-execution]]\n\n```mermaid\nflowchart LR\n    Input --> Rules --> Decision\n```\n\nSee also\n\n* [[consent-token]]\n* [[circuit-breaker-pattern]]\n",
+      "html": "\n# Policy Engine\n\nPolicy Engine\n\nA rule-based system that decides whether actions are allowed.\n\nCore Features\n\n* Deterministic evaluation\n* Rule enforcement\n* Risk scoring\n\nIntegration\n\nCore to:\n\n* <span class=\"wiki-link\" data-id=\"runtime-governance\">runtime-governance</span>\n* <span class=\"wiki-link\" data-id=\"reasoning-vs-execution\">reasoning-vs-execution</span>\n\n```mermaid\nflowchart LR\n    Input --> Rules --> Decision\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"consent-token\">consent-token</span>\n* <span class=\"wiki-link\" data-id=\"circuit-breaker-pattern\">circuit-breaker-pattern</span>\n"
+    },
+    "prompt-injection": {
+      "title": "Prompt Injection",
+      "header": "prompt-injection.md",
+      "markdown": "\n# Prompt Injection\n\nPrompt injection exploits LLM trust in input data.\n\nCore Features\n\n* Instruction hijacking\n* Context manipulation\n* Hidden directives\n\nImpact\n\n* Data leakage\n* Unauthorized actions\n* System compromise\n\nIntegration\n\nCritical for:\n\n* [[rag-systems]]\n* [[llm-as-untrusted-component]]\n\n```mermaid\nsequenceDiagram\n    Attacker->>LLM: Malicious prompt\n    LLM->>System: Altered instruction\n    System: Executes unintended action\n```\n\nSee also\n\n* [[agent-overreach]]\n* [[reasoning-vs-execution]]\n",
+      "html": "\n# Prompt Injection\n\nPrompt injection exploits LLM trust in input data.\n\nCore Features\n\n* Instruction hijacking\n* Context manipulation\n* Hidden directives\n\nImpact\n\n* Data leakage\n* Unauthorized actions\n* System compromise\n\nIntegration\n\nCritical for:\n\n* <span class=\"wiki-link\" data-id=\"rag-systems\">rag-systems</span>\n* <span class=\"wiki-link\" data-id=\"llm-as-untrusted-component\">llm-as-untrusted-component</span>\n\n```mermaid\nsequenceDiagram\n    Attacker->>LLM: Malicious prompt\n    LLM->>System: Altered instruction\n    System: Executes unintended action\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"agent-overreach\">agent-overreach</span>\n* <span class=\"wiki-link\" data-id=\"reasoning-vs-execution\">reasoning-vs-execution</span>\n"
+    },
+    "rag-security": {
+      "title": "RAG Security",
+      "header": "rag-security.md",
+      "markdown": "\n# RAG Security\n\nProtects systems using external knowledge sources.\n\nCore Features\n\n* Source validation\n* Instruction filtering\n* Access control\n\nRisks addressed\n\n* [[prompt-injection]]\n* [[agent-overreach]]\n\nIntegration\n\nUsed in:\n\n* [[rag-systems]]\n* [[tool-augmented-agents]]\n\n```mermaid\nflowchart LR\n    Retriever --> Filter --> SafeContext --> LLM\n```\n\nSee also\n\n* [[intent-validation]]\n",
+      "html": "\n# RAG Security\n\nProtects systems using external knowledge sources.\n\nCore Features\n\n* Source validation\n* Instruction filtering\n* Access control\n\nRisks addressed\n\n* <span class=\"wiki-link\" data-id=\"prompt-injection\">prompt-injection</span>\n* <span class=\"wiki-link\" data-id=\"agent-overreach\">agent-overreach</span>\n\nIntegration\n\nUsed in:\n\n* <span class=\"wiki-link\" data-id=\"rag-systems\">rag-systems</span>\n* <span class=\"wiki-link\" data-id=\"tool-augmented-agents\">tool-augmented-agents</span>\n\n```mermaid\nflowchart LR\n    Retriever --> Filter --> SafeContext --> LLM\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"intent-validation\">intent-validation</span>\n"
+    },
+    "rag-systems": {
+      "title": "RAG Systems",
+      "header": "rag-systems.md",
+      "markdown": "\n# RAG Systems\n\nRAG combines retrieval with generation for better responses.\n\nCore Features\n\n* External knowledge retrieval\n* Context injection\n* Improved accuracy\n\nRisks\n\n* Data poisoning\n* Hidden instructions\n* Permission bypass\n\nIntegration\n\nUsed in:\n\n* [[tool-augmented-agents]]\n* [[llm-as-untrusted-component]]\n\n```mermaid\nflowchart LR\n    Query --> Retriever --> Context --> LLM --> Output\n```\n\nSee also\n\n* [[prompt-injection]]\n* [[agent-overreach]]\n",
+      "html": "\n# RAG Systems\n\nRAG combines retrieval with generation for better responses.\n\nCore Features\n\n* External knowledge retrieval\n* Context injection\n* Improved accuracy\n\nRisks\n\n* Data poisoning\n* Hidden instructions\n* Permission bypass\n\nIntegration\n\nUsed in:\n\n* <span class=\"wiki-link\" data-id=\"tool-augmented-agents\">tool-augmented-agents</span>\n* <span class=\"wiki-link\" data-id=\"llm-as-untrusted-component\">llm-as-untrusted-component</span>\n\n```mermaid\nflowchart LR\n    Query --> Retriever --> Context --> LLM --> Output\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"prompt-injection\">prompt-injection</span>\n* <span class=\"wiki-link\" data-id=\"agent-overreach\">agent-overreach</span>\n"
+    },
+    "reasoning-vs-execution": {
+      "title": "Reasoning vs Execution",
+      "header": "reasoning-vs-execution.md",
+      "markdown": "\n# Reasoning vs Execution\n\nAI systems must separate reasoning from execution.\n\nCore Features\n\n* Reasoning Layer: LLM interprets intent\n* Execution Layer: Deterministic system acts\n\nWhy it matters\n\nPrevents:\n\n* hallucinated actions\n* unsafe execution\n* agent misuse\n\nIntegration\n\nCore to:\n\n* [[llm-as-untrusted-component]]\n* [[agent-systems]]\n\n```mermaid\nflowchart LR\n    Input --> LLM --> Intent --> Policy --> Execution\n```\n\nSee also\n\n* [[agent-overreach]]\n* [[prompt-injection]]\n",
+      "html": "\n# Reasoning vs Execution\n\nAI systems must separate reasoning from execution.\n\nCore Features\n\n* Reasoning Layer: LLM interprets intent\n* Execution Layer: Deterministic system acts\n\nWhy it matters\n\nPrevents:\n\n* hallucinated actions\n* unsafe execution\n* agent misuse\n\nIntegration\n\nCore to:\n\n* <span class=\"wiki-link\" data-id=\"llm-as-untrusted-component\">llm-as-untrusted-component</span>\n* <span class=\"wiki-link\" data-id=\"agent-systems\">agent-systems</span>\n\n```mermaid\nflowchart LR\n    Input --> LLM --> Intent --> Policy --> Execution\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"agent-overreach\">agent-overreach</span>\n* <span class=\"wiki-link\" data-id=\"prompt-injection\">prompt-injection</span>\n"
+    },
+    "runtime-governance": {
+      "title": "Runtime Governance",
+      "header": "runtime-governance.md",
+      "markdown": "\n# Runtime Governance\n\nRuntime governance ensures that AI systems are controlled while they act, not just during design.\n\nCore Features\n\n* Execution-time enforcement\n* Continuous validation\n* Real-time intervention\n\nWhy it matters\n\nStatic rules fail because:\n\n* agents evolve behavior\n* context changes dynamically\n* threats are adaptive\n\nIntegration\n\nCritical for:\n\n* [[agent-systems]]\n* [[autonomous-agents]]\n\n```mermaid\nflowchart LR\n    Agent --> Governance --> Decision --> Execution\n```\n\nSee also\n\n* [[agent-runtime-authority]]\n* [[policy-engine]]\n",
+      "html": "\n# Runtime Governance\n\nRuntime governance ensures that AI systems are controlled while they act, not just during design.\n\nCore Features\n\n* Execution-time enforcement\n* Continuous validation\n* Real-time intervention\n\nWhy it matters\n\nStatic rules fail because:\n\n* agents evolve behavior\n* context changes dynamically\n* threats are adaptive\n\nIntegration\n\nCritical for:\n\n* <span class=\"wiki-link\" data-id=\"agent-systems\">agent-systems</span>\n* <span class=\"wiki-link\" data-id=\"autonomous-agents\">autonomous-agents</span>\n\n```mermaid\nflowchart LR\n    Agent --> Governance --> Decision --> Execution\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"agent-runtime-authority\">agent-runtime-authority</span>\n* <span class=\"wiki-link\" data-id=\"policy-engine\">policy-engine</span>\n"
+    },
+    "signal-vs-noise": {
+      "title": "Signal vs Noise",
+      "header": "signal-vs-noise.md",
+      "markdown": "\n# Signal vs Noise\n\nNot all data is meaningful. Systems must extract signal from noise.\n\nCore Features\n\n* pattern detection\n* filtering\n* statistical significance\n\nIntegration\n\nUsed in:\n\n* [[feature-engineering]]\n* [[statistical-learning]]\n\n```mermaid\nflowchart LR\n    Data --> Filter --> Signal\n    Data --> Filter --> Noise\n```\n\nSee also\n\n* [[anomaly-detection]]\n",
+      "html": "\n# Signal vs Noise\n\nNot all data is meaningful. Systems must extract signal from noise.\n\nCore Features\n\n* pattern detection\n* filtering\n* statistical significance\n\nIntegration\n\nUsed in:\n\n* <span class=\"wiki-link\" data-id=\"feature-engineering\">feature-engineering</span>\n* <span class=\"wiki-link\" data-id=\"statistical-learning\">statistical-learning</span>\n\n```mermaid\nflowchart LR\n    Data --> Filter --> Signal\n    Data --> Filter --> Noise\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"anomaly-detection\">anomaly-detection</span>\n"
+    },
+    "state-machines": {
+      "title": "State Machines",
+      "header": "state-machines.md",
+      "markdown": "\n# State Machines\n\nSystems transition between predefined states based on inputs.\n\nCore Features\n\n* deterministic transitions\n* predictable behavior\n* explicit states\n\nIntegration\n\nUsed in:\n\n* [[policy-engine]]\n* [[approval-workflows]]\n\n```mermaid\nstateDiagram-v2\n    [*] --> Idle\n    Idle --> Processing\n    Processing --> Complete\n```\n\nSee also\n\n* [[control-plane-vs-data-plane]]\n",
+      "html": "\n# State Machines\n\nSystems transition between predefined states based on inputs.\n\nCore Features\n\n* deterministic transitions\n* predictable behavior\n* explicit states\n\nIntegration\n\nUsed in:\n\n* <span class=\"wiki-link\" data-id=\"policy-engine\">policy-engine</span>\n* <span class=\"wiki-link\" data-id=\"approval-workflows\">approval-workflows</span>\n\n```mermaid\nstateDiagram-v2\n    [*] --> Idle\n    Idle --> Processing\n    Processing --> Complete\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"control-plane-vs-data-plane\">control-plane-vs-data-plane</span>\n"
+    },
+    "statistical-learning": {
+      "title": "Statistical Learning",
+      "header": "statistical-learning.md",
+      "markdown": "\n# Statistical Learning\n\nModels learn distributions and patterns from data.\n\nCore Features\n\n* probability distributions\n* inference\n* generalization\n\nIntegration\n\nUsed in:\n\n* [[one-class-svm]]\n* [[anomaly-detection]]\n\n```mermaid\nflowchart LR\n    Data --> Model --> Prediction\n```\n\nSee also\n\n* [[signal-vs-noise]]\n",
+      "html": "\n# Statistical Learning\n\nModels learn distributions and patterns from data.\n\nCore Features\n\n* probability distributions\n* inference\n* generalization\n\nIntegration\n\nUsed in:\n\n* <span class=\"wiki-link\" data-id=\"one-class-svm\">one-class-svm</span>\n* <span class=\"wiki-link\" data-id=\"anomaly-detection\">anomaly-detection</span>\n\n```mermaid\nflowchart LR\n    Data --> Model --> Prediction\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"signal-vs-noise\">signal-vs-noise</span>\n"
+    },
+    "time-series-modeling": {
+      "title": "Time Series Modeling",
+      "header": "time-series-modeling.md",
+      "markdown": "\n# Time Series Modeling\n\nBehavior changes over time and must be modeled sequentially.\n\nCore Features\n\n* temporal dependencies\n* sequence patterns\n* trend analysis\n\nIntegration\n\nUsed in:\n\n* [[lstm-autoencoder]]\n* [[anomaly-detection]]\n\n```mermaid\nflowchart LR\n    t1 --> t2 --> t3 --> t4\n```\n\nSee also\n\n* [[dynamical-systems]]\n",
+      "html": "\n# Time Series Modeling\n\nBehavior changes over time and must be modeled sequentially.\n\nCore Features\n\n* temporal dependencies\n* sequence patterns\n* trend analysis\n\nIntegration\n\nUsed in:\n\n* <span class=\"wiki-link\" data-id=\"lstm-autoencoder\">lstm-autoencoder</span>\n* <span class=\"wiki-link\" data-id=\"anomaly-detection\">anomaly-detection</span>\n\n```mermaid\nflowchart LR\n    t1 --> t2 --> t3 --> t4\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"dynamical-systems\">dynamical-systems</span>\n"
+    },
+    "tool-augmented-agents": {
+      "title": "Tool-Augmented Agents",
+      "header": "tool-augmented-agents.md",
+      "markdown": "\n# Tool-Augmented Agents\n\nAgents extend capabilities by using tools like APIs, databases, and services.\n\nCore Features\n\n* External tool access\n* Dynamic execution\n* Context-aware actions\n\nRisks\n\n* Unauthorized tool usage\n* Data leakage\n* Execution abuse\n\nIntegration\n\nUsed in:\n\n* [[agent-systems]]\n* [[rag-systems]]\n\n```mermaid\nsequenceDiagram\n    Agent->>Tool: API Call\n    Tool-->>Agent: Response\n```\n\nSee also\n\n* [[prompt-injection]]\n* [[agent-overreach]]\n",
+      "html": "\n# Tool-Augmented Agents\n\nAgents extend capabilities by using tools like APIs, databases, and services.\n\nCore Features\n\n* External tool access\n* Dynamic execution\n* Context-aware actions\n\nRisks\n\n* Unauthorized tool usage\n* Data leakage\n* Execution abuse\n\nIntegration\n\nUsed in:\n\n* <span class=\"wiki-link\" data-id=\"agent-systems\">agent-systems</span>\n* <span class=\"wiki-link\" data-id=\"rag-systems\">rag-systems</span>\n\n```mermaid\nsequenceDiagram\n    Agent->>Tool: API Call\n    Tool-->>Agent: Response\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"prompt-injection\">prompt-injection</span>\n* <span class=\"wiki-link\" data-id=\"agent-overreach\">agent-overreach</span>\n"
+    },
+    "tool-execution-guard": {
+      "title": "Tool Execution Guard",
+      "header": "tool-execution-guard.md",
+      "markdown": "\n# Tool Execution Guard\n\nEnsures only approved tools are executed with valid permissions.\n\nCore Features\n\n* Tool registration\n* Permission checks\n* Execution validation\n\nIntegration\n\nUsed in:\n\n* [[agent-runtime-authority]]\n* [[tool-augmented-agents]]\n\n```mermaid\nsequenceDiagram\n    Agent->>Guard: Call Tool\n    Guard->>Policy: Validate\n    Policy-->>Guard: Allow/Deny\n```\n\nSee also\n\n* [[prompt-injection]]\n* [[agent-overreach]]\n",
+      "html": "\n# Tool Execution Guard\n\nEnsures only approved tools are executed with valid permissions.\n\nCore Features\n\n* Tool registration\n* Permission checks\n* Execution validation\n\nIntegration\n\nUsed in:\n\n* <span class=\"wiki-link\" data-id=\"agent-runtime-authority\">agent-runtime-authority</span>\n* <span class=\"wiki-link\" data-id=\"tool-augmented-agents\">tool-augmented-agents</span>\n\n```mermaid\nsequenceDiagram\n    Agent->>Guard: Call Tool\n    Guard->>Policy: Validate\n    Policy-->>Guard: Allow/Deny\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"prompt-injection\">prompt-injection</span>\n* <span class=\"wiki-link\" data-id=\"agent-overreach\">agent-overreach</span>\n"
+    },
+    "zero-trust-architecture": {
+      "title": "Zero Trust Architecture",
+      "header": "zero-trust-architecture.md",
+      "markdown": "\n# Zero Trust Architecture\n\nEvery component is treated as potentially compromised.\n\nCore Features\n\n* No implicit trust\n* Continuous verification\n* Strict access control\n\nIntegration\n\nApplied to:\n\n* [[llm-as-untrusted-component]]\n* [[runtime-governance]]\n\n```mermaid\nflowchart LR\n    Request --> Verify --> Access\n```\n\nSee also\n\n* [[intent-validation]]\n* [[policy-engine]]\n",
+      "html": "\n# Zero Trust Architecture\n\nEvery component is treated as potentially compromised.\n\nCore Features\n\n* No implicit trust\n* Continuous verification\n* Strict access control\n\nIntegration\n\nApplied to:\n\n* <span class=\"wiki-link\" data-id=\"llm-as-untrusted-component\">llm-as-untrusted-component</span>\n* <span class=\"wiki-link\" data-id=\"runtime-governance\">runtime-governance</span>\n\n```mermaid\nflowchart LR\n    Request --> Verify --> Access\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"intent-validation\">intent-validation</span>\n* <span class=\"wiki-link\" data-id=\"policy-engine\">policy-engine</span>\n"
     }
   }
 }
