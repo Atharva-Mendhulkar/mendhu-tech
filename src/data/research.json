@@ -170,6 +170,14 @@
       ]
     },
     {
+      "id": "deterministic-control-plane",
+      "name": "deterministic-control-plane",
+      "group": "general",
+      "color": "#BDBDBD",
+      "description": "",
+      "tags": []
+    },
+    {
       "id": "distributed-systems",
       "name": "Distributed Systems",
       "group": "systems",
@@ -1100,6 +1108,12 @@
       "header": "control-plane-vs-data-plane.md",
       "markdown": "\n# Control Plane vs Data Plane\n\nSystems separate:\n\n* Control Plane → decisions, policies\n* Data Plane → execution\n\nCore Features\n\n* clear separation of concerns\n* scalable execution\n* centralized decision logic\n\nIntegration\n\nCore to:\n\n* [[policy-engine]]\n* [[reasoning-vs-execution]]\n\n```mermaid\nflowchart LR\n    Control --> Decision --> Data --> Execution\n```\n\nSee also\n\n* [[deterministic-control-plane]]\n",
       "html": "\n# Control Plane vs Data Plane\n\nSystems separate:\n\n* Control Plane → decisions, policies\n* Data Plane → execution\n\nCore Features\n\n* clear separation of concerns\n* scalable execution\n* centralized decision logic\n\nIntegration\n\nCore to:\n\n* <span class=\"wiki-link\" data-id=\"policy-engine\">policy-engine</span>\n* <span class=\"wiki-link\" data-id=\"reasoning-vs-execution\">reasoning-vs-execution</span>\n\n```mermaid\nflowchart LR\n    Control --> Decision --> Data --> Execution\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"deterministic-control-plane\">deterministic-control-plane</span>\n"
+    },
+    "deterministic-control-plane": {
+      "title": "deterministic-control-plane",
+      "header": "deterministic-control-plane.md",
+      "markdown": "",
+      "html": ""
     },
     "distributed-systems": {
       "title": "Distributed Systems",
