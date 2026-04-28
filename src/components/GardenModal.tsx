@@ -202,11 +202,17 @@ const Toggle = ({ label, k, onToggle, settings, updateSetting }: ToggleProps) =>
   </label>
 );
 
-interface Props { isOpen:boolean; onClose:()=>void; onMinimize:(id:string,title:string)=>void }
+interface Props { isOpen:boolean; onClose:()=>void; onMinimize:(id:string,title:string)=>void; initialFileId?:string }
 
-export default function GardenModal({ isOpen, onClose, onMinimize }: Props) {
+export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId }: Props) {
   const fileKeys = Object.keys(data.files);
   const [activeFileId, setActiveFileId] = useState(fileKeys[0]??'');
+
+  useEffect(() => {
+    if (initialFileId && fileKeys.includes(initialFileId)) {
+      setActiveFileId(initialFileId);
+    }
+  }, [initialFileId, fileKeys]);
   const [showGraph, setShowGraph]       = useState(false);
   const [isMaxGraph, setIsMaxGraph]     = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);

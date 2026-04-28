@@ -14,6 +14,7 @@ import Terminal from "@/components/Terminal";
 export default function Home() {
   const [activeModalId, setActiveModalId] = useState<string | null>(null);
   const [isGardenOpen, setIsGardenOpen] = useState(false);
+  const [activeGardenFileId, setActiveGardenFileId] = useState<string | undefined>(undefined);
   const [minimizedItems, setMinimizedItems] = useState<{ id: string, title: string, type: 'garden' | 'project' }[]>([]);
   const [restoredId, setRestoredId] = useState<string | null>(null);
 
@@ -89,19 +90,45 @@ export default function Home() {
         <div className="relative z-10 px-8 lg:px-14 py-12">
           
           {/* Spotlight Quick-Trigger */}
-          <div className="absolute top-12 right-8 lg:right-14 z-[210] flex flex-col items-end">
-            <span 
-              className="text-accent/80 tracking-wide rotate-[-3deg] mb-1.5 text-[14px] select-none font-sans italic"
-              style={{ fontFamily: "'Caveat', 'Dancing Script', 'Segoe Print', cursive" }}
-            >
-              Need to find something fast?
-            </span>
+          <div className="absolute top-12 right-8 lg:right-14 z-[210] flex flex-col items-end gap-2">
             <button 
               onClick={() => window.dispatchEvent(new Event('toggle-terminal'))}
               className="font-mono text-[10px] text-ink border border-dashed border-border-strong px-3.5 py-1.5 hover:text-accent hover:border-accent transition-all bg-paper/80 backdrop-blur-sm cursor-pointer rounded shadow-sm select-none"
             >
-              [Ctrl + Space] search
+              [Ctrl + `] search
             </button>
+
+            <svg width="220" height="110" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg" className="select-none pointer-events-none mt-[-10px] mr-[-10px]">
+              <text 
+                x="15" 
+                y="85" 
+                fill="var(--accent)" 
+                fontSize="16" 
+                fontFamily="var(--font-serif), Georgia, serif"
+                transform="rotate(-3 15,85)"
+                className="italic opacity-85"
+              >
+                need to find something fast?
+              </text>
+              <path 
+                d="M60,65 Q110,25 140,12" 
+                fill="none" 
+                stroke="var(--accent)" 
+                strokeWidth="2"
+                strokeDasharray="4 6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="opacity-70"
+              />
+              <path 
+                d="M130,16 L140,12 L136,22" 
+                fill="none" 
+                stroke="var(--accent)" 
+                strokeWidth="2"
+                strokeLinecap="round"
+                className="opacity-70"
+              />
+            </svg>
           </div>
           
           {/* Introduction Section with Header and Meta Links */}
@@ -189,7 +216,7 @@ export default function Home() {
           {/* ─── FOOTER ─── */}
           <footer className="pt-20 pb-8 flex justify-between items-center border-t border-dashed border-border-strong mt-12">
             <div className="font-mono text-[10px] text-ink-faint uppercase tracking-widest flex items-center gap-4">
-              <button onClick={() => window.dispatchEvent(new Event('toggle-terminal'))} className="hover:text-ink transition-colors cursor-pointer">[Ctrl+Space] search</button>
+              <button onClick={() => window.dispatchEvent(new Event('toggle-terminal'))} className="hover:text-ink transition-colors cursor-pointer">[Ctrl+`] search</button>
               <span className="text-border-strong">|</span>
               <button onClick={handleExit} className="hover:text-ink transition-colors cursor-pointer">$ exit</button>
               <span className="text-border-strong">|</span>
@@ -210,6 +237,7 @@ export default function Home() {
         isOpen={isGardenOpen} 
         onClose={() => setIsGardenOpen(false)} 
         onMinimize={(id, title) => handleMinimizeModal(id, title, 'garden')}
+        initialFileId={activeGardenFileId}
       />
       <ProjectModal 
         activeId={activeModalId} 
@@ -233,6 +261,7 @@ export default function Home() {
         onOpenProject={(id) => setActiveModalId(id)}
         onOpenGarden={(fileId) => {
           setIsGardenOpen(true);
+          setActiveGardenFileId(fileId);
         }}
       />
     </main>

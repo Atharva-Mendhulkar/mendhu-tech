@@ -45,27 +45,30 @@ interface SpotlightProps {
   onOpenGarden:  (fileId?: string) => void;
 }
 
-// ── Fuzzy scorer ──────────────────────────────────────────────────────────
-function score(query: string, target: string): number {
-  const q = query.toLowerCase();
-  const t = target.toLowerCase();
-  if (!q) return 1;
-  if (t === q) return 100;
-  if (t.startsWith(q)) return 80;
-  if (t.includes(q)) return 60;
-  let qi = 0;
-  for (let i = 0; i < t.length && qi < q.length; i++) {
-    if (t[i] === q[qi]) qi++;
-  }
-  return qi === q.length ? 30 : 0;
-}
-
+// ── Word Intersect Scorer ──────────────────────────────────────────────────
 function scoreItem(query: string, name: string, desc: string, keywords: string[]): number {
-  return Math.max(
-    score(query, name) * 1.5,
-    score(query, desc),
-    ...keywords.map(k => score(query, k) * 0.8),
-  );
+  const q = query.toLowerCase().trim();
+  if (!q) return 0;
+  
+  const words = q.split(/\s+/);
+  let totalScore = 0;
+  
+  for (const word of words) {
+    let wordScore = 0;
+    if (name.toLowerCase().includes(word)) {
+      wordScore += name.toLowerCase().startsWith(word) ? 100 : 50;
+    }
+    if (desc.toLowerCase().includes(word)) {
+      wordScore += 25;
+    }
+    for (const kw of keywords) {
+      if (kw && kw.toLowerCase().includes(word)) {
+        wordScore += 20;
+      }
+    }
+    totalScore += wordScore;
+  }
+  return totalScore;
 }
 
 // Levenshtein distance for "did you mean"
@@ -211,7 +214,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.code === "Space") { 
+      if (e.ctrlKey && (e.key === "`" || e.code === "Backquote")) { 
         e.preventDefault(); 
         open ? close_() : open_(); 
       }
