@@ -1,11 +1,11 @@
 # mendhu.tech
 
-A high-fidelity research portfolio and knowledge archive built with Next.js, prioritizing architectural clarity and technical depth.
+A high-fidelity portfolio and knowledge archive built with Next.js.
 
 ## Core Features & Implementation
 
 ### 1. The Knowledge Garden
-A graph-based research archive that visualizes the interconnected nature of systems engineering and AI research.
+A graph-based knowledge archive that visualizes the interconnected nature of knowledge (zettelkasten).
 - **Physics-Based Graph**: Implemented using a custom D3-force simulation on a 2D Canvas for high-performance rendering of complex node relationships.
 - **Dynamic Categorization**: Multi-tag classification engine that automatically indexes research notes into relevant disciplines (Systems, AI, Security, etc.) during build-time.
 - **Wikilink Resolution**: Custom markdown parser that supports Obsidian-style `[[wikilinks]]` for seamless inter-document navigation.
@@ -15,18 +15,6 @@ A graph-based research archive that visualizes the interconnected nature of syst
 A metadata-driven technical blog designed for deep-dives into kernel-level monitoring and ML research.
 - **Headless Content Pipeline**: Uses `gray-matter` to parse markdown frontmatter, allowing for a pure Git-based CMS workflow.
 - **Tailored Typography**: Leverages EB Garamond for a classic research feel, contrasted with JetBrains Mono for technical snippets.
-
-### 3. Systems-First Design Language
-- **Architectural Aesthetic**: Modeled after drafting paper and blueprints, utilizing radial-gradient grids and hatching patterns.
-- **High-Fidelity Animations**: Features a macOS-inspired **Genie effect** for modal transitions and an ultra-fast staggered reveal system.
-- **Persistent Interaction**: Includes a 'Banyan' minimization dock and a custom pointer-captured draggable brand icon with magnetic snapping and stable global movement tracking.
-
-### 4. Interactive Dialogue System
-The portfolio features a state-driven interaction engine via the Porygon mascot.
-- **Anchored Dragging**: Pixel-accurate dragging using click-offset math to ensure the cursor stays attached to the grab point.
-- **Contextual Dialogue**: A priority-based messaging system that reacts to user interactions (drag starts, snaps, recalls) and site zones.
-- **Zone Awareness**: Robust spatial detection using bounding-box intersection thresholds (100ms dwell time) and entry locks (500ms) to prevent flickering and noise.
-- **Evolving State**: Interaction memory that progresses the mascot's persona from neutral to curious based on engagement levels.
 
 ## Technical Architecture
 
