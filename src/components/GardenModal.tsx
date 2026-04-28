@@ -652,8 +652,8 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: Props) {
               )}
 
               {/* Dot grid overlay */}
-              <div className="absolute inset-0 pointer-events-none opacity-15 z-0"
-                style={{backgroundImage:'radial-gradient(rgba(0,0,0,0.3) 1px,transparent 1px)',backgroundSize:'16px 16px'}}/>
+              <div className="absolute inset-0 pointer-events-none opacity-40 z-0"
+                style={{backgroundImage:'radial-gradient(rgba(0,0,0,0.5) 1.2px,transparent 1.2px)',backgroundSize:'16px 16px'}}/>
             </div>
           )}
         </div>
