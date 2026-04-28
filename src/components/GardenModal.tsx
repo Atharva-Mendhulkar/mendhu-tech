@@ -27,9 +27,9 @@ if (typeof window !== 'undefined') {
 
 const MermaidBlock = ({ chart }: { chart: string }) => {
   const [svg, setSvg] = useState('');
-  const id = useRef(`mmd-${Math.random().toString(36).slice(2)}`);
   useEffect(() => {
-    mermaid.render(id.current, chart)
+    const uniqueId = `mmd-${Math.random().toString(36).slice(2)}-${Date.now().toString(36)}`;
+    mermaid.render(uniqueId, chart)
       .then(r => setSvg(r.svg))
       .catch((err) => {
         console.error('Failed to render Mermaid chart:', err);
