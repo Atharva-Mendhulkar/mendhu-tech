@@ -114,19 +114,19 @@ export default function Home() {
 
               {/* Multi-loop curved arrow pointing DOWN from middle of text to middle of button */}
               <path 
-                d="M55,50 C80,85 100,10 115,55 S130,115 135,100"
+                d="M55,50 C80,85 100,10 115,55 S124,95 128,82"
                 fill="none" 
                 stroke="var(--accent)" 
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeDasharray="5 10"
+                strokeDasharray="4 6"
                 opacity="0.75"
               />
 
               {/* Arrow head pointing DOWNWARDS */}
               <path 
-                d="M125,92 L135,100 L141,88" 
+                d="M120,74 L128,82 L134,70" 
                 fill="none" 
                 stroke="var(--accent)" 
                 strokeWidth="2"
