@@ -275,7 +275,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: GardenModal
       
       ctx.clearRect(0, 0, lw, lh);
 
-      const k = 0.05, damping = 0.9, repulsion = 6000, centerPull = 0.015, linkDist = 200;
+      const k = 0.02, damping = 0.8, repulsion = 2500, centerPull = 0.008, linkDist = 200;
 
       for (let i = 0; i < simNodes.length; i++) {
         const n1 = simNodes[i];
@@ -306,7 +306,8 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: GardenModal
 
       simNodes.forEach(n => {
         if (n === dragNodeRef.current) return;
-        n.vx *= damping; n.vy *= damping;
+        n.vx = Math.max(-15, Math.min(15, n.vx * damping));
+        n.vy = Math.max(-15, Math.min(15, n.vy * damping));
         n.x += n.vx; n.y += n.vy;
         n.x = Math.max(20, Math.min(lw - 20, n.x));
         n.y = Math.max(20, Math.min(lh - 20, n.y));
