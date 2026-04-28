@@ -93,47 +93,53 @@ export default function Home() {
           <div className="absolute top-1 right-8 lg:right-14 z-[210] flex flex-col items-end gap-1">
             {/* Arrow + text ABOVE the button */}
             <svg 
-              width="240" 
-              height="110" 
-              viewBox="0 0 240 110" 
-              xmlns="http://www.w3.org/2000/svg"
-              className="select-none pointer-events-none mb-[-5px] mr-[-10px]"
-            >
-              {/* Text at the top */}
-              <text 
-                x="15" 
-                y="35" 
-                fill="var(--accent)" 
-                fontSize="16"
-                fontFamily="Caveat, cursive"
-                transform="rotate(-2 15,35)"
-                opacity="0.85"
-              >
-                need to find something fast?
-              </text>
+  width="240" 
+  height="110" 
+  viewBox="0 0 240 110" 
+  xmlns="http://www.w3.org/2000/svg"
+  className="select-none pointer-events-none mb-[-12px] mr-[-35px]"
+>
+  {/* Text at the top */}
+  <text 
+    x="10" 
+    y="30" 
+    fill="var(--accent)" 
+    fontSize="16"
+    fontFamily="Caveat, cursive"
+    transform="rotate(-2 10,30)"
+    opacity="0.85"
+  >
+    need to find something fast?
+  </text>
 
-              {/* Multi-loop curved arrow pointing DOWN from middle of text to middle of button */}
-              <path 
-                d="M55,50 C80,85 100,10 115,55 S124,95 128,82"
-                fill="none" 
-                stroke="var(--accent)" 
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeDasharray="4 6"
-                opacity="0.75"
-              />
+  {/* Dashed Path: 
+    - Moved end point from 180 to 135 to hit the middle of the button.
+    - Path ends at y=88 (just before the arrowhead tip at y=95) to stop overlap.
+  */}
+  <path 
+    d="M60,45 C90,45 135,50 135,88"
+    fill="none" 
+    stroke="var(--accent)" 
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeDasharray="6 7"
+    opacity="0.75"
+  />
 
-              {/* Arrow head pointing DOWNWARDS */}
-              <path 
-                d="M120,74 L128,82 L134,70" 
-                fill="none" 
-                stroke="var(--accent)" 
-                strokeWidth="2"
-                strokeLinecap="round"
-                opacity="0.75"
-              />
-            </svg>
+  {/* Arrowhead: 
+    - Centered at x=135.
+    - The tip (135, 95) is now below the dash, leaving a clean gap.
+  */}
+  <path 
+    d="M127,86 L135,95 L143,86" 
+    fill="none" 
+    stroke="var(--accent)" 
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    opacity="0.75"
+  />
+</svg>
 
             {/* Pill Button */}
             <button 

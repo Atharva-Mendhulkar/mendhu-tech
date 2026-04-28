@@ -29,7 +29,7 @@ const DIALOGUE = {
   },
   rare:   ["Beep. Interesting.", "Data smells good.", "Worth inspecting.", "Suspiciously smart."],
   snap:   ["Connection established", "Linked."],
-  recall: ["LEAVE ME ALONE!", "Ahhhhhhhhhh.....", "Back to base.", "Fine. Coming back."],
+  recall: ["Ahhhhhhhhhh.....", "Back to base.", "Fine. Coming back."],
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
