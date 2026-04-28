@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import mermaid from 'mermaid';
-import { ChevronRight, ChevronDown, FileText, Folder, Maximize2, Minimize2, Share2, Globe, Minus, X } from 'lucide-react';
+import { ChevronRight, ChevronDown, FileText, Folder, Maximize2, Minimize2, Share2, Globe, Minus, X, Settings } from 'lucide-react';
 import rawResearchData from '@/data/research.json';
 
 // Initialize mermaid
@@ -262,28 +262,66 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: GardenModal
       const rect = canvas.getBoundingClientRect();
       const mx = e.clientX - rect.left;
       const my = e.clientY - rect.top;
-      const hit = simNodes.find(n => Math.hypot(n.x - mx, n.y - my) < n.radius + 15);
+      const transform = transformRef.current;
+      const gx = (mx - transform.x) / transform.scale;
+      const gy = (my - transform.y) / transform.scale;
+      
+      const hit = simNodes.find(n => Math.hypot(n.x - gx, n.y - gy) < (n.radius * panelConfig.nodeSize) + 15 / transform.scale);
       if (hit) {
         dragNodeRef.current = hit;
         setActiveFileId(hit.id);
+      } else {
+        isPanningRef.current = true;
+        panStartRef.current = { x: mx - transform.x, y: my - transform.y };
       }
     };
 
     const handleMouseMove = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+      const transform = transformRef.current;
+      const gx = (mx - transform.x) / transform.scale;
+      const gy = (my - transform.y) / transform.scale;
+
       if (dragNodeRef.current) {
-        const rect = canvas.getBoundingClientRect();
-        dragNodeRef.current.x = e.clientX - rect.left;
-        dragNodeRef.current.y = e.clientY - rect.top;
+        dragNodeRef.current.x = gx;
+        dragNodeRef.current.y = gy;
         dragNodeRef.current.vx = 0;
         dragNodeRef.current.vy = 0;
+      } else if (isPanningRef.current) {
+        transform.x = mx - panStartRef.current.x;
+        transform.y = my - panStartRef.current.y;
       }
     };
 
-    const handleMouseUp = () => { dragNodeRef.current = null; };
+    const handleMouseUp = () => { 
+      dragNodeRef.current = null; 
+      isPanningRef.current = false;
+    };
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+      const transform = transformRef.current;
+      
+      const gx = (mx - transform.x) / transform.scale;
+      const gy = (my - transform.y) / transform.scale;
+      
+      const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
+      const newScale = Math.max(0.15, Math.min(4, transform.scale * zoomFactor));
+      
+      transform.x = mx - gx * newScale;
+      transform.y = my - gy * newScale;
+      transform.scale = newScale;
+    };
 
     canvas.addEventListener('mousedown', handleMouseDown);
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
+    canvas.addEventListener('wheel', handleWheel, { passive: false });
 
     const tick = () => {
       const dpr = window.devicePixelRatio || 1;
@@ -292,13 +330,44 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: GardenModal
       
       ctx.clearRect(0, 0, lw, lh);
 
-      const k = 0.02, damping = 0.8, repulsion = 7500, centerPull = 0.004, linkDist = 260;
+      const k = panelConfig.linkForce;
+      const damping = 0.8;
+      const repulsion = panelConfig.repelForce;
+      const centerPull = panelConfig.centerForce;
+      const linkDist = panelConfig.linkDistance;
+
+      ctx.save();
+      const transform = transformRef.current;
+      ctx.translate(transform.x, transform.y);
+      ctx.scale(transform.scale, transform.scale);
+
+      const groupCenters: Record<string, { x: number, y: number }> = {
+        "Intelligence & AI": { x: lw * 0.35, y: lh * 0.35 },
+        "Systems & Infrastructure": { x: lw * 0.65, y: lh * 0.35 },
+        "Security & Governance": { x: lw * 0.35, y: lh * 0.65 },
+        "ML & Physics Research": { x: lw * 0.65, y: lh * 0.65 },
+        "General": { x: lw * 0.5, y: lh * 0.5 }
+      };
 
       for (let i = 0; i < simNodes.length; i++) {
         const n1 = simNodes[i];
         if (n1 === dragNodeRef.current) continue;
-        n1.vx += (lw / 2 - n1.x) * centerPull;
-        n1.vy += (lh / 2 - n1.y) * centerPull;
+
+        if (panelConfig.groupByTags) {
+          let group = 'General';
+          for (const [cat, nodes] of Object.entries(categories)) {
+            if (nodes.includes(n1.id)) {
+              group = cat;
+              break;
+            }
+          }
+          const center = groupCenters[group] || { x: lw / 2, y: lh / 2 };
+          n1.vx += (center.x - n1.x) * (centerPull * 2.5);
+          n1.vy += (center.y - n1.y) * (centerPull * 2.5);
+        } else {
+          n1.vx += (lw / 2 - n1.x) * centerPull;
+          n1.vy += (lh / 2 - n1.y) * centerPull;
+        }
 
         for (let j = i + 1; j < simNodes.length; j++) {
           const n2 = simNodes[j];
@@ -330,30 +399,41 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: GardenModal
         n.y = Math.max(20, Math.min(lh - 20, n.y));
       });
 
-      // Draw Edges (High Visibility)
+      // Draw Edges
       const elapsed = Date.now() - startTime;
       simLinks.forEach(l => {
         if (elapsed < l.source.revealTime || elapsed < l.target.revealTime) return;
+        
+        const sourceMatches = !panelConfig.searchQuery || l.source.name.toLowerCase().includes(panelConfig.searchQuery.toLowerCase());
+        const targetMatches = !panelConfig.searchQuery || l.target.name.toLowerCase().includes(panelConfig.searchQuery.toLowerCase());
+        const matchesSearch = sourceMatches || targetMatches;
+
         const isActive = l.source.id === activeFileIdRef.current || l.target.id === activeFileIdRef.current;
+        
         ctx.beginPath();
         ctx.setLineDash(isActive ? [] : [4, 4]);
         ctx.strokeStyle = isActive ? 'rgba(0,71,255,0.95)' : 'rgba(26,26,26,0.6)';
-        ctx.lineWidth = isActive ? 3 : 2;
+        ctx.lineWidth = (isActive ? 3 : 2) * panelConfig.linkThickness;
+        ctx.globalAlpha = matchesSearch ? 1.0 : 0.1;
         ctx.moveTo(l.source.x, l.source.y);
         ctx.lineTo(l.target.x, l.target.y);
         ctx.stroke();
       });
 
-      // Draw Nodes (Premium Glass)
+      // Draw Nodes
       simNodes.forEach(node => {
         if (elapsed < node.revealTime) return;
+        const matchesSearch = !panelConfig.searchQuery || node.name.toLowerCase().includes(panelConfig.searchQuery.toLowerCase());
+
         const isActive = node.id === activeFileIdRef.current;
         const isConnected = simLinks.some(l => 
           (l.source.id === node.id && l.target.id === activeFileIdRef.current) ||
           (l.target.id === node.id && l.source.id === activeFileIdRef.current)
         );
         const col = node.color || '#BDBDBD';
-        const r = node.radius;
+        const r = node.radius * panelConfig.nodeSize;
+
+        ctx.globalAlpha = matchesSearch ? 1.0 : 0.15;
 
         if (isActive || isConnected) {
           ctx.shadowBlur = isActive ? 35 : 18;
@@ -366,10 +446,10 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: GardenModal
         ctx.setLineDash([2, 4]);
         ctx.strokeStyle = col;
         ctx.lineWidth = 2.2;
-        ctx.globalAlpha = isActive ? 1.0 : (isConnected ? 0.9 : 0.6);
+        ctx.globalAlpha = matchesSearch ? (isActive ? 1.0 : (isConnected ? 0.9 : 0.6)) : 0.1;
         ctx.arc(node.x, node.y, r + 8 + pulse, 0, Math.PI * 2);
         ctx.stroke();
-        ctx.globalAlpha = 1.0;
+        ctx.globalAlpha = matchesSearch ? 1.0 : 0.15;
 
         ctx.beginPath();
         ctx.setLineDash([]);
@@ -386,7 +466,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: GardenModal
         ctx.arc(node.x, node.y, isActive ? 9 : 7, 0, Math.PI * 2);
         ctx.fill(); ctx.stroke();
 
-        // Labels (High Visibility Black/Dark)
+        // Labels
         ctx.shadowBlur = 0;
         ctx.font = isActive 
           ? '700 13px "JetBrains Mono", var(--font-mono), monospace' 
@@ -400,17 +480,18 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: GardenModal
           ctx.beginPath();
           ctx.roundRect(node.x - tw/2 - 8, node.y + r + 14, tw + 16, 22, 4);
           ctx.fill();
-          ctx.fillStyle = '#000000'; // Pure black for active
+          ctx.fillStyle = '#000000';
         } else {
-          ctx.fillStyle = isConnected ? '#1A1A1A' : '#333333'; // Deep ink for others
+          ctx.fillStyle = isConnected ? '#1A1A1A' : '#333333';
         }
         
-        ctx.globalAlpha = (isActive || isConnected) ? 1.0 : 0.85;
+        ctx.globalAlpha = matchesSearch ? ((isActive || isConnected) ? 1.0 : 0.85) : 0.1;
         ctx.textAlign = 'center';
         ctx.fillText(text, node.x, node.y + r + 30);
         ctx.globalAlpha = 1.0;
       });
 
+      ctx.restore();
       simulationRef.current = requestAnimationFrame(tick);
     };
 
@@ -421,6 +502,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: GardenModal
       canvas.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
+      canvas.removeEventListener('wheel', handleWheel);
     };
   }, [showGraph, isOpen]);
 
@@ -635,6 +717,116 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: GardenModal
               bg-[rgba(26,26,26,0.01)] overflow-hidden shrink-0 flex-col relative transition-all duration-500
             `}>
               <canvas ref={canvasRef} className="w-full h-full cursor-grab active:cursor-grabbing relative z-10" />
+              
+              {/* Obsidian-Style Control Panel */}
+              {isGraphMaximized && (
+                <div className="absolute top-4 right-4 z-20 w-[280px] bg-[rgba(253,253,251,0.95)] backdrop-blur-md border border-dashed border-border-strong rounded-[2px] shadow-[0_15px_40px_-10px_rgba(0,0,0,0.15)] flex flex-col p-4 font-mono text-[11px] text-ink overflow-y-auto max-h-[90%]">
+                  <div className="flex items-center justify-between mb-4 pb-2 border-b border-dashed border-border-strong">
+                    <span className="font-bold tracking-widest uppercase text-[10px] text-accent">Graph Controls</span>
+                    <Settings size={14} className="text-accent animate-spin-slow" />
+                  </div>
+
+                  {/* Filters / Search */}
+                  <div className="mb-4">
+                    <div className="font-bold uppercase text-[9px] text-ink-faint tracking-widest mb-2">Search Nodes</div>
+                    <input 
+                      type="text" 
+                      value={panelConfig.searchQuery} 
+                      onChange={(e) => setPanelConfig({ ...panelConfig, searchQuery: e.target.value })}
+                      placeholder="Type to filter..."
+                      className="w-full bg-[rgba(26,26,26,0.03)] border border-dashed border-border-strong px-3 py-1.5 font-mono text-[11px] rounded-[2px] focus:outline-none focus:border-accent"
+                    />
+                  </div>
+
+                  {/* Groups */}
+                  <div className="mb-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <div className="font-bold uppercase text-[9px] text-ink-faint tracking-widest">Group By Tags</div>
+                      <input 
+                        type="checkbox" 
+                        checked={panelConfig.groupByTags}
+                        onChange={(e) => setPanelConfig({ ...panelConfig, groupByTags: e.target.checked })}
+                        className="accent-accent"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Display */}
+                  <div className="mb-4 pb-2 border-t border-dashed border-border-strong pt-2">
+                    <div className="font-bold uppercase text-[9px] text-ink-faint tracking-widest mb-2">Display</div>
+                    <div className="space-y-2">
+                      <div>
+                        <div className="flex justify-between text-[10px] mb-1">
+                          <span>Node Size</span>
+                          <span>{panelConfig.nodeSize.toFixed(1)}x</span>
+                        </div>
+                        <input 
+                          type="range" min="0.5" max="3" step="0.1"
+                          value={panelConfig.nodeSize}
+                          onChange={(e) => setPanelConfig({ ...panelConfig, nodeSize: parseFloat(e.target.value) })}
+                          className="w-full accent-accent"
+                        />
+                      </div>
+                      <div>
+                        <div className="flex justify-between text-[10px] mb-1">
+                          <span>Link Thickness</span>
+                          <span>{panelConfig.linkThickness.toFixed(1)}x</span>
+                        </div>
+                        <input 
+                          type="range" min="0.5" max="4" step="0.1"
+                          value={panelConfig.linkThickness}
+                          onChange={(e) => setPanelConfig({ ...panelConfig, linkThickness: parseFloat(e.target.value) })}
+                          className="w-full accent-accent"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Forces */}
+                  <div className="mb-2 pb-2 border-t border-dashed border-border-strong pt-2">
+                    <div className="font-bold uppercase text-[9px] text-ink-faint tracking-widest mb-2">Forces</div>
+                    <div className="space-y-2">
+                      <div>
+                        <div className="flex justify-between text-[10px] mb-1">
+                          <span>Centre Force</span>
+                          <span>{panelConfig.centerForce.toFixed(4)}</span>
+                        </div>
+                        <input 
+                          type="range" min="0.0005" max="0.015" step="0.0005"
+                          value={panelConfig.centerForce}
+                          onChange={(e) => setPanelConfig({ ...panelConfig, centerForce: parseFloat(e.target.value) })}
+                          className="w-full accent-accent"
+                        />
+                      </div>
+                      <div>
+                        <div className="flex justify-between text-[10px] mb-1">
+                          <span>Repel Force</span>
+                          <span>{panelConfig.repelForce}</span>
+                        </div>
+                        <input 
+                          type="range" min="1000" max="15000" step="500"
+                          value={panelConfig.repelForce}
+                          onChange={(e) => setPanelConfig({ ...panelConfig, repelForce: parseInt(e.target.value) })}
+                          className="w-full accent-accent"
+                        />
+                      </div>
+                      <div>
+                        <div className="flex justify-between text-[10px] mb-1">
+                          <span>Link Distance</span>
+                          <span>{panelConfig.linkDistance}px</span>
+                        </div>
+                        <input 
+                          type="range" min="100" max="400" step="10"
+                          value={panelConfig.linkDistance}
+                          onChange={(e) => setPanelConfig({ ...panelConfig, linkDistance: parseInt(e.target.value) })}
+                          className="w-full accent-accent"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Background Dots */}
               <div 
                 className="absolute inset-0 pointer-events-none opacity-[0.4]"
