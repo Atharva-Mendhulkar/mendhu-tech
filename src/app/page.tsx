@@ -175,6 +175,8 @@ export default function Home() {
             <div className="font-mono text-[10px] text-ink-faint uppercase tracking-widest flex items-center gap-4">
               <button onClick={() => window.dispatchEvent(new Event('toggle-terminal'))} className="hover:text-ink transition-colors cursor-pointer">$ terminal</button>
               <span className="text-border-strong">|</span>
+              <button onClick={handleExit} className="hover:text-ink transition-colors cursor-pointer">$ exit</button>
+              <span className="text-border-strong">|</span>
               <span>v2.0.4-stable</span>
               <span className="text-border-strong">|</span>
               <span>© Atharva Mendhulkar {new Date().getFullYear()}</span>
