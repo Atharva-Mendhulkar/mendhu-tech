@@ -112,26 +112,26 @@ export default function Home() {
                 need to find something fast?
               </text>
 
-              {/* Multi-loop curved arrow pointing DOWN */}
+              {/* Quadratic curved arrow pointing DOWN from middle of text to middle of button */}
               <path 
-                d="M35,45 C65,85 95,5 125,55 S175,105 205,75"
+                d="M100,45 Q120,75 135,100"
                 fill="none" 
                 stroke="var(--accent)" 
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeDasharray="3 6 2 6"
-                opacity="0.7"
+                strokeDasharray="4 6"
+                opacity="0.75"
               />
 
               {/* Arrow head pointing DOWNWARDS */}
               <path 
-                d="M195,73 L205,75 L202,63" 
+                d="M125,92 L135,100 L141,88" 
                 fill="none" 
                 stroke="var(--accent)" 
                 strokeWidth="2"
                 strokeLinecap="round"
-                opacity="0.7"
+                opacity="0.75"
               />
             </svg>
 

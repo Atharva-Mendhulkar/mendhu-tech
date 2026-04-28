@@ -24,12 +24,12 @@ const GARDEN_FILES = rawResearchData.nodes.map((n: any) => ({
 }));
 
 const COMMANDS = [
-  { id: "garden",   name: "open garden",    desc: "Open knowledge garden interface" },
-  { id: "resume",   name: "open resume",    desc: "View official credentials in PDF viewer" },
-  { id: "linkedin", name: "goto linkedin",  desc: "Redirect to standard profile credentials" },
-  { id: "github",   name: "goto github",    desc: "View public version control workspaces" },
-  { id: "twitter",  name: "goto twitter",   desc: "Check research workflows online" },
-  { id: "help",     name: "show commands",  desc: "List all active utility pointers" },
+  { id: "projects", name: "type projects",  desc: "View modular technical research labs" },
+  { id: "garden",   name: "type garden",    desc: "Access the research knowledge garden" },
+  { id: "resume",   name: "open resume",    desc: "View official PDF credentials directly" },
+  { id: "linkedin", name: "goto linkedin",  desc: "Redirect to standard network links" },
+  { id: "github",   name: "goto github",    desc: "Explore active version control hubs" },
+  { id: "twitter",  name: "goto twitter",   desc: "Follow research updates online" },
 ];
 
 // Tag icon map
@@ -101,7 +101,6 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
   const [cursor, setCursor] = useState(0);
   const [mode,   setMode]   = useState<"all" | "garden">("all");
   const [isShowingResume, setIsShowingResume] = useState(false);
-  const [isShowingCommands, setIsShowingCommands] = useState(false);
   
   // Pagination limits for 'Show More'
   const [visibleCount, setVisibleCount] = useState(5);
@@ -155,11 +154,10 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
   // ── Looping Placeholders ──────────────────────────────────────────────────
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const placeholders = useMemo(() => [
-    "type 'open garden' directly",
-    "type 'open resume' to view info",
-    "type 'show commands' anytime",
-    "pinn overview",
-    "temporal stability",
+    "type 'projects' to view build logs",
+    "type 'garden' to access maps",
+    "type 'open resume' for credentials",
+    "search physics pipelines",
   ], []);
 
   useEffect(() => {
@@ -191,11 +189,13 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
     const availableProjects = mode === "all" ? PROJECTS : [];
     const availableGarden   = GARDEN_FILES;
 
+    // Direct command filters natively mapped
     const matchedCommands: ResultItem[] = COMMANDS.filter(cmd => {
-      if (q === "show commands" || q === "show" || q === "commands" || q === "help") return true;
+      if (q === "show commands" || q === "help" || q === "commands") return true;
       return cmd.name.toLowerCase().includes(q) || cmd.desc.toLowerCase().includes(q);
     }).map(item => ({ kind: "command" as const, item }));
 
+    // Projects boosted directly if query matches 'project'
     const scored: { r: ResultItem; s: number }[] = [
       ...availableProjects.map(item => ({
         r: { kind: "project" as const, item },
@@ -234,13 +234,11 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
   // ── Open / close ──────────────────────────────────────────────────────────
 
   const open_ = useCallback(() => { 
-    setOpen(true); setQuery(""); setMode("all"); setCursor(0); 
-    setIsShowingResume(false); setIsShowingCommands(false);
+    setOpen(true); setQuery(""); setMode("all"); setCursor(0); setIsShowingResume(false); 
   }, []);
   
   const close_ = useCallback(() => { 
-    setOpen(false); setQuery(""); setMode("all"); setCursor(0); 
-    setIsShowingResume(false); setIsShowingCommands(false);
+    setOpen(false); setQuery(""); setMode("all"); setCursor(0); setIsShowingResume(false); 
   }, []);
 
   useEffect(() => {
@@ -282,7 +280,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
     }
     else if (e.key === "Tab") {
       const lower = query.toLowerCase().trim();
-      if (lower === "knowledge garden" || lower === "garden" || lower === "open garden") {
+      if (lower === "knowledge garden" || lower === "garden" || lower === "type garden") {
         e.preventDefault();
         setMode("garden");
         setQuery("");
@@ -312,6 +310,8 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
       if (r.item.id === "garden") {
         close_();
         setTimeout(() => onOpenGarden(), 100);
+      } else if (r.item.id === "projects") {
+        setQuery("project");
       } else if (r.item.id === "resume") {
         setIsShowingResume(true);
       } else if (r.item.id === "linkedin") {
@@ -323,8 +323,6 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
       } else if (r.item.id === "twitter") {
         window.open("https://x.com/atharvarta", "_blank");
         close_();
-      } else if (r.item.id === "help") {
-        setIsShowingCommands(true);
       }
     }
   };
@@ -383,33 +381,8 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
         </div>
       )}
 
-      {/* Commands List Overlay Box */}
-      {isShowingCommands && (
-        <div className="fixed inset-0 z-[100000] bg-paper/95 backdrop-blur-md flex items-center justify-center p-6">
-          <div className="bg-paper-light border border-dashed border-border-strong rounded-xl p-6 w-full max-w-md shadow-2xl relative font-mono">
-            <button 
-              onClick={() => setIsShowingCommands(false)}
-              className="absolute top-4 right-4 text-ink-faint hover:text-ink cursor-pointer"
-            >
-              <X size={16} />
-            </button>
-            <h3 className="text-accent font-bold text-[13px] uppercase tracking-wider mb-4 pb-2 border-b border-dashed border-border-strong flex items-center gap-2">
-              <TermIcon size={16} /> Utility Commands
-            </h3>
-            <div className="space-y-3.5 text-[11px]">
-              {COMMANDS.map(cmd => (
-                <div key={cmd.id} className="flex flex-col gap-0.5 border-b border-dashed border-border-strong/40 pb-2">
-                  <div className="text-ink font-bold">{cmd.name}</div>
-                  <div className="text-ink-faint text-[10px]">{cmd.desc}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Panel with 20% Glassmorphism */}
-      {open && !isShowingResume && !isShowingCommands && (
+      {/* Panel with Increased Glassmorphism Transparency */}
+      {open && !isShowingResume && (
         <div
           className="fixed z-[99999] left-1/2"
           style={{ 
@@ -422,18 +395,18 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
           onMouseDown={handleMouseDown}
         >
           <div style={{
-            background: "rgba(253, 253, 251, 0.22)",
+            background: "rgba(253, 253, 251, 0.1)",
             backdropFilter: "blur(24px)",
             WebkitBackdropFilter: "blur(24px)",
-            border: "1px border-dashed rgba(26, 26, 26, 0.2)",
+            border: "1px dashed rgba(26, 26, 26, 0.15)",
             borderRadius: 16,
-            boxShadow: "0 40px 100px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.06)",
+            boxShadow: "0 40px 100px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.04)",
             overflow: "hidden",
             animation: "spot-in 0.16s cubic-bezier(0.16,1,0.3,1) forwards",
           }}>
 
             {/* Input */}
-            <div className="flex items-center gap-3 px-5 py-4" style={{ borderBottom: "1px dashed rgba(26,26,26,0.12)" }}>
+            <div className="flex items-center gap-3 px-5 py-4" style={{ borderBottom: "1px dashed rgba(26,26,26,0.1)" }}>
               <Search size={15} className="text-ink shrink-0 opacity-60" strokeWidth={1.5} />
               
               {mode === "garden" && (
