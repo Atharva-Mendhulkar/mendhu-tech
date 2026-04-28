@@ -31,7 +31,7 @@ Core to:
 
 ```mermaid
 flowchart LR
-    Behavior --> Features --> Model --> Identity Score
+    Behavior --> Features --> Model --> IdentityScore["Identity Score"]
 ```
 
 See also

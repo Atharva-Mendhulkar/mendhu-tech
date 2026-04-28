@@ -1,837 +1,577 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import mermaid from 'mermaid';
-import { ChevronRight, ChevronDown, FileText, Folder, Maximize2, Minimize2, Share2, Globe, Minus, X, Settings } from 'lucide-react';
+import { ChevronRight, ChevronDown, FileText, Maximize2, Minimize2, Share2, Globe, Minus, X, Settings, Search } from 'lucide-react';
 import rawResearchData from '@/data/research.json';
 
-// Initialize mermaid
+// ── Mermaid ────────────────────────────────────────────────────────────────
 if (typeof window !== 'undefined') {
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: 'neutral',
-    securityLevel: 'loose',
-    fontFamily: 'var(--font-jetbrains-mono)',
-  });
+  mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'loose' });
 }
 
-// Robust Mermaid Component
-const Mermaid = ({ chart }: { chart: string }) => {
-  const [svg, setSvg] = useState<string>('');
-  const [error, setError] = useState<string | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const id = useRef(`mermaid-${Math.random().toString(36).substring(2, 11)}`);
-
+const MermaidBlock = ({ chart }: { chart: string }) => {
+  const [svg, setSvg] = useState('');
+  const id = useRef(`mmd-${Math.random().toString(36).slice(2)}`);
   useEffect(() => {
-    let isMounted = true;
-    const renderChart = async () => {
-      if (!chart) return;
-      try {
-        // Clear previous error and SVG
-        setError(null);
-        const { svg: renderedSvg } = await mermaid.render(id.current, chart);
-        if (isMounted) setSvg(renderedSvg);
-      } catch (err) {
-        console.error('Mermaid render error:', err);
-        if (isMounted) setError('Diagram rendering failed. Check syntax.');
-      }
-    };
-    renderChart();
-    return () => { isMounted = false; };
+    mermaid.render(id.current, chart).then(r => setSvg(r.svg)).catch(() => {});
   }, [chart]);
-
-  if (error) {
-    return (
-      <div className="my-8 p-6 bg-red-50 border border-dashed border-red-200 rounded-[2px] font-mono text-[11px] text-red-600">
-        <div className="font-bold mb-2 uppercase tracking-widest">[MERMAID_ERROR]</div>
-        {error}
-        <pre className="mt-4 opacity-70 overflow-x-auto p-4 bg-white/50">{chart}</pre>
-      </div>
-    );
-  }
-
   return (
-    <div 
-      ref={containerRef}
-      className="mermaid-chart my-10 flex justify-center bg-[rgba(0,71,255,0.02)] border border-dashed border-accent/15 p-8 rounded-[2px] transition-all hover:border-accent/30 overflow-x-auto"
-      dangerouslySetInnerHTML={{ __html: svg || '<div class="animate-pulse font-mono text-[10px] text-accent">Compiling Diagram...</div>' }}
-    />
+    <div className="my-8 p-6 border border-dashed border-accent/20 overflow-x-auto"
+      dangerouslySetInnerHTML={{ __html: svg || '<span class="font-mono text-[10px] text-ink-faint">rendering…</span>' }} />
   );
 };
 
-interface ResearchFile {
-  title: string;
-  header: string;
-  html: string;
-  markdown?: string;
-}
-
-interface ResearchNode {
-  id: string;
-  name: string;
-  group: string;
-  color: string;
-  description: string;
-  radius: number;
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  tags?: string[];
-}
-
-interface ResearchLink {
-  source: any;
-  target: any;
-}
-
+// ── Types ──────────────────────────────────────────────────────────────────
+interface ResearchFile { title: string; header: string; html?: string; markdown?: string }
+interface RawNode { id: string; name?: string; label?: string; group: string; color: string; description?: string; tags?: string[] }
 interface ResearchData {
-  nodes: ResearchNode[];
+  nodes: RawNode[];
   links: { source: string; target: string }[];
   files: Record<string, ResearchFile>;
 }
+const data = rawResearchData as unknown as ResearchData;
 
-const researchData = rawResearchData as unknown as ResearchData;
-
-interface GardenModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onMinimize: (id: string, title: string) => void;
+interface SimNode {
+  id: string; label: string; color: string; group: string; tags: string[];
+  x: number; y: number; vx: number; vy: number;
+  r: number; isTag: boolean; revealAt: number;
+}
+interface SimLink { source: SimNode; target: SimNode }
+interface GraphSettings {
+  nodeSize: number; linkThickness: number; centerForce: number;
+  repelForce: number; linkForce: number; linkDistance: number;
+  groupByTags: boolean; searchQuery: string;
 }
 
-export default function GardenModal({ isOpen, onClose, onMinimize }: GardenModalProps) {
-  const fileKeys = Object.keys(researchData.files);
-  const [activeFileId, setActiveFileId] = useState<string>(fileKeys[0] || '');
-  const [showGraph, setShowGraph] = useState(false);
-  const [isGraphMaximized, setIsGraphMaximized] = useState(false);
-  const [expandedFolders, setExpandedFolders] = useState<Record<string, boolean>>({
-    "Systems": true,
-    "Security": true,
-    "Intelligence": true,
-    "General": true
-  });
+const TAG_COLORS: Record<string, string> = {
+  ai:'#00FF88', agents:'#FFBD2E', systems:'#FF5F57',
+  security:'#CC77FF', ml:'#0047FF', physics:'#20C9A6',
+  saas:'#F97316', kernel:'#EF4444', pinn:'#3B82F6',
+};
+const tagColor = (t: string) => TAG_COLORS[t.replace('#','')] ?? '#888888';
 
-  const [panelConfig, setPanelConfig] = useState({
-    nodeSize: 1.2,
-    linkThickness: 1.5,
-    centerForce: 0.004,
-    repelForce: 7500,
-    linkForce: 0.02,
-    linkDistance: 260,
-    groupByTags: false,
-    searchQuery: '',
-    showArrows: false,
-    showTags: true,
-  });
+const DEFAULT: GraphSettings = {
+  nodeSize:1.0, linkThickness:1.0, centerForce:0.003,
+  repelForce:6000, linkForce:0.018, linkDistance:220,
+  groupByTags:true, searchQuery:'',
+};
 
-  const transformRef = useRef({ scale: 1, x: 0, y: 0 });
-  const isPanningRef = useRef(false);
-  const panStartRef = useRef({ x: 0, y: 0 });
-  
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const simulationRef = useRef<number | null>(null);
-  const nodesRef = useRef<any[]>([]);
-  const dragNodeRef = useRef<any | null>(null);
-
-  const categories = useMemo(() => {
-    const groups: Record<string, string[]> = {
-      "Intelligence & AI": [],
-      "Systems & Infrastructure": [],
-      "Security & Governance": [],
-      "ML & Physics Research": [],
-      "General": []
+function buildSimGraph(raw: ResearchData, groupByTags: boolean, W: number, H: number, existing: SimNode[]) {
+  const cx = W/2, cy = H/2, now = Date.now();
+  const fileNodes: SimNode[] = raw.nodes.map((n,i) => {
+    const ex = existing.find(e => e.id === n.id);
+    return ex ?? {
+      id:n.id, label:n.name??n.label??n.id, color:n.color??'#888',
+      group:n.group, tags:n.tags??[],
+      x:cx+(Math.random()-.5)*300, y:cy+(Math.random()-.5)*300,
+      vx:0, vy:0, r:8, isTag:false, revealAt:now+i*100,
     };
-    
-    const groupMapping: Record<string, string> = {
-      'ai': 'Intelligence & AI',
-      'intelligence': 'Intelligence & AI',
-      'agent': 'Intelligence & AI',
-      'systems': 'Systems & Infrastructure',
-      'kernel': 'Systems & Infrastructure',
-      'security': 'Security & Governance',
-      'ml': 'ML & Physics Research',
-      'physics': 'ML & Physics Research',
-      'pinn': 'ML & Physics Research',
-      'pde': 'ML & Physics Research'
+  });
+  const fileLinks: SimLink[] = raw.links.flatMap(l => {
+    const s=fileNodes.find(n=>n.id===l.source), t=fileNodes.find(n=>n.id===l.target);
+    return s&&t?[{source:s,target:t}]:[];
+  });
+  if (!groupByTags) return { nodes:fileNodes, links:fileLinks };
+
+  const allTags = new Set<string>();
+  fileNodes.forEach(n => n.tags.forEach(t => allTags.add(t.replace('#','').toLowerCase())));
+  const tagNodes: SimNode[] = [...allTags].map((tag,i) => {
+    const ex = existing.find(e=>e.id===`#${tag}`);
+    return ex ?? {
+      id:`#${tag}`, label:`#${tag}`, color:tagColor(tag), group:'tag', tags:[],
+      x:cx+Math.cos((i/allTags.size)*Math.PI*2)*160,
+      y:cy+Math.sin((i/allTags.size)*Math.PI*2)*160,
+      vx:0, vy:0, r:14, isTag:true, revealAt:now,
     };
-
-    researchData.nodes.forEach(node => {
-      const nodeTags = node.tags || [];
-      let placed = false;
-
-      nodeTags.forEach(tag => {
-        const cat = groupMapping[tag.toLowerCase()];
-        if (cat && groups[cat]) {
-          if (!groups[cat].includes(node.id)) {
-            groups[cat].push(node.id);
-            placed = true;
-          }
-        }
-      });
-
-      if (!placed) {
-        const cat = groupMapping[node.group] || 'General';
-        if (!groups[cat].includes(node.id)) {
-          groups[cat].push(node.id);
-        }
-      }
+  });
+  const tagLinks: SimLink[] = [];
+  fileNodes.forEach(fn => {
+    fn.tags.forEach(t => {
+      const tid=t.replace('#','').toLowerCase();
+      const hub=tagNodes.find(n=>n.id===`#${tid}`);
+      if(hub) tagLinks.push({source:hub, target:fn});
     });
+  });
+  return { nodes:[...tagNodes,...fileNodes], links:[...fileLinks,...tagLinks] };
+}
 
-    return groups;
-  }, []);
+interface Props { isOpen:boolean; onClose:()=>void; onMinimize:(id:string,title:string)=>void }
 
-  const activeFile = researchData.files[activeFileId];
+export default function GardenModal({ isOpen, onClose, onMinimize }: Props) {
+  const fileKeys = Object.keys(data.files);
+  const [activeFileId, setActiveFileId] = useState(fileKeys[0]??'');
+  const [showGraph, setShowGraph]       = useState(false);
+  const [isMaxGraph, setIsMaxGraph]     = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMounted, setIsMounted]       = useState(false);
+  const [settings, setSettings]         = useState<GraphSettings>({...DEFAULT});
+  const settingsRef                     = useRef<GraphSettings>({...DEFAULT});
+  const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const activeTagRef = useRef<string | null>(null);
+  useEffect(()=>{activeTagRef.current=activeTag;},[activeTag]);
 
-  useEffect(() => {
-    if (isOpen) document.body.style.overflow = 'hidden';
-    else document.body.style.overflow = 'auto';
-    return () => { document.body.style.overflow = 'auto'; };
-  }, [isOpen]);
-
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
-  }, [onClose]);
-
-  const toggleFolder = (folder: string) => {
-    setExpandedFolders(prev => ({ ...prev, [folder]: !prev[folder] }));
+  // KEY FIX: update both state (for UI) AND ref (for RAF loop)
+  const updateSetting = <K extends keyof GraphSettings>(k: K, v: GraphSettings[K]) => {
+    settingsRef.current = {...settingsRef.current, [k]:v};
+    setSettings(s => ({...s,[k]:v}));
   };
 
-  const activeFileIdRef = useRef(activeFileId);
-  useEffect(() => { activeFileIdRef.current = activeFileId; }, [activeFileId]);
+  const canvasRef    = useRef<HTMLCanvasElement>(null);
+  const rafRef       = useRef<number|null>(null);
+  const simNodesRef  = useRef<SimNode[]>([]);
+  const simLinksRef  = useRef<SimLink[]>([]);
+  const dragNodeRef  = useRef<SimNode|null>(null);
+  const transformRef = useRef({scale:1,x:0,y:0});
+  const isPanRef     = useRef(false);
+  const panStartRef  = useRef({x:0,y:0});
+  const activeIdRef  = useRef(activeFileId);
+  useEffect(()=>{activeIdRef.current=activeFileId;},[activeFileId]);
 
-  // Physics Simulation
-  useEffect(() => {
-    if (!showGraph || !isOpen || !canvasRef.current) return;
-
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const resizeObserver = new ResizeObserver(entries => {
-      const dpr = window.devicePixelRatio || 1;
-      for (let entry of entries) {
-        const { width, height } = entry.contentRect;
-        canvas.width = width * dpr;
-        canvas.height = height * dpr;
-        canvas.style.width = `${width}px`;
-        canvas.style.height = `${height}px`;
-        const ctx = canvas.getContext('2d');
-        if (ctx) ctx.scale(dpr, dpr);
-        
-        nodesRef.current.forEach(n => {
-          n.x = Math.max(20, Math.min(width - 20, n.x));
-          n.y = Math.max(20, Math.min(height - 20, n.y));
-        });
+  const categories = useMemo(()=>{
+    const map:Record<string,string[]>={
+      'Intelligence & AI':[],'Systems & Infra':[],'Security & Governance':[],'ML & Physics':[],'General':[],
+    };
+    const mapping:Record<string,string>={
+      ai:'Intelligence & AI',agents:'Intelligence & AI',intelligence:'Intelligence & AI',
+      systems:'Systems & Infra',kernel:'Systems & Infra',infrastructure:'Systems & Infra',
+      security:'Security & Governance',governance:'Security & Governance',
+      ml:'ML & Physics',physics:'ML & Physics',pinn:'ML & Physics',pde:'ML & Physics',
+    };
+    data.nodes.forEach(n=>{
+      const tags=n.tags??[];
+      let placed=false;
+      for(const t of tags){
+        const cat=mapping[t.toLowerCase().replace('#','')];
+        if(cat&&!map[cat].includes(n.id)){map[cat].push(n.id);placed=true;break;}
       }
+      if(!placed){const cat=mapping[n.group]??'General';if(!map[cat].includes(n.id))map[cat].push(n.id);}
     });
+    return map;
+  },[]);
 
-    if (canvas.parentElement) resizeObserver.observe(canvas.parentElement);
+  const [expandedFolders,setExpandedFolders] = useState<Record<string,boolean>>(
+    Object.fromEntries(Object.keys(categories).map(k=>[k,true]))
+  );
 
-    if (nodesRef.current.length === 0) {
-      const rect = canvas.getBoundingClientRect();
-      const lw = rect.width || 400;
-      const lh = rect.height || 600;
-      
-      nodesRef.current = researchData.nodes.map((n, i) => ({
-        ...n,
-        x: lw / 2 + (Math.random() - 0.5) * 200,
-        y: lh / 2 + (Math.random() - 0.5) * 400,
-        vx: 0,
-        vy: 0,
-        radius: researchData.links.filter(l => l.source === n.id || l.target === n.id).length > 2 ? 14 : 10,
-        revealTime: i * 150 // Staggered reveal
-      }));
-    }
-    
-    const startTime = Date.now();
-    
-    const simNodes = nodesRef.current;
-    const simLinks = researchData.links
-      .map(l => ({
-        source: simNodes.find(n => n.id === l.source),
-        target: simNodes.find(n => n.id === l.target),
-      }))
-      .filter((l): l is { source: any; target: any } => l.source && l.target);
+  useEffect(()=>{
+    if(isOpen) setTimeout(()=>setIsMounted(true),10);
+    else setIsMounted(false);
+  },[isOpen]);
 
-    const handleMouseDown = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      const mx = e.clientX - rect.left;
-      const my = e.clientY - rect.top;
-      const transform = transformRef.current;
-      const gx = (mx - transform.x) / transform.scale;
-      const gy = (my - transform.y) / transform.scale;
-      
-      const hit = simNodes.find(n => Math.hypot(n.x - gx, n.y - gy) < (n.radius * panelConfig.nodeSize) + 15 / transform.scale);
-      if (hit) {
-        dragNodeRef.current = hit;
-        setActiveFileId(hit.id);
-      } else {
-        isPanningRef.current = true;
-        panStartRef.current = { x: mx - transform.x, y: my - transform.y };
+  useEffect(()=>{
+    document.body.style.overflow=isOpen?'hidden':'';
+    return ()=>{document.body.style.overflow='';};
+  },[isOpen]);
+
+  useEffect(()=>{
+    const h=(e:KeyboardEvent)=>{if(e.key==='Escape')onClose();};
+    window.addEventListener('keydown',h);
+    return ()=>window.removeEventListener('keydown',h);
+  },[onClose]);
+
+  const handleGroupToggle = (v:boolean)=>{
+    updateSetting('groupByTags',v);
+  };
+  const triggerAnimate = () => {
+    const now = Date.now();
+    simNodesRef.current.forEach((n, i) => {
+      n.revealAt = now + (n.isTag ? 0 : i * 50);
+    });
+  };
+
+  // ── SIMULATION ───────────────────────────────────────────────────────────
+  useEffect(()=>{
+    if(!showGraph||!isOpen||!canvasRef.current) return;
+    const canvas=canvasRef.current;
+    const ctx=canvas.getContext('2d')!;
+    const dpr=window.devicePixelRatio||1;
+
+    const ro=new ResizeObserver(()=>{
+      const p=canvas.parentElement!;
+      canvas.width=p.clientWidth*dpr; canvas.height=p.clientHeight*dpr;
+      canvas.style.width=`${p.clientWidth}px`; canvas.style.height=`${p.clientHeight}px`;
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    });
+    ro.observe(canvas.parentElement!);
+    const p=canvas.parentElement!;
+    canvas.width=p.clientWidth*dpr; canvas.height=p.clientHeight*dpr;
+    canvas.style.width=`${p.clientWidth}px`; canvas.style.height=`${p.clientHeight}px`;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+
+    const rebuild=()=>{
+      const {nodes,links}=buildSimGraph(data,settingsRef.current.groupByTags,p.clientWidth,p.clientHeight,simNodesRef.current);
+      simNodesRef.current=nodes; simLinksRef.current=links;
+    };
+    if(simNodesRef.current.length===0) rebuild();
+
+    const getGraph=(mx:number,my:number)=>{
+      const t=transformRef.current;
+      return {gx:(mx-t.x)/t.scale,gy:(my-t.y)/t.scale};
+    };
+
+    const onDown=(e:MouseEvent)=>{
+      const r=canvas.getBoundingClientRect();
+      const {gx,gy}=getGraph(e.clientX-r.left,e.clientY-r.top);
+      const s=settingsRef.current;
+      const hit=simNodesRef.current.find(n=>Math.hypot(n.x-gx,n.y-gy)<(n.isTag?n.r*1.5:n.r)*s.nodeSize+12);
+      if(hit){
+        dragNodeRef.current=hit;
+        if(!hit.isTag) {
+          setActiveFileId(hit.id);
+          setActiveTag(null);
+        } else {
+          setActiveTag(prev => prev === hit.label ? null : hit.label);
+        }
       }
+      else{isPanRef.current=true;panStartRef.current={x:(e.clientX-r.left)-transformRef.current.x,y:(e.clientY-r.top)-transformRef.current.y};}
     };
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      const mx = e.clientX - rect.left;
-      const my = e.clientY - rect.top;
-      const transform = transformRef.current;
-      const gx = (mx - transform.x) / transform.scale;
-      const gy = (my - transform.y) / transform.scale;
-
-      if (dragNodeRef.current) {
-        dragNodeRef.current.x = gx;
-        dragNodeRef.current.y = gy;
-        dragNodeRef.current.vx = 0;
-        dragNodeRef.current.vy = 0;
-      } else if (isPanningRef.current) {
-        transform.x = mx - panStartRef.current.x;
-        transform.y = my - panStartRef.current.y;
-      }
+    const onMove=(e:MouseEvent)=>{
+      const r=canvas.getBoundingClientRect();
+      const {gx,gy}=getGraph(e.clientX-r.left,e.clientY-r.top);
+      if(dragNodeRef.current){dragNodeRef.current.x=gx;dragNodeRef.current.y=gy;dragNodeRef.current.vx=0;dragNodeRef.current.vy=0;}
+      else if(isPanRef.current){const mx=e.clientX-r.left,my=e.clientY-r.top;transformRef.current.x=mx-panStartRef.current.x;transformRef.current.y=my-panStartRef.current.y;}
     };
-
-    const handleMouseUp = () => { 
-      dragNodeRef.current = null; 
-      isPanningRef.current = false;
-    };
-
-    const handleWheel = (e: WheelEvent) => {
+    const onUp=()=>{dragNodeRef.current=null;isPanRef.current=false;};
+    const onWheel=(e:WheelEvent)=>{
       e.preventDefault();
-      const rect = canvas.getBoundingClientRect();
-      const mx = e.clientX - rect.left;
-      const my = e.clientY - rect.top;
-      const transform = transformRef.current;
-      
-      const gx = (mx - transform.x) / transform.scale;
-      const gy = (my - transform.y) / transform.scale;
-      
-      const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
-      const newScale = Math.max(0.15, Math.min(4, transform.scale * zoomFactor));
-      
-      transform.x = mx - gx * newScale;
-      transform.y = my - gy * newScale;
-      transform.scale = newScale;
+      const r=canvas.getBoundingClientRect();
+      const mx=e.clientX-r.left,my=e.clientY-r.top;
+      const t=transformRef.current;
+      const gx=(mx-t.x)/t.scale,gy=(my-t.y)/t.scale;
+      const ns=Math.max(0.1,Math.min(5,t.scale*(e.deltaY<0?1.12:0.88)));
+      t.x=mx-gx*ns;t.y=my-gy*ns;t.scale=ns;
     };
+    canvas.addEventListener('mousedown',onDown);
+    window.addEventListener('mousemove',onMove);
+    window.addEventListener('mouseup',onUp);
+    canvas.addEventListener('wheel',onWheel,{passive:false});
 
-    canvas.addEventListener('mousedown', handleMouseDown);
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
-    canvas.addEventListener('wheel', handleWheel, { passive: false });
+    const tick=()=>{
+      const s=settingsRef.current;   // LIVE — reads ref, not stale closure
+      const now=Date.now();
+      const W=canvas.width/dpr, H=canvas.height/dpr;
+      const nodes=simNodesRef.current, links=simLinksRef.current;
 
-    const tick = () => {
-      const dpr = window.devicePixelRatio || 1;
-      const lw = canvas.width / dpr;
-      const lh = canvas.height / dpr;
-      
-      ctx.clearRect(0, 0, lw, lh);
+      // Rebuild if groupByTags changed
+      const hasTagNodes=nodes.some(n=>n.isTag);
+      if(s.groupByTags!==hasTagNodes) rebuild();
 
-      const k = panelConfig.linkForce;
-      const damping = 0.8;
-      const repulsion = panelConfig.repelForce;
-      const centerPull = panelConfig.centerForce;
-      const linkDist = panelConfig.linkDistance;
+      ctx.clearRect(0,0,W,H);
 
       ctx.save();
-      const transform = transformRef.current;
-      ctx.translate(transform.x, transform.y);
-      ctx.scale(transform.scale, transform.scale);
+      const t=transformRef.current;
+      ctx.translate(t.x,t.y);ctx.scale(t.scale,t.scale);
 
-      const groupCenters: Record<string, { x: number, y: number }> = {
-        "Intelligence & AI": { x: lw * 0.35, y: lh * 0.35 },
-        "Systems & Infrastructure": { x: lw * 0.65, y: lh * 0.35 },
-        "Security & Governance": { x: lw * 0.35, y: lh * 0.65 },
-        "ML & Physics Research": { x: lw * 0.65, y: lh * 0.65 },
-        "General": { x: lw * 0.5, y: lh * 0.5 }
-      };
-
-      for (let i = 0; i < simNodes.length; i++) {
-        const n1 = simNodes[i];
-        if (n1 === dragNodeRef.current) continue;
-
-        if (panelConfig.groupByTags) {
-          let group = 'General';
-          for (const [cat, nodes] of Object.entries(categories)) {
-            if (nodes.includes(n1.id)) {
-              group = cat;
-              break;
-            }
-          }
-          const center = groupCenters[group] || { x: lw / 2, y: lh / 2 };
-          n1.vx += (center.x - n1.x) * (centerPull * 2.5);
-          n1.vy += (center.y - n1.y) * (centerPull * 2.5);
-        } else {
-          n1.vx += (lw / 2 - n1.x) * centerPull;
-          n1.vy += (lh / 2 - n1.y) * centerPull;
-        }
-
-        for (let j = i + 1; j < simNodes.length; j++) {
-          const n2 = simNodes[j];
-          const dx = n1.x - n2.x, dy = n1.y - n2.y;
-          const distSq = dx * dx + dy * dy + 1;
-          const dist = Math.sqrt(distSq);
-          const f = repulsion / distSq;
-          const fx = (dx / dist) * f, fy = (dy / dist) * f;
-          n1.vx += fx; n1.vy += fy;
-          n2.vx -= fx; n2.vy -= fy;
+      const cx=W/2,cy=H/2;
+      for(let i=0;i<nodes.length;i++){
+        const n1=nodes[i];
+        if(n1===dragNodeRef.current) continue;
+        n1.vx+=(cx-n1.x)*s.centerForce*(n1.isTag?4:1);
+        n1.vy+=(cy-n1.y)*s.centerForce*(n1.isTag?4:1);
+        for(let j=i+1;j<nodes.length;j++){
+          const n2=nodes[j];
+          const dx=n1.x-n2.x,dy=n1.y-n2.y;
+          const d2=dx*dx+dy*dy+1,d=Math.sqrt(d2);
+          const f=s.repelForce/d2;
+          const fx=(dx/d)*f,fy=(dy/d)*f;
+          n1.vx+=fx;n1.vy+=fy;n2.vx-=fx;n2.vy-=fy;
         }
       }
-
-      simLinks.forEach(l => {
-        const dx = l.source.x - l.target.x, dy = l.source.y - l.target.y;
-        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-        const f = (dist - linkDist) * k;
-        const fx = (dx / dist) * f, fy = (dy / dist) * f;
-        if (l.source !== dragNodeRef.current) { l.source.vx -= fx; l.source.vy -= fy; }
-        if (l.target !== dragNodeRef.current) { l.target.vx += fx; l.target.vy += fy; }
+      links.forEach(l=>{
+        const dx=l.source.x-l.target.x,dy=l.source.y-l.target.y;
+        const d=Math.sqrt(dx*dx+dy*dy)||1;
+        const f=(d-s.linkDistance)*s.linkForce;
+        const fx=(dx/d)*f,fy=(dy/d)*f;
+        if(l.source!==dragNodeRef.current){l.source.vx-=fx;l.source.vy-=fy;}
+        if(l.target!==dragNodeRef.current){l.target.vx+=fx;l.target.vy+=fy;}
+      });
+      const damp=0.82,maxV=12;
+      nodes.forEach(n=>{
+        if(n===dragNodeRef.current) return;
+        n.vx=Math.max(-maxV,Math.min(maxV,n.vx*damp));
+        n.vy=Math.max(-maxV,Math.min(maxV,n.vy*damp));
+        n.x+=n.vx;n.y+=n.vy;
+        n.x=Math.max(24,Math.min(W-24,n.x));
+        n.y=Math.max(24,Math.min(H-24,n.y));
       });
 
-      simNodes.forEach(n => {
-        if (n === dragNodeRef.current) return;
-        n.vx = Math.max(-15, Math.min(15, n.vx * damping));
-        n.vy = Math.max(-15, Math.min(15, n.vy * damping));
-        n.x += n.vx; n.y += n.vy;
-        n.x = Math.max(20, Math.min(lw - 20, n.x));
-        n.y = Math.max(20, Math.min(lh - 20, n.y));
-      });
+      const activeId=activeIdRef.current;
+      const q=s.searchQuery.toLowerCase();
 
-      // Draw Edges
-      const elapsed = Date.now() - startTime;
-      simLinks.forEach(l => {
-        if (elapsed < l.source.revealTime || elapsed < l.target.revealTime) return;
+      // Draw edges
+      links.forEach(l=>{
+        if(now<l.source.revealAt||now<l.target.revealAt) return;
         
-        const sourceMatches = !panelConfig.searchQuery || l.source.name.toLowerCase().includes(panelConfig.searchQuery.toLowerCase());
-        const targetMatches = !panelConfig.searchQuery || l.target.name.toLowerCase().includes(panelConfig.searchQuery.toLowerCase());
-        const matchesSearch = sourceMatches || targetMatches;
-
-        const isActive = l.source.id === activeFileIdRef.current || l.target.id === activeFileIdRef.current;
-        
-        ctx.beginPath();
-        ctx.setLineDash(isActive ? [] : [4, 4]);
-        ctx.strokeStyle = isActive ? 'rgba(0,71,255,0.95)' : 'rgba(26,26,26,0.6)';
-        ctx.lineWidth = (isActive ? 3 : 2) * panelConfig.linkThickness;
-        ctx.globalAlpha = matchesSearch ? 1.0 : 0.1;
-        ctx.moveTo(l.source.x, l.source.y);
-        ctx.lineTo(l.target.x, l.target.y);
-        ctx.stroke();
-      });
-
-      // Draw Nodes
-      simNodes.forEach(node => {
-        if (elapsed < node.revealTime) return;
-        const matchesSearch = !panelConfig.searchQuery || node.name.toLowerCase().includes(panelConfig.searchQuery.toLowerCase());
-
-        const isActive = node.id === activeFileIdRef.current;
-        const isConnected = simLinks.some(l => 
-          (l.source.id === node.id && l.target.id === activeFileIdRef.current) ||
-          (l.target.id === node.id && l.source.id === activeFileIdRef.current)
+        const isTagActive = activeTagRef.current && (
+          l.source.label === activeTagRef.current || 
+          l.target.label === activeTagRef.current ||
+          l.source.tags.map(t=>`#${t.replace('#','').toLowerCase()}`).includes(activeTagRef.current.toLowerCase()) ||
+          l.target.tags.map(t=>`#${t.replace('#','').toLowerCase()}`).includes(activeTagRef.current.toLowerCase())
         );
-        const col = node.color || '#BDBDBD';
-        const r = node.radius * panelConfig.nodeSize;
+        
+        const active=l.source.id===activeId||l.target.id===activeId || isTagActive;
+        const matches=!q||l.source.label.toLowerCase().includes(q)||l.target.label.toLowerCase().includes(q);
+        ctx.globalAlpha=matches?1:0.07;
+        ctx.setLineDash(active?[]:[3,5]);
+        ctx.lineWidth=(active?2.2:1.0)*s.linkThickness;
+        
+        if(active) ctx.strokeStyle='rgba(0,71,255,0.85)';
+        else if(l.source.isTag||l.target.isTag){
+          const hub=l.source.isTag?l.source:l.target;
+          ctx.strokeStyle=hub.color+'44';
+        } else ctx.strokeStyle='rgba(26,26,26,0.3)';
+        ctx.beginPath();ctx.moveTo(l.source.x,l.source.y);ctx.lineTo(l.target.x,l.target.y);ctx.stroke();
+      });
+      ctx.setLineDash([]);ctx.globalAlpha=1;
 
-        ctx.globalAlpha = matchesSearch ? 1.0 : 0.15;
+      // Draw nodes
+      nodes.forEach(node=>{
+        if(now<node.revealAt) return;
+        
+        const isTagActive = activeTagRef.current && (
+          node.label === activeTagRef.current ||
+          node.tags.map(t=>`#${t.replace('#','').toLowerCase()}`).includes(activeTagRef.current.toLowerCase())
+        );
+        
+        const isActive=node.id===activeId || isTagActive;
+        const isConn=links.some(l=>(l.source.id===node.id&&l.target.id===activeId)||(l.target.id===node.id&&l.source.id===activeId));
+        const matches=!q||node.label.toLowerCase().includes(q);
+        const nr=node.r*s.nodeSize*(node.isTag?1.6:1);
+        ctx.globalAlpha=matches?1:0.08;
 
-        if (isActive || isConnected) {
-          ctx.shadowBlur = isActive ? 35 : 18;
-          ctx.shadowColor = isActive ? 'rgba(0,71,255,0.6)' : 'rgba(0,71,255,0.3)';
-        } else ctx.shadowBlur = 0;
+        // Glow
+        if(isActive||isConn||node.isTag){
+          ctx.shadowBlur=isActive?30:node.isTag?18:10;
+          ctx.shadowColor=node.isTag?node.color+'BB':isActive?'rgba(0,71,255,0.5)':''+node.color+'55';
+        } else ctx.shadowBlur=0;
 
-        const pulse = isActive ? Math.sin(Date.now() / 300) * 3 : 0;
-
-        ctx.beginPath();
-        ctx.setLineDash([2, 4]);
-        ctx.strokeStyle = col;
-        ctx.lineWidth = 2.2;
-        ctx.globalAlpha = matchesSearch ? (isActive ? 1.0 : (isConnected ? 0.9 : 0.6)) : 0.1;
-        ctx.arc(node.x, node.y, r + 8 + pulse, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.globalAlpha = matchesSearch ? 1.0 : 0.15;
-
-        ctx.beginPath();
+        // Outer ring (wireframe)
+        const pulse=isActive?Math.sin(now/280)*2.5:0;
+        ctx.beginPath();ctx.setLineDash([2,4]);
+        ctx.strokeStyle=node.color+'80';
+        ctx.lineWidth=node.isTag?2:1.2;
+        ctx.arc(node.x,node.y,nr+7+pulse,0,Math.PI*2);ctx.stroke();
         ctx.setLineDash([]);
-        const grad = ctx.createRadialGradient(node.x - 2, node.y - 2, 0, node.x, node.y, r);
-        if (isActive) { grad.addColorStop(0, col); grad.addColorStop(1, col); }
-        else {
-          grad.addColorStop(0, '#FFFFFF');
-          grad.addColorStop(0.8, isConnected ? 'rgba(0,71,255,0.25)' : '#F9F9F7');
-          grad.addColorStop(1, isConnected ? 'rgba(0,71,255,0.35)' : '#F3F3F0');
-        }
-        ctx.fillStyle = grad;
-        ctx.strokeStyle = isActive ? col : (isConnected ? 'rgba(0,71,255,0.8)' : 'rgba(26,26,26,0.5)');
-        ctx.lineWidth = isActive ? 4 : 2.2;
-        ctx.arc(node.x, node.y, isActive ? 9 : 7, 0, Math.PI * 2);
-        ctx.fill(); ctx.stroke();
 
-        // Labels
-        ctx.shadowBlur = 0;
-        ctx.font = isActive 
-          ? '700 13px "JetBrains Mono", var(--font-mono), monospace' 
-          : '600 11px "JetBrains Mono", var(--font-mono), monospace';
-        
-        const text = node.name;
-        const tw = ctx.measureText(text).width;
-        
-        if (isActive) {
-          ctx.fillStyle = 'rgba(0,71,255,0.1)';
-          ctx.beginPath();
-          ctx.roundRect(node.x - tw/2 - 8, node.y + r + 14, tw + 16, 22, 4);
-          ctx.fill();
-          ctx.fillStyle = '#000000';
-        } else {
-          ctx.fillStyle = isConnected ? '#1A1A1A' : '#333333';
+        // Fill
+        ctx.beginPath();
+        if(isActive) ctx.fillStyle=node.color;
+        else if(node.isTag) ctx.fillStyle=node.color;
+        else {
+          const g=ctx.createRadialGradient(node.x-1,node.y-1,0,node.x,node.y,nr);
+          g.addColorStop(0,'#FFFFFF');
+          g.addColorStop(1,isConn?node.color+'44':'#F0EFE8');
+          ctx.fillStyle=g;
         }
-        
-        ctx.globalAlpha = matchesSearch ? ((isActive || isConnected) ? 1.0 : 0.85) : 0.1;
-        ctx.textAlign = 'center';
-        ctx.fillText(text, node.x, node.y + r + 30);
-        ctx.globalAlpha = 1.0;
+        ctx.strokeStyle=node.isTag?'rgba(255,255,255,0.25)':isActive?node.color:(isConn?node.color:'rgba(26,26,26,0.35)');
+        ctx.lineWidth=isActive||node.isTag?2.5:1.5;
+        ctx.arc(node.x,node.y,nr,0,Math.PI*2);ctx.fill();ctx.stroke();
+        ctx.shadowBlur=0;
+
+        // Label
+        const lsz=node.isTag?12:isActive?11:10;
+        ctx.font=`${node.isTag||isActive?'700':'500'} ${lsz}px "JetBrains Mono",monospace`;
+        ctx.textAlign='center';
+        if(isActive){
+          const tw=ctx.measureText(node.label).width;
+          ctx.fillStyle='rgba(0,71,255,0.08)';
+          ctx.beginPath();ctx.roundRect(node.x-tw/2-6,node.y+nr+8,tw+12,18,3);ctx.fill();
+        }
+        ctx.fillStyle=node.isTag?node.color:isActive?'rgba(0,71,255,1.0)':(isConn?'#1A1A1A':'#555');
+        ctx.fillText(node.label,node.x,node.y+nr+22);
+        ctx.globalAlpha=1;
       });
 
       ctx.restore();
-      simulationRef.current = requestAnimationFrame(tick);
+      rafRef.current=requestAnimationFrame(tick);
     };
+    rafRef.current=requestAnimationFrame(tick);
 
-    tick();
-    return () => {
-      if (simulationRef.current) cancelAnimationFrame(simulationRef.current);
-      resizeObserver.disconnect();
-      canvas.removeEventListener('mousedown', handleMouseDown);
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-      canvas.removeEventListener('wheel', handleWheel);
+    return ()=>{
+      if(rafRef.current) cancelAnimationFrame(rafRef.current);
+      ro.disconnect();
+      canvas.removeEventListener('mousedown',onDown);
+      window.removeEventListener('mousemove',onMove);
+      window.removeEventListener('mouseup',onUp);
+      canvas.removeEventListener('wheel',onWheel);
     };
-  }, [showGraph, isOpen]);
+  },[showGraph,isOpen]); // intentionally minimal — all live values via refs
 
-  const renderContent = () => {
-    if (!activeFile) return null;
-    const rawContent = activeFile.markdown || activeFile.html;
-
-    // Process wikilinks: [[ID|Label]] or [[ID]] -> <wiki-link data-id="id">label</wiki-link>
-    const content = rawContent.replace(/\[\[([^|\]]+)(?:\|([^\]]+))?\]\]/g, (match, id, label) => {
-      const targetId = id.toLowerCase().replace(/\s+/g, '_');
-      return `<wiki-link data-id="${targetId}">${label || id}</wiki-link>`;
-    });
-
+  const activeFile=data.files[activeFileId];
+  const renderContent=()=>{
+    if(!activeFile) return null;
+    const raw=activeFile.markdown??activeFile.html??'';
+    const content=raw.replace(/\[\[([^|\]]+)(?:\|([^\]]+))?\]\]/g,(_,id,label)=>
+      `<wiki-link data-id="${id.toLowerCase().replace(/\s+/g,'_')}">${label??id}</wiki-link>`
+    );
     return (
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeRaw]}
-        components={{
-          'wiki-link': ({ node, ...props }: any) => (
-            <button 
-              onClick={() => setActiveFileId(props['data-id'])}
-              className="text-accent font-bold hover:underline decoration-dashed underline-offset-4 transition-all"
-            >
-              {props.children}
-            </button>
-          ),
-          code({ inline, className, children, ...props }: any) {
-            const match = /language-(\w+)/.exec(className || '');
-            const contentString = String(children).replace(/\n$/, '');
-            if (!inline && match && match[1] === 'mermaid') return <Mermaid chart={contentString} />;
-            
-            return inline ? (
-              <code className="bg-[rgba(0,71,255,0.08)] px-1.5 py-0.5 rounded-[2px] text-accent font-mono text-[11px] font-medium" {...props}>
-                {children}
-              </code>
-            ) : (
-              <div className="my-8 rounded-[2px] overflow-hidden border border-dashed border-border-strong group">
-                <div className="bg-[rgba(26,26,26,0.03)] border-b border-dashed border-border-strong px-4 py-2 flex justify-between items-center">
-                  <div className="font-mono text-[9px] text-ink-faint uppercase tracking-widest">{match?.[1] || 'source'} // buffer</div>
-                  <div className="flex gap-1.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-ink-faint/30" /><div className="w-1.5 h-1.5 rounded-full bg-ink-faint/30" />
-                  </div>
-                </div>
-                <pre className="bg-[rgba(26,26,26,0.01)] p-6 overflow-x-auto">
-                  <code className="font-mono text-[12.5px] leading-[1.8] text-ink block" {...props}>{children}</code>
-                </pre>
-              </div>
-            );
-          },
-          h1: ({ children }: any) => <h1 className="font-serif text-[32px] font-medium mb-8 text-ink mt-12">{children}</h1>,
-          h2: ({ children }: any) => <h2 className="font-serif text-[24px] font-medium mb-6 text-ink mt-10 border-b border-dashed border-border-strong pb-2">{children}</h2>,
-          h3: ({ children }: any) => <h3 className="font-serif text-[20px] font-medium mb-4 text-ink mt-8">{children}</h3>,
-          p: ({ children }: any) => <div className="font-serif text-[16px] leading-[1.8] text-ink-muted mb-6">{children}</div>,
-          ul: ({ children }: any) => <ul className="list-none space-y-3 mb-8 pl-4">{children}</ul>,
-          li: ({ children }: any) => (
-            <li className="flex items-start gap-3 text-ink-muted font-serif text-[16px]">
-              <span className="text-accent mt-1.5 shrink-0"><ChevronRight size={14} /></span>{children}
-            </li>
-          ),
-          blockquote: ({ children }: any) => (
-            <blockquote className="border-l-2 border-dashed border-accent bg-[rgba(0,71,255,0.02)] pl-6 py-4 my-8 italic text-ink-muted font-serif text-[17px]">{children}</blockquote>
-          ),
-          img: ({ src, alt }: any) => (
-            <div className="my-8 space-y-2">
-              <img src={src} alt={alt} className="w-full border border-dashed border-border-strong rounded-[2px]" />
-              {alt && <div className="text-center font-mono text-[10px] text-ink-faint uppercase">Fig // {alt}</div>}
-            </div>
-          ),
-        } as any}
-      >
-        {content}
-      </ReactMarkdown>
+      <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={{
+        'wiki-link':({node,...p}:any)=>(
+          <button onClick={()=>setActiveFileId(p['data-id'])} className="text-accent font-bold border-b border-dashed border-accent hover:bg-accent-light px-0.5 transition-all">{p.children}</button>
+        ),
+        code({inline,className,children,...p}:any){
+          const lang=/language-(\w+)/.exec(className??'')?.[1];
+          const str=String(children).replace(/\n$/,'');
+          if(!inline&&lang==='mermaid') return <MermaidBlock chart={str}/>;
+          return inline
+            ?<code className="bg-accent/10 text-accent px-1 rounded font-mono text-[12px]"{...p}>{children}</code>
+            :<div className="my-6 border border-dashed border-border-strong rounded-[2px] overflow-hidden">
+              <div className="bg-black/5 border-b border-dashed border-border-strong px-4 py-2 font-mono text-[9px] text-ink-faint uppercase tracking-widest">{lang??'code'}</div>
+              <pre className="p-6 overflow-x-auto"><code className="font-mono text-[12px] leading-[1.8] text-ink block">{children}</code></pre>
+            </div>;
+        },
+        h1:({children}:any)=><h1 className="font-serif text-[30px] font-medium mb-6 text-ink mt-10">{children}</h1>,
+        h2:({children}:any)=><h2 className="font-serif text-[22px] font-medium mb-4 text-ink mt-8 border-b border-dashed border-border-strong pb-2">{children}</h2>,
+        h3:({children}:any)=><h3 className="font-serif text-[18px] font-medium mb-3 text-ink mt-6">{children}</h3>,
+        p:({children}:any)=><div className="font-serif text-[15px] leading-[1.85] text-ink-muted mb-5">{children}</div>,
+        ul:({children}:any)=><ul className="space-y-2 mb-6 pl-4">{children}</ul>,
+        li:({children}:any)=><li className="flex items-start gap-3 text-ink-muted font-serif text-[15px]"><ChevronRight size={12} className="text-accent mt-1.5 shrink-0"/>{children}</li>,
+        blockquote:({children}:any)=><blockquote className="border-l-2 border-dashed border-accent bg-accent/5 pl-6 py-3 my-6 italic text-ink-muted">{children}</blockquote>,
+        table:({children}:any)=><div className="overflow-x-auto my-6 border border-dashed border-border-strong"><table className="w-full font-mono text-[12px]">{children}</table></div>,
+        th:({children}:any)=><th className="text-left px-4 py-2 font-bold text-ink bg-black/5 border-b border-dashed border-border-strong">{children}</th>,
+        td:({children}:any)=><td className="px-4 py-2 text-ink-muted border-b border-dashed border-border-strong/40">{children}</td>,
+      } as any}>{content}</ReactMarkdown>
     );
   };
 
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
+  if(!isOpen) return null;
 
-  useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => setIsMounted(true), 10);
-    } else {
-      setIsMounted(false);
-    }
-  }, [isOpen]);
+  const SliderRow = ({label,k,min,max,step,fmt}:{label:string,k:keyof GraphSettings,min:number,max:number,step:number,fmt:(v:number)=>string}) => (
+    <div>
+      <div className="flex justify-between font-mono text-[9.5px] text-ink-muted mb-1">
+        <span>{label}</span><span className="text-accent">{fmt(settings[k] as number)}</span>
+      </div>
+      <input type="range" min={min} max={max} step={step} value={settings[k] as number}
+        onChange={e=>updateSetting(k,parseFloat(e.target.value))}
+        className="w-full accent-accent h-1"/>
+    </div>
+  );
 
-  if (!isOpen) return null;
+  const Toggle = ({label,k,onToggle}:{label:string,k:keyof GraphSettings,onToggle?:(v:boolean)=>void}) => (
+    <label className="flex items-center justify-between font-mono text-[10px] text-ink-muted cursor-pointer">
+      <span>{label}</span>
+      <button
+        onClick={()=>{const nv=!settings[k];onToggle?onToggle(nv as boolean):updateSetting(k,nv);}}
+        className={`w-9 h-5 rounded-full border border-dashed transition-all relative ${settings[k]?'bg-accent border-accent':'border-border-strong'}`}
+      >
+        <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${settings[k]?'left-4':'left-0.5'}`}/>
+      </button>
+    </label>
+  );
 
   return (
-    <div className={`fixed inset-0 z-[9999] flex items-center justify-center p-2 md:p-8 transition-opacity duration-500 ${isMounted ? 'opacity-100' : 'opacity-0'}`}>
-      <div className="absolute inset-0 bg-[rgba(253,253,251,0.98)] backdrop-blur-[16px]" onClick={onClose} />
-      <div 
-        className="relative bg-paper border border-dashed border-border-strong flex flex-col shadow-[0_60px_120px_-30px_rgba(0,0,0,0.2)] w-full md:w-[98vw] h-[98vh] md:h-[96vh] rounded-[2px] overflow-hidden transition-all duration-500 animate-modal-enter"
-      >
-        
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row items-center gap-4 p-4 border-b border-dashed border-border-strong bg-paper relative z-30">
-          <div className="flex items-center justify-between w-full sm:w-auto gap-4">
-            <div className="flex gap-2">
-              <button onClick={onClose} className="w-3 h-3 rounded-full border border-red-500/30 bg-red-500/10 hover:bg-red-500/40 flex items-center justify-center group">
-                <X size={8} className="text-red-600 opacity-0 group-hover:opacity-100" />
-              </button>
-              <button 
-                onClick={() => onMinimize('garden-authority', 'Knowledge Garden')}
-                className="w-3 h-3 rounded-full border border-yellow-500/30 bg-yellow-500/10 hover:bg-yellow-500/40 flex items-center justify-center group"
-              >
-                <Minus size={8} className="text-yellow-600 opacity-0 group-hover:opacity-100" />
-              </button>
-              <div className="w-3 h-3 rounded-full border border-green-500/30 bg-green-500/10" />
-            </div>
-            <button 
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="lg:hidden font-mono text-[9px] px-3 py-1 border border-dashed border-border-strong hover:text-accent"
-            >
-              {isSidebarOpen ? '[CLOSE MENU]' : '[OPEN MENU]'}
-            </button>
-          </div>
+    <div className={`fixed inset-0 z-[9999] flex items-center justify-center p-2 md:p-6 transition-opacity duration-300 ${isMounted?'opacity-100':'opacity-0'}`}>
+      <div className="absolute inset-0 bg-[rgba(253,253,251,0.97)] backdrop-blur-[12px]" onClick={onClose}/>
+      <div className="relative bg-paper border border-dashed border-border-strong flex flex-col w-full md:w-[98vw] h-[98vh] md:h-[95vh] rounded-[2px] overflow-hidden shadow-[0_40px_100px_-20px_rgba(0,0,0,0.18)]">
 
-          <div className="flex-1 text-center hidden sm:flex items-center justify-center gap-3">
-            <Globe size={14} className="text-ink-faint" />
-            <div className="font-mono text-[10px] md:text-[11px] font-bold tracking-[0.2em] md:tracking-[0.4em] text-ink uppercase truncate max-w-[200px] md:max-w-none">
-              Knowledge Garden AUTHORITY // {fileKeys.length} NODES
-            </div>
+        {/* Chrome */}
+        <div className="flex items-center gap-4 px-5 py-3 border-b border-dashed border-border-strong bg-paper shrink-0 z-30">
+          <div className="flex gap-2">
+            <button onClick={onClose} className="w-3 h-3 rounded-full bg-red-400/60 border border-red-500/30 hover:bg-red-500 group flex items-center justify-center"><X size={7} className="text-red-800 opacity-0 group-hover:opacity-100"/></button>
+            <button onClick={()=>onMinimize('garden-authority','Knowledge Garden')} className="w-3 h-3 rounded-full bg-yellow-400/60 border border-yellow-500/30 hover:bg-yellow-500 group flex items-center justify-center"><Minus size={7} className="text-yellow-800 opacity-0 group-hover:opacity-100"/></button>
+            <div className="w-3 h-3 rounded-full bg-green-400/60 border border-green-500/30"/>
           </div>
-
-          <div className="flex gap-2 w-full sm:w-auto justify-center">
-            {showGraph && (
-              <button onClick={() => setIsGraphMaximized(!isGraphMaximized)} className={`font-mono text-[9px] md:text-[10px] px-3 py-1 border border-dashed border-border-strong hover:border-accent hover:text-accent transition-all flex items-center gap-2 ${isGraphMaximized ? 'bg-accent-light text-accent' : ''}`}>
-                {isGraphMaximized ? <Minimize2 size={12} /> : <Maximize2 size={12} />} 
-                <span className="hidden xs:inline">{isGraphMaximized ? 'RESTORE' : 'MAX GRAPH'}</span>
-              </button>
-            )}
-            <button 
-              onClick={() => {
-                if (showGraph) setIsGraphMaximized(false);
-                setShowGraph(!showGraph);
-              }} 
-              className="font-mono text-[9px] md:text-[10px] px-4 py-1 border border-dashed border-border-strong hover:border-accent hover:text-accent whitespace-nowrap"
-            >
-              [{showGraph ? 'HIDE GRAPH' : 'SHOW GRAPH'}]
-            </button>
+          <div className="flex-1 flex items-center justify-center gap-2">
+            <Globe size={13} className="text-ink-faint"/>
+            <span className="font-mono text-[10px] tracking-[0.3em] text-ink-muted uppercase font-bold">Knowledge Garden // {fileKeys.length} nodes</span>
+          </div>
+          <div className="flex gap-2">
+            {showGraph&&<button onClick={()=>setIsMaxGraph(!isMaxGraph)} className={`font-mono text-[9px] px-3 py-1 border border-dashed border-border-strong flex items-center gap-1.5 transition-all hover:border-accent hover:text-accent ${isMaxGraph?'bg-accent-light text-accent':'text-ink-muted'}`}>{isMaxGraph?<Minimize2 size={11}/>:<Maximize2 size={11}/>}<span className="hidden sm:inline">{isMaxGraph?'restore':'max graph'}</span></button>}
+            <button onClick={()=>{if(showGraph)setIsMaxGraph(false);setShowGraph(!showGraph);}} className="font-mono text-[9px] px-3 py-1 border border-dashed border-border-strong text-ink-muted hover:border-accent hover:text-accent transition-all">[{showGraph?'hide graph':'show graph'}]</button>
+            <button onClick={()=>setIsSidebarOpen(!isSidebarOpen)} className="lg:hidden font-mono text-[9px] px-3 py-1 border border-dashed border-border-strong text-ink-muted hover:text-accent">[menu]</button>
           </div>
         </div>
 
-        <div className="flex-1 flex overflow-hidden relative">
-          
-          {/* Sidebar (Explorer) */}
-          <div className={`
-            absolute lg:relative z-20 h-full w-[260px] border-r border-dashed border-border-strong overflow-y-auto bg-paper lg:bg-[rgba(26,26,26,0.01)] transition-transform duration-300
-            ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-          `}>
-            <div className="p-4 space-y-2">
-              {Object.entries(categories).map(([category, files]) => (
-                <div key={category} className="mb-4">
-                  <button 
-                    onClick={() => toggleFolder(category)} 
-                    className={`w-full font-mono text-[10px] tracking-widest uppercase mb-1 flex items-center gap-2 px-3 py-2 rounded-[2px] transition-all
-                      ${expandedFolders[category] ? 'bg-accent-light text-accent border border-dashed border-accent/30' : 'text-ink-muted hover:bg-black/5 hover:text-ink'}`}
-                  >
-                    {expandedFolders[category] ? <ChevronDown size={12} className="text-accent" /> : <ChevronRight size={12} />}
-                    <span className={expandedFolders[category] ? 'font-bold' : ''}>{category}</span>
+        <div className="flex-1 flex overflow-hidden">
+          {/* Sidebar */}
+          <div className={`absolute lg:relative z-20 h-full w-[240px] shrink-0 border-r border-dashed border-border-strong overflow-y-auto bg-paper transition-transform duration-300 ${isSidebarOpen?'translate-x-0':'-translate-x-full lg:translate-x-0'}`}>
+            <div className="p-3 sticky top-0 bg-paper z-10 border-b border-dashed border-border-strong">
+              <div className="relative">
+                <Search size={11} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint"/>
+                <input type="text" value={settings.searchQuery} onChange={e=>updateSetting('searchQuery',e.target.value)} placeholder="search nodes…" className="w-full font-mono text-[10px] pl-7 pr-3 py-2 border border-dashed border-border-strong bg-transparent focus:outline-none focus:border-accent placeholder:text-ink-faint"/>
+              </div>
+            </div>
+            <div className="p-3 space-y-3">
+              {Object.entries(categories).map(([cat,ids])=>(
+                <div key={cat}>
+                  <button onClick={()=>setExpandedFolders(p=>({...p,[cat]:!p[cat]}))} className={`w-full flex items-center gap-2 px-2 py-1.5 font-mono text-[9.5px] tracking-widest uppercase transition-all ${expandedFolders[cat]?'text-accent':'text-ink-muted hover:text-ink'}`}>
+                    {expandedFolders[cat]?<ChevronDown size={11}/>:<ChevronRight size={11}/>}{cat}<span className="ml-auto text-ink-faint">{ids.length}</span>
                   </button>
-                  {expandedFolders[category] && (
-                    <div className="space-y-0.5 pl-3 border-l border-dashed border-border-strong/40 ml-1.5 mt-1">
-                      {files.map(id => {
-                        const file = researchData.files[id];
-                        if (!file) return null;
-                        return (
-                          <button 
-                            key={id} 
-                            onClick={() => { setActiveFileId(id); setIsSidebarOpen(false); }} 
-                            className={`w-full text-left font-mono text-[11px] px-3 py-2 rounded-[2px] transition-all flex items-center gap-2 mb-0.5
-                              ${activeFileId === id ? 'bg-accent text-white shadow-md' : 'text-ink-muted hover:bg-accent-light hover:text-accent'}`}
-                          >
-                            <FileText size={10} className={activeFileId === id ? 'text-white' : 'opacity-30'} />
-                            <span className="truncate">{file.title}</span>
-                          </button>
-                        );
-                      })}
+                  {expandedFolders[cat]&&(
+                    <div className="ml-4 pl-3 border-l border-dashed border-border-strong/50 space-y-0.5 mt-1">
+                      {ids.map(id=>{const f=data.files[id];if(!f)return null;return(
+                        <button key={id} onClick={()=>{setActiveFileId(id);setIsSidebarOpen(false);}} className={`w-full text-left flex items-center gap-2 px-2 py-1.5 font-mono text-[10px] rounded-[2px] transition-all truncate ${activeFileId===id?'bg-accent text-white':'text-ink-muted hover:text-accent hover:bg-accent-light'}`}>
+                          <FileText size={9} className={activeFileId===id?'text-white shrink-0':'shrink-0 opacity-40'}/><span className="truncate">{f.title}</span>
+                        </button>
+                      );})}
                     </div>
                   )}
                 </div>
               ))}
             </div>
           </div>
+          {isSidebarOpen&&<div className="absolute inset-0 z-10 lg:hidden" onClick={()=>setIsSidebarOpen(false)}/>}
 
-          {/* Overlay for sidebar on mobile */}
-          {isSidebarOpen && (
-            <div className="absolute inset-0 bg-black/5 z-10 lg:hidden" onClick={() => setIsSidebarOpen(false)} />
-          )}
-
-          {/* Main Editor */}
-          {!isGraphMaximized && (
-            <div className="flex-1 overflow-y-auto relative bg-paper transition-all">
-              <div className="relative z-10 p-6 md:p-12 lg:p-20 max-w-[900px] mx-auto animate-fade-in">
-                <div className="flex items-center justify-between mb-8 md:mb-12">
-                  <div className="font-mono text-[9px] md:text-[10px] text-accent tracking-[0.2em] md:tracking-[0.3em] uppercase font-bold flex items-center gap-4">
-                    <span className="hidden xs:block h-px w-8 md:w-12 bg-accent/40"></span>
-                    {activeFile?.header}
-                  </div>
-                  <Share2 size={14} className="text-ink-faint shrink-0" />
+          {/* Editor */}
+          {!isMaxGraph&&(
+            <div className="flex-1 overflow-y-auto bg-paper">
+              <div className="p-8 md:p-14 max-w-[820px] mx-auto">
+                <div className="flex items-center gap-3 mb-8">
+                  <span className="font-mono text-[9px] text-accent tracking-[0.25em] uppercase font-bold">{activeFile?.header}</span>
+                  <div className="flex-1 h-px bg-accent/20"/>
+                  <Share2 size={12} className="text-ink-faint"/>
                 </div>
-                <div className="garden-content">{renderContent()}</div>
+                {renderContent()}
               </div>
             </div>
           )}
 
-          {/* Graph View */}
-          {showGraph && (
-            <div className={`
-              ${isGraphMaximized ? 'w-full' : 'hidden lg:flex w-[400px] border-l border-dashed border-border-strong'}
-              bg-[rgba(26,26,26,0.01)] overflow-hidden shrink-0 flex-col relative transition-all duration-500
-            `}>
-              <canvas ref={canvasRef} className="w-full h-full cursor-grab active:cursor-grabbing relative z-10" />
-              
-              {/* Obsidian-Style Control Panel */}
-              {isGraphMaximized && (
-                <div className="absolute top-4 right-4 z-20 w-[280px] bg-[rgba(253,253,251,0.95)] backdrop-blur-md border border-dashed border-border-strong rounded-[2px] shadow-[0_15px_40px_-10px_rgba(0,0,0,0.15)] flex flex-col p-4 font-mono text-[11px] text-ink overflow-y-auto max-h-[90%]">
-                  <div className="flex items-center justify-between mb-4 pb-2 border-b border-dashed border-border-strong">
-                    <span className="font-bold tracking-widest uppercase text-[10px] text-accent">Graph Controls</span>
-                    <Settings size={14} className="text-accent animate-spin-slow" />
-                  </div>
+          {/* Graph */}
+          {showGraph&&(
+            <div className={`relative flex flex-col shrink-0 overflow-hidden border-l border-dashed border-border-strong transition-all duration-300 ${isMaxGraph?'flex-1':'w-[380px] hidden lg:flex'}`}>
+              <canvas ref={canvasRef} className="w-full h-full block cursor-crosshair relative z-10"/>
 
-                  {/* Filters / Search */}
-                  <div className="mb-4">
-                    <div className="font-bold uppercase text-[9px] text-ink-faint tracking-widest mb-2">Search Nodes</div>
-                    <input 
-                      type="text" 
-                      value={panelConfig.searchQuery} 
-                      onChange={(e) => setPanelConfig({ ...panelConfig, searchQuery: e.target.value })}
-                      placeholder="Type to filter..."
-                      className="w-full bg-[rgba(26,26,26,0.03)] border border-dashed border-border-strong px-3 py-1.5 font-mono text-[11px] rounded-[2px] focus:outline-none focus:border-accent"
-                    />
-                  </div>
+              {/* Settings Toggle Icon — only visible when graph is maximised */}
+              {isMaxGraph && (
+                <button 
+                  onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                  className={`absolute top-3 right-3 z-30 p-2 border border-dashed border-border-strong bg-[rgba(253,253,251,0.95)] hover:border-accent hover:text-accent transition-all ${isSettingsOpen ? 'text-accent border-accent' : 'text-ink-muted'}`}
+                >
+                  <Settings size={14} />
+                </button>
+              )}
 
-                  {/* Groups */}
-                  <div className="mb-4">
-                    <div className="flex justify-between items-center mb-2">
-                      <div className="font-bold uppercase text-[9px] text-ink-faint tracking-widest">Group By Tags</div>
-                      <input 
-                        type="checkbox" 
-                        checked={panelConfig.groupByTags}
-                        onChange={(e) => setPanelConfig({ ...panelConfig, groupByTags: e.target.checked })}
-                        className="accent-accent"
-                      />
+              {/* Settings panel — visible when isMaxGraph AND isSettingsOpen */}
+              {isMaxGraph && isSettingsOpen && (
+                <div className="absolute top-12 right-3 z-20 w-[240px] bg-[rgba(253,253,251,0.97)] border border-dashed border-border-strong shadow-lg">
+                  <div className="flex items-center gap-2 px-3 py-2 border-b border-dashed border-border-strong">
+                    <Settings size={11} className="text-accent"/><span className="font-mono text-[9px] uppercase tracking-widest text-accent font-bold">Graph Controls</span>
+                  </div>
+                  <div className="p-3 space-y-3 max-h-[75vh] overflow-y-auto">
+                    <Toggle label="Group by tags" k="groupByTags" onToggle={handleGroupToggle}/>
+                    <div className="border-t border-dashed border-border-strong pt-3 space-y-3">
+                      <SliderRow label="Node size"      k="nodeSize"      min={0.4} max={2.5}   step={0.1}    fmt={v=>v.toFixed(1)+'×'}/>
+                      <SliderRow label="Link thickness" k="linkThickness" min={0.3} max={3.5}   step={0.1}    fmt={v=>v.toFixed(1)+'×'}/>
+                      <SliderRow label="Link distance"  k="linkDistance"  min={80}  max={450}   step={10}     fmt={v=>v+'px'}/>
+                      <SliderRow label="Repel force"    k="repelForce"    min={500} max={20000} step={500}    fmt={v=>''+v}/>
+                      <SliderRow label="Center force"   k="centerForce"   min={0.0005} max={0.02} step={0.0005} fmt={v=>v.toFixed(4)}/>
+                      <SliderRow label="Link force"     k="linkForce"     min={0.002} max={0.08} step={0.002}  fmt={v=>v.toFixed(3)}/>
                     </div>
-                  </div>
-
-                  {/* Display */}
-                  <div className="mb-4 pb-2 border-t border-dashed border-border-strong pt-2">
-                    <div className="font-bold uppercase text-[9px] text-ink-faint tracking-widest mb-2">Display</div>
-                    <div className="space-y-2">
-                      <div>
-                        <div className="flex justify-between text-[10px] mb-1">
-                          <span>Node Size</span>
-                          <span>{panelConfig.nodeSize.toFixed(1)}x</span>
-                        </div>
-                        <input 
-                          type="range" min="0.5" max="3" step="0.1"
-                          value={panelConfig.nodeSize}
-                          onChange={(e) => setPanelConfig({ ...panelConfig, nodeSize: parseFloat(e.target.value) })}
-                          className="w-full accent-accent"
-                        />
-                      </div>
-                      <div>
-                        <div className="flex justify-between text-[10px] mb-1">
-                          <span>Link Thickness</span>
-                          <span>{panelConfig.linkThickness.toFixed(1)}x</span>
-                        </div>
-                        <input 
-                          type="range" min="0.5" max="4" step="0.1"
-                          value={panelConfig.linkThickness}
-                          onChange={(e) => setPanelConfig({ ...panelConfig, linkThickness: parseFloat(e.target.value) })}
-                          className="w-full accent-accent"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Forces */}
-                  <div className="mb-2 pb-2 border-t border-dashed border-border-strong pt-2">
-                    <div className="font-bold uppercase text-[9px] text-ink-faint tracking-widest mb-2">Forces</div>
-                    <div className="space-y-2">
-                      <div>
-                        <div className="flex justify-between text-[10px] mb-1">
-                          <span>Centre Force</span>
-                          <span>{panelConfig.centerForce.toFixed(4)}</span>
-                        </div>
-                        <input 
-                          type="range" min="0.0005" max="0.015" step="0.0005"
-                          value={panelConfig.centerForce}
-                          onChange={(e) => setPanelConfig({ ...panelConfig, centerForce: parseFloat(e.target.value) })}
-                          className="w-full accent-accent"
-                        />
-                      </div>
-                      <div>
-                        <div className="flex justify-between text-[10px] mb-1">
-                          <span>Repel Force</span>
-                          <span>{panelConfig.repelForce}</span>
-                        </div>
-                        <input 
-                          type="range" min="1000" max="15000" step="500"
-                          value={panelConfig.repelForce}
-                          onChange={(e) => setPanelConfig({ ...panelConfig, repelForce: parseInt(e.target.value) })}
-                          className="w-full accent-accent"
-                        />
-                      </div>
-                      <div>
-                        <div className="flex justify-between text-[10px] mb-1">
-                          <span>Link Distance</span>
-                          <span>{panelConfig.linkDistance}px</span>
-                        </div>
-                        <input 
-                          type="range" min="100" max="400" step="10"
-                          value={panelConfig.linkDistance}
-                          onChange={(e) => setPanelConfig({ ...panelConfig, linkDistance: parseInt(e.target.value) })}
-                          className="w-full accent-accent"
-                        />
-                      </div>
+                    <div className="border-t border-dashed border-border-strong pt-3">
+                      <button onClick={triggerAnimate} className="w-full font-mono text-[9px] py-1.5 border border-dashed border-border-strong text-ink-muted hover:border-accent hover:text-accent transition-all uppercase tracking-wider font-bold">Animate Making</button>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Background Dots */}
-              <div 
-                className="absolute inset-0 pointer-events-none opacity-[0.4]"
-                style={{ backgroundImage: 'radial-gradient(rgba(0, 0, 0, 0.25) 1px, transparent 1px)', backgroundSize: '16px 16px' }}
-              />
+              {/* Dot grid overlay */}
+              <div className="absolute inset-0 pointer-events-none opacity-15 z-0"
+                style={{backgroundImage:'radial-gradient(rgba(0,0,0,0.3) 1px,transparent 1px)',backgroundSize:'16px 16px'}}/>
             </div>
           )}
         </div>
