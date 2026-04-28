@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import {
   FolderOpen, BookOpen, Search, CornerDownLeft,
-  ArrowUp, ArrowDown, Cpu, FlaskConical, Leaf, Layers,
+  ArrowUp, ArrowDown, Cpu, FlaskConical, Leaf, Layers, Terminal as TermIcon, FileText
 } from "lucide-react";
 import rawResearchData from "@/data/research.json";
 
@@ -23,6 +23,15 @@ const GARDEN_FILES = rawResearchData.nodes.map((n: any) => ({
   keywords: n.tags || [],
 }));
 
+const COMMANDS = [
+  { id: "garden",   name: "open garden",    desc: "Open knowledge garden interface" },
+  { id: "resume",   name: "open resume",    desc: "Renders resume profile data right here" },
+  { id: "linkedin", name: "goto linkedin",  desc: "Redirect to standard profile credentials" },
+  { id: "github",   name: "goto github",    desc: "View public version control workspaces" },
+  { id: "twitter",  name: "goto twitter",   desc: "Check research workflows online" },
+  { id: "help",     name: "show commands",  desc: "List all active utility pointers" },
+];
+
 // Tag icon map
 const TAG_ICON: Record<string, React.ReactNode> = {
   research: <FlaskConical size={13} strokeWidth={1.5} />,
@@ -30,15 +39,18 @@ const TAG_ICON: Record<string, React.ReactNode> = {
   kernel:   <Cpu          size={13} strokeWidth={1.5} />,
   saas:     <Layers       size={13} strokeWidth={1.5} />,
   garden:   <Leaf         size={13} strokeWidth={1.5} />,
+  command:  <TermIcon     size={13} strokeWidth={1.5} />,
 };
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
 type ProjectItem  = typeof PROJECTS[number];
 type GardenItem   = typeof GARDEN_FILES[number];
+type CommandItem  = typeof COMMANDS[number];
 type ResultItem   =
   | { kind: "project"; item: ProjectItem }
-  | { kind: "garden";  item: GardenItem  };
+  | { kind: "garden";  item: GardenItem  }
+  | { kind: "command"; item: CommandItem };
 
 interface SpotlightProps {
   onOpenProject: (id: string) => void;
@@ -88,6 +100,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
   const [query,  setQuery]  = useState("");
   const [cursor, setCursor] = useState(0);
   const [mode,   setMode]   = useState<"all" | "garden">("all");
+  const [isShowingResume, setIsShowingResume] = useState(false);
   
   // Pagination limits for 'Show More'
   const [visibleCount, setVisibleCount] = useState(5);
@@ -140,9 +153,9 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
   // ── Looping Placeholders ──────────────────────────────────────────────────
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const placeholders = useMemo(() => [
-    "type 'avara' to goto avara",
-    "type 'garden' to enter knowledge garden",
-    "Ctrl + Space to search",
+    "type 'open garden' directly",
+    "type 'open resume' to view info",
+    "type 'show commands' anytime",
     "pinn overview",
     "temporal stability",
   ], []);
@@ -163,8 +176,9 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
   // ── Search ────────────────────────────────────────────────────────────────
 
   const { results, suggestions } = useMemo(() => {
-    const q = query.trim();
+    const q = query.trim().toLowerCase();
 
+    // If query empty
     if (!q) {
       if (mode === "garden") {
         const results: ResultItem[] = GARDEN_FILES.map(item => ({ kind: "garden" as const, item }));
@@ -173,9 +187,16 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
       return { results: [], suggestions: [] };
     }
 
+    // Context scoping
     const availableProjects = mode === "all" ? PROJECTS : [];
     const availableGarden   = GARDEN_FILES;
 
+    // Filter commands directly
+    const matchedCommands: ResultItem[] = COMMANDS.filter(cmd => 
+      cmd.name.toLowerCase().includes(q) || cmd.desc.toLowerCase().includes(q)
+    ).map(item => ({ kind: "command" as const, item }));
+
+    // Scored search
     const scored: { r: ResultItem; s: number }[] = [
       ...availableProjects.map(item => ({
         r: { kind: "project" as const, item },
@@ -187,16 +208,21 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
       })),
     ];
 
-    const hits = scored.filter(x => x.s > 0).sort((a, b) => b.s - a.s).map(x => x.r);
+    const hits = [
+      ...matchedCommands,
+      ...scored.filter(x => x.s > 0).sort((a, b) => b.s - a.s).map(x => x.r)
+    ];
 
+    // Suggestions via Levenshtein
     let suggestions: string[] = [];
     if (hits.length === 0) {
       const allNames = [
         ...availableProjects.map(p => p.name),
         ...availableGarden.map(f => f.name),
+        ...COMMANDS.map(c => c.name),
       ];
       suggestions = allNames
-        .map(n => ({ n, d: levenshtein(q.toLowerCase(), n.toLowerCase()) }))
+        .map(n => ({ n, d: levenshtein(q, n.toLowerCase()) }))
         .filter(x => x.d <= 3 && x.d < q.length)
         .sort((a, b) => a.d - b.d)
         .map(x => x.n)
@@ -209,8 +235,13 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
 
   // ── Open / close ──────────────────────────────────────────────────────────
 
-  const open_ = useCallback(() => { setOpen(true); setQuery(""); setMode("all"); setCursor(0); }, []);
-  const close_ = useCallback(() => { setOpen(false); setQuery(""); setMode("all"); setCursor(0); }, []);
+  const open_ = useCallback(() => { 
+    setOpen(true); setQuery(""); setMode("all"); setCursor(0); setIsShowingResume(false); 
+  }, []);
+  
+  const close_ = useCallback(() => { 
+    setOpen(false); setQuery(""); setMode("all"); setCursor(0); setIsShowingResume(false); 
+  }, []);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -251,7 +282,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
     }
     else if (e.key === "Tab") {
       const lower = query.toLowerCase().trim();
-      if (lower === "knowledge garden" || lower === "garden") {
+      if (lower === "knowledge garden" || lower === "garden" || lower === "open garden") {
         e.preventDefault();
         setMode("garden");
         setQuery("");
@@ -271,9 +302,31 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
   // ── Activate ──────────────────────────────────────────────────────────────
 
   const activate = (r: ResultItem) => {
-    close_();
-    if (r.kind === "project") setTimeout(() => onOpenProject(r.item.id), 100);
-    else setTimeout(() => onOpenGarden(r.item.id), 100);
+    if (r.kind === "project") {
+      close_();
+      setTimeout(() => onOpenProject(r.item.id), 100);
+    } else if (r.kind === "garden") {
+      close_();
+      setTimeout(() => onOpenGarden(r.item.id), 100);
+    } else if (r.kind === "command") {
+      if (r.item.id === "garden") {
+        close_();
+        setTimeout(() => onOpenGarden(), 100);
+      } else if (r.item.id === "resume") {
+        setIsShowingResume(true);
+      } else if (r.item.id === "linkedin") {
+        window.open("https://linkedin.com/in/mendhu36/", "_blank");
+        close_();
+      } else if (r.item.id === "github") {
+        window.open("https://github.com/Atharva-Mendhulkar", "_blank");
+        close_();
+      } else if (r.item.id === "twitter") {
+        window.open("https://x.com/atharvarta", "_blank");
+        close_();
+      } else if (r.item.id === "help") {
+        setQuery("show");
+      }
+    }
   };
 
   // ── Highlight ─────────────────────────────────────────────────────────────
@@ -293,6 +346,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
 
   // ── Rendering sections ────────────────────────────────────────────────────
 
+  const commandResults = results.filter(r => r.kind === "command");
   const projectResults = results.filter(r => r.kind === "project");
   const gardenResults  = results.filter(r => r.kind === "garden");
   const hasResults     = results.length > 0;
@@ -322,7 +376,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
           onMouseDown={handleMouseDown}
         >
           <div style={{
-            background: "rgba(253,253,251,0.96)",
+            background: "rgba(253,253,251,0.98)",
             border: "1px dashed rgba(26,26,26,0.18)",
             borderRadius: 16,
             boxShadow: "0 40px 100px rgba(0,0,0,0.16), 0 2px 8px rgba(0,0,0,0.05)",
@@ -344,7 +398,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
               <input
                 ref={inputRef}
                 value={query}
-                onChange={e => setQuery(e.target.value)}
+                onChange={e => { setQuery(e.target.value); if (isShowingResume) setIsShowingResume(false); }}
                 onKeyDown={handleKeyDown}
                 placeholder={placeholders[placeholderIndex]}
                 className="mac-text-cursor flex-1 bg-transparent outline-none font-mono text-[13px] text-ink placeholder:text-ink-faint"
@@ -359,9 +413,61 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
               )}
             </div>
 
+            {/* Resume View */}
+            {isShowingResume && (
+              <div className="p-6 overflow-y-auto" style={{ maxHeight: 360, scrollbarWidth: "none" }}>
+                <div className="flex justify-between items-center pb-4 mb-4 border-b border-dashed border-border-strong">
+                  <div className="font-mono text-[14px] font-bold text-ink flex items-center gap-2">
+                    <FileText size={16} className="text-accent" /> Atharva Mendhulkar
+                  </div>
+                  <button 
+                    onClick={() => setIsShowingResume(false)} 
+                    className="font-mono text-[10px] text-ink-faint hover:text-ink border border-dashed px-2 py-1 rounded cursor-pointer"
+                  >
+                    Close
+                  </button>
+                </div>
+                <div className="font-mono text-[11px] text-ink space-y-4">
+                  <div>
+                    <span className="text-accent font-bold uppercase tracking-wider">[Education]</span>
+                    <p className="mt-1 font-bold">Vellore Institute of Technology, Vellore (Jul. 2024 - Aug. 2028)</p>
+                    <p className="text-ink-muted">B.Tech in Information Technology</p>
+                  </div>
+                  <div>
+                    <span className="text-accent font-bold uppercase tracking-wider">[Patent]</span>
+                    <p className="mt-1 font-bold">UPRS - Universal Process Responsiveness System</p>
+                    <p className="text-ink-muted">Predictive XGBoost model intercepting background telemetry.</p>
+                  </div>
+                  <div>
+                    <span className="text-accent font-bold uppercase tracking-wider">[Experience]</span>
+                    <p className="mt-1 font-bold">IIT Gandhinagar - InventX Scholar</p>
+                    <p className="text-ink-muted">Algorithmic device optimization targeting latency loops.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Body */}
-            {(hasResults || (mode === "garden" && !query)) && (
+            {!isShowingResume && (hasResults || (mode === "garden" && !query)) && (
               <div ref={listRef} className="overflow-y-auto" style={{ maxHeight: 360, scrollbarWidth: "none" }}>
+
+                {/* Commands section */}
+                {commandResults.length > 0 && (
+                  <>
+                    <SectionHeader label="Commands" />
+                    {commandResults.map(r => (
+                      <Row
+                        key={r.item.id}
+                        r={r}
+                        idx={results.indexOf(r)}
+                        isActive={cursor === results.indexOf(r)}
+                        onClick={() => activate(r)}
+                        onHover={() => setCursor(results.indexOf(r))}
+                        highlight={highlight}
+                      />
+                    ))}
+                  </>
+                )}
 
                 {/* Projects section */}
                 {projectResults.length > 0 && (
@@ -426,7 +532,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
             )}
 
             {/* Empty state while searching */}
-            {!hasResults && query && (
+            {!isShowingResume && !hasResults && query && (
               <div className="px-5 py-8">
                 <p className="font-mono text-[11px] text-ink-faint text-center mb-4">
                   No results for <span className="text-ink">&ldquo;{query}&rdquo;</span>
@@ -464,6 +570,23 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
               {mode === "all" && query.toLowerCase().includes("gar") && <Hint keys={["⇥"]} label="lock mode" />}
               <Hint keys={["esc"]}      label="close"    />
             </div>
+
+            {/* Drag Zone at Bottom */}
+            <div 
+              className="w-full h-10 border-t border-dashed border-border-strong relative flex items-center justify-center select-none"
+              style={{
+                background: "rgba(10,10,10,0.06)",
+                backgroundImage: "linear-gradient(135deg, rgba(10,10,10,0.06) 25%, transparent 25%, transparent 50%, rgba(10,10,10,0.06) 50%, rgba(10,10,10,0.06) 75%, transparent 75%, transparent)",
+                backgroundSize: "16px 16px"
+              }}
+            >
+              <div 
+                className="bg-white border border-dashed border-border-strong px-3 py-1 rounded font-mono text-[9px] text-ink-faint pointer-events-none shadow-sm"
+              >
+                drag search over this region
+              </div>
+            </div>
+
           </div>
         </div>
       )}
@@ -497,7 +620,7 @@ function Row({ r, idx, isActive, onClick, onHover, highlight }: {
   onHover: () => void;
   highlight: (t: string) => React.ReactNode;
 }) {
-  const tag = r.kind === "project" ? (r.item as ProjectItem).tag : "garden";
+  const tag = r.kind === "project" ? (r.item as ProjectItem).tag : r.kind === "garden" ? "garden" : "command";
 
   return (
     <button
@@ -521,7 +644,9 @@ function Row({ r, idx, isActive, onClick, onHover, highlight }: {
         <span className={isActive ? "text-accent" : "text-ink-faint"}>
           {r.kind === "project"
             ? <FolderOpen size={14} strokeWidth={1.5} />
-            : <BookOpen   size={14} strokeWidth={1.5} />}
+            : r.kind === "garden"
+              ? <BookOpen size={14} strokeWidth={1.5} />
+              : <TermIcon size={14} strokeWidth={1.5} />}
         </span>
       </div>
 

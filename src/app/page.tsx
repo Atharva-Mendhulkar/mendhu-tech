@@ -90,43 +90,57 @@ export default function Home() {
         <div className="relative z-10 px-8 lg:px-14 py-12">
           
           {/* Spotlight Quick-Trigger */}
-          <div className="absolute top-12 right-8 lg:right-14 z-[210] flex flex-col items-end gap-2">
+          <div className="absolute top-12 right-8 lg:right-14 z-[210] flex flex-col items-end gap-1">
+            {/* Button */}
             <button 
               onClick={() => window.dispatchEvent(new Event('toggle-terminal'))}
-              className="font-mono text-[10px] text-ink border border-dashed border-border-strong px-3.5 py-1.5 hover:text-accent hover:border-accent transition-all bg-paper/80 backdrop-blur-sm cursor-pointer rounded shadow-sm select-none"
+              className="flex flex-col items-center font-mono px-4 py-2 border border-dashed border-border-strong bg-paper/80 backdrop-blur-sm rounded shadow-sm hover:text-accent hover:border-accent transition-all cursor-pointer"
             >
-              [Ctrl + `] search
+              <span className="text-sm">Search</span>
+              <span className="text-[10px] text-gray-400 mt-0.5">Ctrl + `</span>
             </button>
 
-            <svg width="220" height="110" viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg" className="select-none pointer-events-none mt-[-10px] mr-[-10px]">
+            {/* Arrow + text */}
+            <svg 
+              width="240" 
+              height="140" 
+              viewBox="0 0 240 140" 
+              xmlns="http://www.w3.org/2000/svg"
+              className="select-none pointer-events-none -mt-2 -mr-2"
+            >
+              {/* Text */}
               <text 
-                x="15" 
-                y="85" 
+                x="10" 
+                y="120" 
                 fill="var(--accent)" 
-                fontSize="16" 
-                fontFamily="var(--font-serif), Georgia, serif"
-                transform="rotate(-3 15,85)"
-                className="italic opacity-85"
+                fontSize="16"
+                fontFamily="Caveat, cursive"
+                transform="rotate(-4 10,120)"
+                opacity="0.85"
               >
                 need to find something fast?
               </text>
+
+              {/* Multi-loop curved arrow */}
               <path 
-                d="M60,65 Q110,25 140,12" 
+                d="M30,100 C60,60 90,140 120,80 S170,20 200,50"
                 fill="none" 
                 stroke="var(--accent)" 
                 strokeWidth="2"
-                strokeDasharray="4 6"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="opacity-70"
+                strokeDasharray="3 6 2 6"
+                opacity="0.7"
               />
+
+              {/* Arrow head */}
               <path 
-                d="M130,16 L140,12 L136,22" 
+                d="M195,45 L205,50 L198,35" 
                 fill="none" 
                 stroke="var(--accent)" 
                 strokeWidth="2"
                 strokeLinecap="round"
-                className="opacity-70"
+                opacity="0.7"
               />
             </svg>
           </div>
