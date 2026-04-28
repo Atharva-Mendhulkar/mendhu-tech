@@ -1,733 +1,492 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import {
+  FolderOpen, BookOpen, Search, CornerDownLeft,
+  ArrowUp, ArrowDown, Cpu, FlaskConical, Leaf, Layers,
+} from "lucide-react";
 
-// ── Types ──────────────────────────────────────────────────────────────────
-interface TerminalLine {
-  id: number;
-  type: "input" | "output" | "error" | "success" | "system" | "ascii" | "matrix";
-  content: string | string[];
-}
+// ── Data ──────────────────────────────────────────────────────────────────
 
-interface TerminalProps {
-  onNavigate: (section: string) => void;
-  onOpenProject: (id: string) => void;
-  onOpenGarden: (fileId?: string) => void;
-}
-
-// ── ASCII Art ──────────────────────────────────────────────────────────────
-const BOOT_ASCII = [
-  "  ███╗   ███╗███████╗███╗   ██╗██████╗ ██╗  ██╗██╗   ██╗",
-  "  ████╗ ████║██╔════╝████╗  ██║██╔══██╗██║  ██║██║   ██║",
-  "  ██╔████╔██║█████╗  ██╔██╗ ██║██║  ██║███████║██║   ██║",
-  "  ██║╚██╔╝██║██╔══╝  ██║╚██╗██║██║  ██║██╔══██║██║   ██║",
-  "  ██║ ╚═╝ ██║███████╗██║ ╚████║██████╔╝██║  ██║╚██████╔╝",
-  "  ╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ",
-  "",
-  "  mendhu.tech OS v2.0.4 — Systems Engineer & AI Researcher",
-  "  Type 'help' for available commands.",
-];
-
-const PORYGON_ASCII = [
-  "      ▄▄████▄▄",
-  "    ▄█  ████  █▄",
-  "   ██  ██████  ██",
-  "  ██   ██  ██   ██",
-  "  ██   ██████   ██",
-  "   ██  ██  ██  ██",
-  "    ▀█▄        ▄█▀",
-  "      ▀████████▀",
-  "   Porygon says: gao~",
-];
-
-const DOOM_FRAMES = [
-`
-  ·▄▄▄▄  ▄▄▌         ▄▄▌   ▄▄▄▄· ▪  ▄▄▄  ▄▄▄ .
-  ██▪ ██ ██•  ▪     ██•  ▐█ ▀█▪██ ▀▄ █·▀▄.▀·
-  ▐█· ▐█▌██▪   ▄█▀▄ ██▪  ▐█▀▀█▄▐█·▐▀▀▄ ▐▀▀▪▄
-  ██. ██ ▐█▌▐▌▐█▌.▐▌▐█▌▐▌██▄▪▐█▐█▌▐█•█▌▐█▄▄▌
-  ▀▀▀▀▀• .▀▀▀  ▀█▄▀▪.▀▀▀ ·▀▀▀▀ ▀▀▀.▀  ▀ ▀▀▀ 
-
-  [■■■■■■■■■■■■■■■■□□□□] 70% loaded
-  UAC FACILITY — PHOBOS ANOMALY
-  Demons: 72  Ammo: 50  Health: 95%
-  > E1M1: Hangar
-  > press any key to... just kidding.
-  > this is a portfolio, not a game engine.
-  > (but imagine if it was)
-`,
-];
-
-const MATRIX_CHARS = "日ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｪｩｨ01";
-
-// ── Commands registry ──────────────────────────────────────────────────────
 const PROJECTS = [
-  { id: "jointpinn", name: "JointPINN",  desc: "PM2.5 Source Identification via PINNs" },
-  { id: "avara",     name: "AVARA",      desc: "Agent Runtime Security Authority" },
-  { id: "kphd",      name: "K-PHD",      desc: "Kernel Predictive Hang Detector" },
-  { id: "floework",  name: "Floework",   desc: "Human-Aware SaaS Productivity" },
+  { id: "jointpinn", name: "JointPINN",  desc: "PM2.5 Source Identification via PINNs",     tag: "research", keywords: ["ml", "physics", "pinn", "air", "pollution"] },
+  { id: "avara",     name: "AVARA",      desc: "Agent Runtime Security Authority",           tag: "systems",  keywords: ["agent", "security", "runtime", "llm"] },
+  { id: "kphd",      name: "K-PHD",      desc: "Kernel Predictive Hang Detector",            tag: "kernel",   keywords: ["linux", "kernel", "hang", "ema", "c"] },
+  { id: "floework",  name: "Floework",   desc: "Human-Aware SaaS Productivity Platform",    tag: "saas",     keywords: ["saas", "productivity", "node", "socket"] },
 ];
 
-const SECTIONS = ["about", "blog", "projects", "garden", "contact"];
-
-// ── Help output ────────────────────────────────────────────────────────────
-const HELP_TEXT = [
-  "┌─────────────────────────────────────────────────────────────┐",
-  "│                    AVAILABLE COMMANDS                       │",
-  "├──────────────────┬──────────────────────────────────────────┤",
-  "│ NAVIGATION       │                                          │",
-  "│  goto <section>  │ about, blog, projects, garden, contact   │",
-  "│  open <project>  │ jointpinn, avara, kphd, floework         │",
-  "│  garden [file]   │ open knowledge garden, optionally a file │",
-  "│  ls              │ list all sections and projects           │",
-  "├──────────────────┼──────────────────────────────────────────┤",
-  "│ INFO             │                                          │",
-  "│  whoami          │ about the author                         │",
-  "│  stack           │ tech stack used on this site             │",
-  "│  research        │ list research notes                      │",
-  "│  links           │ external links                           │",
-  "│  cv / resume     │ open resume                              │",
-  "├──────────────────┼──────────────────────────────────────────┤",
-  "│ FUN              │                                          │",
-  "│  porygon         │ meet the mascot                          │",
-  "│  doom            │ boot DOOM                                │",
-  "│  matrix          │ follow the white rabbit                  │",
-  "│  hack            │ look busy                                │",
-  "│  cowsay <text>   │ a wise cow speaks                        │",
-  "│  history         │ command history                          │",
-  "│  neofetch        │ system info                              │",
-  "├──────────────────┼──────────────────────────────────────────┤",
-  "│ SYSTEM           │                                          │",
-  "│  clear           │ clear terminal                           │",
-  "│  exit / q        │ close terminal                           │",
-  "└──────────────────┴──────────────────────────────────────────┘",
-  "",
-  "  Tip: Use ↑↓ for history, Tab for autocomplete, ctrl+` or ` to toggle",
+const GARDEN_FILES = [
+  { id: "pinn_abstract",      name: "JointPINN Overview",       desc: "Abstract & motivation for the PINN system",     keywords: ["overview", "intro", "pinn"] },
+  { id: "pinn_pde",           name: "Advection-Diffusion PDE",  desc: "Core physics equation driving the model",       keywords: ["physics", "pde", "equation", "math"] },
+  { id: "avara_main",         name: "AVARA Architecture",       desc: "Agent security design and threat model",        keywords: ["security", "design", "architecture"] },
+  { id: "kphd",               name: "Kernel Hang Detection",    desc: "EMA + tracepoints approach in Linux kernel",   keywords: ["kernel", "linux", "tracepoint"] },
+  { id: "temporal_stability", name: "Temporal Stability",       desc: "Cross-project concept: stability over time",   keywords: ["stability", "time", "concept"] },
 ];
 
-// ── Component ──────────────────────────────────────────────────────────────
-export default function Terminal({ onNavigate, onOpenProject, onOpenGarden }: TerminalProps) {
-  const [isOpen, setIsOpen]         = useState(false);
-  const [isBooting, setIsBooting]   = useState(false);
-  const [lines, setLines]           = useState<TerminalLine[]>([]);
-  const [input, setInput]           = useState("");
-  const [history, setHistory]       = useState<string[]>([]);
-  const [histIdx, setHistIdx]       = useState(-1);
-  const [suggestion, setSuggestion] = useState("");
-  const [isMatrix, setIsMatrix]     = useState(false);
-  const [isHacking, setIsHacking]   = useState(false);
+// Tag icon map
+const TAG_ICON: Record<string, React.ReactNode> = {
+  research: <FlaskConical size={13} strokeWidth={1.5} />,
+  systems:  <Layers       size={13} strokeWidth={1.5} />,
+  kernel:   <Cpu          size={13} strokeWidth={1.5} />,
+  saas:     <Layers       size={13} strokeWidth={1.5} />,
+  garden:   <Leaf         size={13} strokeWidth={1.5} />,
+};
 
-  const inputRef    = useRef<HTMLInputElement>(null);
-  const scrollRef   = useRef<HTMLDivElement>(null);
-  const matrixRef   = useRef<HTMLCanvasElement>(null);
-  const hackRef     = useRef<ReturnType<typeof setInterval> | null>(null);
-  const matrixRaf   = useRef<number | null>(null);
-  const lineIdRef   = useRef(0);
+// ── Types ─────────────────────────────────────────────────────────────────
 
-  const nextId = () => ++lineIdRef.current;
+type ProjectItem  = typeof PROJECTS[number];
+type GardenItem   = typeof GARDEN_FILES[number];
+type ResultItem   =
+  | { kind: "project"; item: ProjectItem }
+  | { kind: "garden";  item: GardenItem  };
 
-  // ── Scroll to bottom ───────────────────────────────────────────────────
+interface SpotlightProps {
+  onOpenProject: (id: string) => void;
+  onOpenGarden:  (fileId?: string) => void;
+}
+
+// ── Fuzzy scorer ──────────────────────────────────────────────────────────
+function score(query: string, target: string): number {
+  const q = query.toLowerCase();
+  const t = target.toLowerCase();
+  if (!q) return 1;
+  if (t === q) return 100;
+  if (t.startsWith(q)) return 80;
+  if (t.includes(q)) return 60;
+  let qi = 0;
+  for (let i = 0; i < t.length && qi < q.length; i++) {
+    if (t[i] === q[qi]) qi++;
+  }
+  return qi === q.length ? 30 : 0;
+}
+
+function scoreItem(query: string, name: string, desc: string, keywords: string[]): number {
+  return Math.max(
+    score(query, name) * 1.5,
+    score(query, desc),
+    ...keywords.map(k => score(query, k) * 0.8),
+  );
+}
+
+// Levenshtein distance for "did you mean"
+function levenshtein(a: string, b: string): number {
+  const m = a.length, n = b.length;
+  const dp = Array.from({ length: m + 1 }, (_, i) => Array.from({ length: n + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0)));
+  for (let i = 1; i <= m; i++)
+    for (let j = 1; j <= n; j++)
+      dp[i][j] = a[i-1] === b[j-1] ? dp[i-1][j-1] : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+  return dp[m][n];
+}
+
+// ── Component ─────────────────────────────────────────────────────────────
+
+export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProps) {
+  const [open,   setOpen]   = useState(false);
+  const [query,  setQuery]  = useState("");
+  const [cursor, setCursor] = useState(0);
+  const [mode,   setMode]   = useState<"all" | "garden">("all");
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const listRef  = useRef<HTMLDivElement>(null);
+
+  // ── Looping Placeholders ──────────────────────────────────────────────────
+  const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  const placeholders = useMemo(() => [
+    "Search projects...",
+    "knowledge garden",
+    "pinn overview",
+    "open avara",
+    "temporal stability",
+    "type 'garden' + Tab",
+  ], []);
+
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [lines]);
+    if (!open) return;
+    const interval = setInterval(() => {
+      setPlaceholderIndex(i => (i + 1) % placeholders.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [open, placeholders]);
 
-  // ── Focus input ────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (isOpen && !isBooting) setTimeout(() => inputRef.current?.focus(), 80);
-  }, [isOpen, isBooting]);
+  // ── Search ────────────────────────────────────────────────────────────────
 
-  // ── Keyboard shortcut: backtick or ctrl+` ──────────────────────────────────
+  const { results, suggestions } = useMemo(() => {
+    const q = query.trim();
+
+    // If query empty
+    if (!q) {
+      if (mode === "garden") {
+        const results: ResultItem[] = GARDEN_FILES.map(item => ({ kind: "garden" as const, item }));
+        return { results, suggestions: [] };
+      }
+      return { results: [], suggestions: [] };
+    }
+
+    // Context scoping
+    const availableProjects = mode === "all" ? PROJECTS : [];
+    const availableGarden   = GARDEN_FILES;
+
+    // Scored search
+    const scored: { r: ResultItem; s: number }[] = [
+      ...availableProjects.map(item => ({
+        r: { kind: "project" as const, item },
+        s: scoreItem(q, item.name, item.desc, item.keywords),
+      })),
+      ...availableGarden.map(item => ({
+        r: { kind: "garden" as const, item },
+        s: scoreItem(q, item.name, item.desc, item.keywords),
+      })),
+    ];
+
+    const hits = scored.filter(x => x.s > 0).sort((a, b) => b.s - a.s).map(x => x.r);
+
+    // Suggestions via Levenshtein
+    let suggestions: string[] = [];
+    if (hits.length === 0) {
+      const allNames = [
+        ...availableProjects.map(p => p.name),
+        ...availableGarden.map(f => f.name),
+      ];
+      suggestions = allNames
+        .map(n => ({ n, d: levenshtein(q.toLowerCase(), n.toLowerCase()) }))
+        .filter(x => x.d <= 3 && x.d < q.length)
+        .sort((a, b) => a.d - b.d)
+        .map(x => x.n)
+        .filter((v, i, arr) => arr.indexOf(v) === i)
+        .slice(0, 3);
+    }
+
+    return { results: hits, suggestions };
+  }, [query, mode]);
+
+  // ── Open / close ──────────────────────────────────────────────────────────
+
+  const open_ = useCallback(() => { setOpen(true); setQuery(""); setMode("all"); setCursor(0); }, []);
+  const close_ = useCallback(() => { setOpen(false); setQuery(""); setMode("all"); setCursor(0); }, []);
+
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      const isBacktick = e.key === "`";
-      const isCtrlBacktick = e.key === "`" && e.ctrlKey;
-      const isNormalBacktick = e.key === "`" && !e.metaKey && !e.ctrlKey;
-      
-      if (isNormalBacktick || isCtrlBacktick) {
-        e.preventDefault();
-        toggleTerminal();
-      }
-      if (e.key === "Escape" && isOpen) closeTerminal();
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") { e.preventDefault(); open ? close_() : open_(); }
+      if (e.key === "Escape" && open) close_();
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [isOpen]);
+  }, [open, open_, close_]);
 
-  // ── Event listener: toggle-terminal ─────────────────────────────────────
   useEffect(() => {
-    const handleToggle = () => toggleTerminal();
+    const handleToggle = () => { open ? close_() : open_(); };
     window.addEventListener('toggle-terminal', handleToggle);
     return () => window.removeEventListener('toggle-terminal', handleToggle);
-  }, [isOpen, lines]);
+  }, [open, open_, close_]);
 
-  // ── Boot sequence ──────────────────────────────────────────────────────
-  const bootUp = useCallback(() => {
-    setIsBooting(true);
-    setLines([]);
+  useEffect(() => {
+    if (open) setTimeout(() => inputRef.current?.focus(), 60);
+  }, [open]);
 
-    const bootLines = [
-      { type: "system" as const, content: "Initializing mendhu.tech OS..." },
-      { type: "system" as const, content: "Loading kernel modules... [OK]" },
-      { type: "system" as const, content: "Mounting research vault... [OK]" },
-      { type: "ascii"  as const, content: BOOT_ASCII },
-      { type: "system" as const, content: `Session started: ${new Date().toLocaleString()}` },
-      { type: "system" as const, content: 'Type "help" for available commands.' },
-    ];
+  // ── Keyboard nav ──────────────────────────────────────────────────────────
 
-    let delay = 0;
-    bootLines.forEach((l, i) => {
-      setTimeout(() => {
-        setLines(prev => [...prev, { id: nextId(), ...l }]);
-        if (i === bootLines.length - 1) setIsBooting(false);
-      }, delay);
-      delay += l.type === "ascii" ? 120 : 60 + i * 20;
-    });
-  }, []);
-
-  const toggleTerminal = () => {
-    if (isOpen) { closeTerminal(); return; }
-    setIsOpen(true);
-    setIsMatrix(false);
-    if (isHacking) stopHack();
-    if (lines.length === 0) bootUp();
-  };
-
-  const closeTerminal = () => {
-    setIsOpen(false);
-    setIsMatrix(false);
-    if (hackRef.current) stopHack();
-    if (matrixRaf.current) { cancelAnimationFrame(matrixRaf.current); matrixRaf.current = null; }
-  };
-
-  // ── Print helpers ──────────────────────────────────────────────────────
-  const print = (content: string | string[], type: TerminalLine["type"] = "output") =>
-    setLines(prev => [...prev, { id: nextId(), type, content }]);
-
-  const printLines = (arr: string[], type: TerminalLine["type"] = "output") =>
-    setLines(prev => [...prev, { id: nextId(), type, content: arr }]);
-
-  const printError = (msg: string) => print(`bash: ${msg}: command not found`, "error");
-
-  // ── Tab autocomplete ───────────────────────────────────────────────────
-  const ALL_COMMANDS = [
-    "help","clear","exit","goto","open","garden","ls","whoami","stack",
-    "research","links","cv","resume","porygon","doom","matrix","hack",
-    "cowsay","history","neofetch",
-    ...SECTIONS.map(s => `goto ${s}`),
-    ...PROJECTS.map(p => `open ${p.id}`),
-  ];
-
-  const updateSuggestion = (val: string) => {
-    if (!val) { setSuggestion(""); return; }
-    const match = ALL_COMMANDS.find(c => c.startsWith(val) && c !== val);
-    setSuggestion(match ? match.slice(val.length) : "");
-  };
-
-  // ── Matrix effect ──────────────────────────────────────────────────────
-  const startMatrix = () => {
-    setIsMatrix(true);
-    setTimeout(() => {
-      const canvas = matrixRef.current;
-      if (!canvas) return;
-      const ctx = canvas.getContext("2d")!;
-      canvas.width  = canvas.parentElement!.clientWidth;
-      canvas.height = canvas.parentElement!.clientHeight;
-      const cols = Math.floor(canvas.width / 14);
-      const drops = Array(cols).fill(1);
-
-      const tick = () => {
-        ctx.fillStyle = "rgba(0,0,0,0.05)";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "#00FF88";
-        ctx.font = "13px JetBrains Mono, monospace";
-        drops.forEach((y, i) => {
-          const char = MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)];
-          ctx.fillText(char, i * 14, y * 14);
-          if (y * 14 > canvas.height && Math.random() > 0.975) drops[i] = 0;
-          drops[i]++;
-        });
-        matrixRaf.current = requestAnimationFrame(tick);
-      };
-      tick();
-    }, 50);
-
-    setTimeout(() => {
-      if (matrixRaf.current) cancelAnimationFrame(matrixRaf.current);
-      setIsMatrix(false);
-      print("// You have been unplugged.", "success");
-    }, 8000);
-  };
-
-  // ── Hack effect ────────────────────────────────────────────────────────
-  const HACK_CHARS = "0123456789ABCDEF!@#$%^&*<>?/|\\{}[]";
-  const hackLine = () =>
-    Array.from({ length: 60 }, () => HACK_CHARS[Math.floor(Math.random() * HACK_CHARS.length)]).join(" ");
-
-  const startHack = () => {
-    setIsHacking(true);
-    let count = 0;
-    hackRef.current = setInterval(() => {
-      setLines(prev => {
-        const last = prev[prev.length - 1];
-        if (last?.type === "matrix") {
-          return [...prev.slice(0, -1), { ...last, content: hackLine() }];
-        }
-        return [...prev, { id: nextId(), type: "matrix", content: hackLine() }];
-      });
-      count++;
-      if (count > 40) stopHack();
-    }, 80);
-  };
-
-  const stopHack = () => {
-    if (hackRef.current) { clearInterval(hackRef.current); hackRef.current = null; }
-    setIsHacking(false);
-    print("ACCESS GRANTED. Welcome, operative.", "success");
-  };
-
-  // ── Cowsay ────────────────────────────────────────────────────────────
-  const cowsay = (text: string) => {
-    const len = Math.max(text.length, 10);
-    const top = " " + "_".repeat(len + 2);
-    const mid = `< ${text.padEnd(len)} >`;
-    const bot = " " + "-".repeat(len + 2);
-    return [
-      top, mid, bot,
-      "        \\   ^__^",
-      "         \\  (oo)\\_______",
-      "            (__)\\       )\\/\\",
-      "                ||----w |",
-      "                ||     ||",
-    ];
-  };
-
-  // ── Neofetch ──────────────────────────────────────────────────────────
-  const NEOFETCH = [
-    "  ┌──────────────────────────────────────────────┐",
-    "  │                 mendhu@tech                  │",
-    "  ├──────────────────────────────────────────────┤",
-    `  │  OS       mendhu.tech OS v2.0.4-stable        │`,
-    `  │  Host     Vercel Edge Network                 │`,
-    `  │  Kernel   Next.js 15 (App Router)             │`,
-    `  │  Shell    JetBrains Mono Terminal             │`,
-    `  │  DE       Wireframe / Paper aesthetic         │`,
-    `  │  WM       React + Framer Motion               │`,
-    `  │  Theme    Warm Paper (#FDFDFB)                │`,
-    `  │  Icons    Lucide React                        │`,
-    `  │  CPU      PyTorch 2.5 + ERA5 tensors          │`,
-    `  │  GPU      K-Net diffusivity field             │`,
-    `  │  Memory   165,000+ training samples           │`,
-    `  │  Uptime   ${new Date().getFullYear() - 2002} yrs (born 2002)              │`,
-    "  ├──────────────────────────────────────────────┤",
-    "  │  ██ ██ ██ ██ ██ ██ ██ ██   colour palette    │",
-    "  └──────────────────────────────────────────────┘",
-  ];
-
-  // ── Command processor ──────────────────────────────────────────────────
-  const processCommand = useCallback((raw: string) => {
-    const cmd   = raw.trim();
-    const parts = cmd.split(" ");
-    const base  = parts[0].toLowerCase();
-    const arg   = parts.slice(1).join(" ");
-
-    // Echo input
-    setLines(prev => [...prev, { id: nextId(), type: "input", content: cmd }]);
-
-    // History
-    setHistory(h => [cmd, ...h.filter(c => c !== cmd)].slice(0, 50));
-    setHistIdx(-1);
-
-    if (!cmd) return;
-
-    switch (base) {
-      // ── Navigation ────────────────────────────────────────────────────
-      case "goto": {
-        const target = arg.toLowerCase();
-        if (!target) { print("Usage: goto <section> — try: about, blog, projects, garden, contact", "error"); return; }
-        if (!SECTIONS.includes(target)) { print(`Section '${target}' not found. Available: ${SECTIONS.join(", ")}`, "error"); return; }
-        print(`// Navigating to #${target}...`, "success");
-        setTimeout(() => {
-          document.getElementById(target)?.scrollIntoView({ behavior: "smooth" });
-          onNavigate(target);
-        }, 300);
-        break;
-      }
-
-      case "open": {
-        const pid = arg.toLowerCase();
-        const proj = PROJECTS.find(p => p.id === pid || p.name.toLowerCase() === pid);
-        if (!proj) {
-          print(`Project '${arg}' not found.`, "error");
-          printLines(PROJECTS.map(p => `  ${p.id.padEnd(12)} — ${p.desc}`));
-          return;
-        }
-        print(`// Booting ${proj.name}...`, "success");
-        setTimeout(() => onOpenProject(proj.id), 400);
-        break;
-      }
-
-      case "garden": {
-        print(`// Opening Knowledge Garden${arg ? ` → ${arg}` : ""}...`, "success");
-        setTimeout(() => onOpenGarden(arg || undefined), 300);
-        break;
-      }
-
-      // ── ls ────────────────────────────────────────────────────────────
-      case "ls": {
-        printLines([
-          "drwxr-xr-x  sections/",
-          ...SECTIONS.map(s => `  -rw-r--r--  ${s}`),
-          "",
-          "drwxr-xr-x  projects/",
-          ...PROJECTS.map(p => `  -rw-r--r--  ${p.id.padEnd(14)} ${p.desc}`),
-        ]);
-        break;
-      }
-
-      // ── Info ──────────────────────────────────────────────────────────
-      case "whoami": {
-        printLines([
-          "  Atharva Mendhulkar",
-          "  ──────────────────────────────────────────────",
-          "  Role    : Systems Engineer & AI Researcher",
-          "  College : VIT Vellore (B.Tech CSE)",
-          "  Research: Physics-Informed ML, Kernel Systems",
-          "  Patent  : UPRS — Predictive Hang Detection (IPA 1970)",
-          "  Email   : mendhu36@outlook.com",
-          "  GitHub  : github.com/Atharva-Mendhulkar",
-        ]);
-        break;
-      }
-
-      case "stack": {
-        printLines([
-          "  ┌─ Frontend ───────────────────────────────────",
-          "  │  Next.js 15, React, TypeScript, Tailwind CSS",
-          "  │  Framer Motion, Three.js, D3 force graph",
-          "  ├─ Research ───────────────────────────────────",
-          "  │  PyTorch 2.5, ERA5 reanalysis, CPCB sensor data",
-          "  │  Physics-Informed Neural Networks (PINN)",
-          "  ├─ Systems ────────────────────────────────────",
-          "  │  C, Linux Kernel (GPL v2), Netlink/GENL",
-          "  │  EMA prediction, tracepoints, hash tables",
-          "  ├─ SaaS ───────────────────────────────────────",
-          "  │  Node.js, Socket.IO, PostgreSQL, Redis, Stripe",
-          "  └─ Infra ──────────────────────────────────────",
-          "     Vercel, Supabase, Hashnode, GitHub Actions",
-        ]);
-        break;
-      }
-
-      case "research": {
-        printLines([
-          "  research.json — knowledge graph nodes",
-          "  ────────────────────────────────────────────",
-          "  Use 'garden' to open the interactive graph.",
-          "  Use 'garden <node-id>' to jump to a specific note.",
-          "",
-          "  Top nodes:",
-          "  · pinn_abstract    — JointPINN overview",
-          "  · pinn_pde         — Advection-diffusion equation",
-          "  · avara_main       — Agent security architecture",
-          "  · kphd             — Kernel hang detection",
-          "  · temporal_stability — Cross-project concept",
-        ]);
-        break;
-      }
-
-      case "links": {
-        printLines([
-          "  External links:",
-          "  · github    https://github.com/Atharva-Mendhulkar",
-          "  · twitter   https://x.com/atharvanta",
-          "  · blog      https://blog.mendhu.tech",
-          "  · resume    https://drive.google.com/file/d/1fRhtpOOUqrIayHYB34IQtjnDG0x1sL3l",
-          "  · email     mendhu36@outlook.com",
-        ]);
-        break;
-      }
-
-      case "cv":
-      case "resume": {
-        print("// Opening resume in new tab...", "success");
-        setTimeout(() => window.open("https://drive.google.com/file/d/1fRhtpOOUqrIayHYB34IQtjnDG0x1sL3l/view", "_blank"), 300);
-        break;
-      }
-
-      // ── Fun ───────────────────────────────────────────────────────────
-      case "porygon": {
-        printLines(PORYGON_ASCII, "ascii");
-        print("Type 2 = Normal-type. Made of programming code. Loves portfolios.", "system");
-        break;
-      }
-
-      case "doom": {
-        printLines(DOOM_FRAMES[0].split("\n"), "ascii");
-        break;
-      }
-
-      case "matrix": {
-        print("// Initializing matrix protocol... follow the white rabbit.", "success");
-        setTimeout(startMatrix, 500);
-        break;
-      }
-
-      case "hack": {
-        print("// Initiating access sequence...", "system");
-        setTimeout(startHack, 300);
-        break;
-      }
-
-      case "cowsay": {
-        const text = arg || "moo";
-        printLines(cowsay(text));
-        break;
-      }
-
-      case "history": {
-        if (history.length === 0) { print("No history yet."); return; }
-        printLines(history.map((c, i) => `  ${String(i + 1).padStart(3, " ")}  ${c}`));
-        break;
-      }
-
-      case "neofetch": {
-        printLines(NEOFETCH, "ascii");
-        break;
-      }
-
-      // ── System ────────────────────────────────────────────────────────
-      case "help": {
-        printLines(HELP_TEXT, "output");
-        break;
-      }
-
-      case "clear": {
-        setLines([]);
-        return;
-      }
-
-      case "exit":
-      case "q": {
-        closeTerminal();
-        return;
-      }
-
-      // ── Easter eggs ───────────────────────────────────────────────────
-      case "sudo": {
-        print("Nice try. This portfolio runs rootless containers.", "error");
-        break;
-      }
-      case "rm": {
-        if (arg.includes("-rf") || arg.includes("/")) {
-          print("❌ Segmentation fault (core dumped) — just kidding. Portfolio is read-only.", "error");
-        } else {
-          printError(cmd);
-        }
-        break;
-      }
-      case "vim": { print("// vim opened. Good luck exiting. Try :q! — actually, just type 'exit'.", "system"); break; }
-      case "git": { print("// git: 'git push origin main' — already deployed on Vercel.", "system"); break; }
-      case "npm":
-      case "bun":
-      case "node": { print("// Runtime detected. This is a browser, not a terminal (but we try harder).", "system"); break; }
-      case "ping": { print(`PING ${arg || "mendhu.tech"}: 56 bytes. Reply from Vercel Edge: time=0.8ms ttl=64`, "output"); break; }
-      case "curl":
-      case "wget": { print("// Network: CORS says no. Portfolio says: just read the screen.", "error"); break; }
-      case "cat": {
-        if (arg.includes("flag") || arg.includes("secret")) {
-          print("CTF{m3ndhu_t3ch_15_n0t_4_CTF_but_g00d_tr7}", "success");
-        } else {
-          print(`cat: ${arg}: No such file in browser filesystem. Try 'research' or 'stack'.`, "error");
-        }
-        break;
-      }
-      case "ls -la":
-      case "ls -l": {
-        printLines([
-          "total 48",
-          "drwxr-xr-x  8 mendhu mendhu 4096 Apr 2026 .",
-          "drwxr-xr-x  3 root   root   4096 Jan 2026 ..",
-          "-rw-r--r--  1 mendhu mendhu  420 Apr 2026 .obsidian/",
-          "-rwxr-xr-x  1 mendhu mendhu 8192 Apr 2026 research.json",
-          "-rw-r--r--  1 mendhu mendhu 2048 Apr 2026 projects.ts",
-          "-rwxr-xr-x  1 mendhu mendhu 4096 Apr 2026 porygon.svg",
-          "-rw-r--r--  1 mendhu mendhu  999 Apr 2026 UPRS_patent.pdf",
-        ]);
-        break;
-      }
-      case "uname": {
-        print("mendhu.tech OS v2.0.4-stable #1 SMP Next.js 15 x86_64 Browser", "output");
-        break;
-      }
-
-      default: {
-        printError(base);
-        print(`Did you mean: ${ALL_COMMANDS.filter(c => c.startsWith(base[0])).slice(0,3).join(", ") || "help"}?`, "system");
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowDown") { 
+      e.preventDefault(); 
+      setCursor(c => Math.min(c + 1, results.length - 1)); 
+    }
+    else if (e.key === "ArrowUp") { 
+      e.preventDefault(); 
+      setCursor(c => Math.max(c - 1, 0)); 
+    }
+    else if (e.key === "Enter") { 
+      e.preventDefault(); 
+      if (results[cursor]) activate(results[cursor]); 
+    }
+    else if (e.key === "Tab") {
+      const lower = query.toLowerCase().trim();
+      if (lower === "knowledge garden" || lower === "garden") {
+        e.preventDefault();
+        setMode("garden");
+        setQuery("");
       }
     }
-  }, [history, onNavigate, onOpenProject, onOpenGarden]);
-
-  // ── Input handling ─────────────────────────────────────────────────────
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      const cmd = input.trim();
-      setInput("");
-      setSuggestion("");
-      if (cmd) processCommand(cmd);
-    } else if (e.key === "Tab") {
-      e.preventDefault();
-      if (suggestion) {
-        setInput(prev => prev + suggestion);
-        setSuggestion("");
-      }
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      const idx = Math.min(histIdx + 1, history.length - 1);
-      setHistIdx(idx);
-      setInput(history[idx] ?? "");
-      setSuggestion("");
-    } else if (e.key === "ArrowDown") {
-      e.preventDefault();
-      const idx = Math.max(histIdx - 1, -1);
-      setHistIdx(idx);
-      setInput(idx === -1 ? "" : history[idx] ?? "");
-      setSuggestion("");
-    } else if (e.key === "`") {
-      e.preventDefault();
-      closeTerminal();
+    else if (e.key === "Backspace" && query === "" && mode === "garden") {
+      setMode("all");
     }
   };
 
-  // ── Line renderer ──────────────────────────────────────────────────────
-  const renderLine = (line: TerminalLine) => {
-    const arr = Array.isArray(line.content) ? line.content : [line.content];
-    const color = {
-      input:   "text-[#00FF88]",
-      output:  "text-[rgba(255,255,255,0.75)]",
-      error:   "text-red-400",
-      success: "text-[#00FF88]",
-      system:  "text-[rgba(255,255,255,0.35)]",
-      ascii:   "text-[#00FF88]",
-      matrix:  "text-[#00FF88] opacity-80",
-    }[line.type];
+  useEffect(() => {
+    listRef.current?.querySelector<HTMLElement>(`[data-idx="${cursor}"]`)?.scrollIntoView({ block: "nearest" });
+  }, [cursor]);
 
-    const prefix = line.type === "input" ? "$ " : "  ";
+  useEffect(() => { setCursor(0); }, [query, mode]);
 
+  // ── Activate ──────────────────────────────────────────────────────────────
+
+  const activate = (r: ResultItem) => {
+    close_();
+    if (r.kind === "project") setTimeout(() => onOpenProject(r.item.id), 100);
+    else setTimeout(() => onOpenGarden(r.item.id), 100);
+  };
+
+  // ── Highlight ─────────────────────────────────────────────────────────────
+
+  const highlight = (text: string) => {
+    if (!query.trim()) return <>{text}</>;
+    const idx = text.toLowerCase().indexOf(query.toLowerCase().trim());
+    if (idx === -1) return <>{text}</>;
     return (
-      <div key={line.id} className="mb-0.5">
-        {arr.map((l, i) => (
-          <div key={i} className={`font-mono text-[12px] leading-[1.6] whitespace-pre ${color}`}>
-            {i === 0 && line.type === "input" ? (
-              <span><span className="text-accent font-bold">atharva@mendhu</span><span className="text-[rgba(255,255,255,0.3)]">:</span><span className="text-[#00FF88]">~</span><span className="text-[rgba(255,255,255,0.3)]">$</span> <span>{l}</span></span>
-            ) : (
-              <span>{l}</span>
-            )}
-          </div>
-        ))}
-      </div>
+      <>
+        {text.slice(0, idx)}
+        <span className="text-accent">{text.slice(idx, idx + query.trim().length)}</span>
+        {text.slice(idx + query.trim().length)}
+      </>
     );
   };
 
-  // ── Render ─────────────────────────────────────────────────────────────
+  // ── Rendering sections ────────────────────────────────────────────────────
+
+  const projectResults = results.filter(r => r.kind === "project");
+  const gardenResults  = results.filter(r => r.kind === "garden");
+  const hasResults     = results.length > 0;
+
   return (
     <>
-      {/* Keyboard hint — shown on page */}
-      {!isOpen && (
-        <button
-          onClick={toggleTerminal}
-          className="fixed bottom-6 left-6 z-[9000] font-mono text-[9px] text-ink-faint border border-dashed border-border-strong px-3 py-1.5 hover:text-accent hover:border-accent transition-all bg-paper/80 backdrop-blur-sm"
-          title="Open terminal"
-        >
-          [`] terminal
-        </button>
+      {/* Scrim */}
+      {open && (
+        <div
+          className="fixed inset-0 z-[99998]"
+          style={{ background: "rgba(10,10,10,0.2)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}
+          onClick={close_}
+        />
       )}
 
-      {/* Terminal window */}
-      {isOpen && (
-        <div className="fixed inset-0 z-[99999] flex items-end justify-center pb-0 pointer-events-none">
-          <div
-            className="pointer-events-auto w-full max-w-[960px] mx-auto"
-            style={{ height: "55vh" }}
-          >
-            {/* Window chrome */}
-            <div className="flex items-center gap-2 px-4 py-2 bg-[#1A1A1A] border-t border-l border-r border-dashed border-[rgba(255,255,255,0.12)]">
-              <button onClick={closeTerminal} className="w-3 h-3 rounded-full bg-red-500/70 hover:bg-red-500 border border-red-600/30 flex items-center justify-center group">
-                <span className="text-[6px] text-red-900 opacity-0 group-hover:opacity-100">✕</span>
-              </button>
-              <div className="w-3 h-3 rounded-full bg-yellow-500/70 border border-yellow-600/30" />
-              <div className="w-3 h-3 rounded-full bg-green-500/70 border border-green-600/30" />
-              <div className="flex-1 text-center font-mono text-[10px] text-[rgba(255,255,255,0.2)] tracking-widest">
-                mendhu@terminal — bash — 960×480
-              </div>
-              <div className="font-mono text-[9px] text-[rgba(255,255,255,0.2)] border border-dashed border-[rgba(255,255,255,0.1)] px-2 py-0.5">
-                [` ] close
-              </div>
-            </div>
+      {/* Panel */}
+      {open && (
+        <div
+          className="fixed z-[99999] left-1/2"
+          style={{ top: "26%", transform: "translateX(-50%)", width: "min(640px, 92vw)" }}
+        >
+          <div style={{
+            background: "rgba(253,253,251,0.5)",
+            backdropFilter: "blur(40px) saturate(210%)",
+            WebkitBackdropFilter: "blur(40px) saturate(210%)",
+            border: "1px dashed rgba(26,26,26,0.18)",
+            borderRadius: 16,
+            boxShadow: "0 40px 100px rgba(0,0,0,0.16), 0 2px 8px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.95)",
+            overflow: "hidden",
+            animation: "spot-in 0.16s cubic-bezier(0.16,1,0.3,1) forwards",
+          }}>
 
-            {/* Terminal body */}
-            <div
-              className="relative bg-[#0A0A0A] border-l border-r border-b border-dashed border-[rgba(255,255,255,0.1)] overflow-hidden"
-              style={{ height: "calc(100% - 32px)" }}
-              onClick={() => inputRef.current?.focus()}
-            >
-              {/* Matrix canvas */}
-              {isMatrix && (
-                <canvas ref={matrixRef} className="absolute inset-0 z-10 w-full h-full" />
+            {/* Input */}
+            <div className="flex items-center gap-3 px-5 py-4" style={{ borderBottom: "1px dashed rgba(26,26,26,0.1)" }}>
+              <Search size={15} className="text-ink-faint shrink-0" strokeWidth={1.5} />
+              
+              {mode === "garden" && (
+                <span className="flex items-center gap-1 font-mono text-[10px] text-accent border border-dashed border-accent/40 bg-accent/5 px-2 py-0.5 rounded shrink-0">
+                  <Leaf size={11} /> garden
+                  <button onClick={() => setMode("all")} className="hover:text-ink ml-1 font-bold">×</button>
+                </span>
               )}
 
-              {/* Diagonal hatch overlay */}
-              <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
-                style={{ backgroundImage: "repeating-linear-gradient(-45deg, rgba(0,255,136,1) 0, rgba(0,255,136,1) 1px, transparent 1px, transparent 8px)" }}
+              <input
+                ref={inputRef}
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder={placeholders[placeholderIndex]}
+                className="flex-1 bg-transparent outline-none font-mono text-[13px] text-ink placeholder:text-ink-faint"
+                spellCheck={false}
+                autoComplete="off"
               />
+              
+              {query && (
+                <span className="font-mono text-[9px] text-ink-faint border border-dashed border-border-strong px-1.5 py-0.5" style={{ borderRadius: 4 }}>
+                  {results.length} hit{results.length !== 1 ? "s" : ""}
+                </span>
+              )}
+            </div>
 
-              {/* Scroll area */}
-              <div
-                ref={scrollRef}
-                className="h-full overflow-y-auto px-4 pt-3 pb-2"
-                style={{ scrollbarWidth: "thin", scrollbarColor: "#1a1a1a #0a0a0a" }}
-              >
-                {lines.map(renderLine)}
+            {/* Body */}
+            {(hasResults || (mode === "garden" && !query)) && (
+              <div ref={listRef} className="overflow-y-auto" style={{ maxHeight: 360, scrollbarWidth: "none" }}>
 
-                {/* Input row */}
-                {!isBooting && !isMatrix && (
-                  <div className="flex items-center gap-1 mt-1 font-mono text-[12px]">
-                    <span className="text-accent font-bold">atharva@mendhu</span>
-                    <span className="text-[rgba(255,255,255,0.3)]">:</span>
-                    <span className="text-[#00FF88]">~</span>
-                    <span className="text-[rgba(255,255,255,0.3)]">$</span>
-                    <span className="relative flex-1 ml-1">
-                      <input
-                        ref={inputRef}
-                        value={input}
-                        onChange={e => { setInput(e.target.value); updateSuggestion(e.target.value); }}
-                        onKeyDown={handleKeyDown}
-                        className="bg-transparent outline-none text-[#00FF88] font-mono text-[12px] w-full caret-[#00FF88]"
-                        spellCheck={false}
-                        autoComplete="off"
-                        autoCorrect="off"
-                        autoCapitalize="off"
+                {/* Projects section */}
+                {projectResults.length > 0 && (
+                  <>
+                    <SectionHeader label="Projects" />
+                    {projectResults.map(r => (
+                      <Row
+                        key={r.item.id}
+                        r={r}
+                        idx={results.indexOf(r)}
+                        isActive={cursor === results.indexOf(r)}
+                        onClick={() => activate(r)}
+                        onHover={() => setCursor(results.indexOf(r))}
+                        highlight={highlight}
                       />
-                      {/* Ghost suggestion */}
-                      {suggestion && (
-                        <span className="absolute left-0 top-0 font-mono text-[12px] text-[rgba(255,255,255,0.2)] pointer-events-none whitespace-pre">
-                          {input}<span>{suggestion}</span>
-                        </span>
-                      )}
-                    </span>
-                  </div>
+                    ))}
+                  </>
                 )}
 
-                {isBooting && (
-                  <div className="font-mono text-[12px] text-[rgba(255,255,255,0.3)] mt-1">
-                    <span className="animate-pulse">Booting</span>
-                    <span className="cursor-blink ml-1">▋</span>
+                {/* Garden section */}
+                {gardenResults.length > 0 && (
+                  <>
+                    <SectionHeader label="Garden" />
+                    {gardenResults.map(r => (
+                      <Row
+                        key={r.item.id}
+                        r={r}
+                        idx={results.indexOf(r)}
+                        isActive={cursor === results.indexOf(r)}
+                        onClick={() => activate(r)}
+                        onHover={() => setCursor(results.indexOf(r))}
+                        highlight={highlight}
+                      />
+                    ))}
+                  </>
+                )}
+
+                <div className="h-1" />
+              </div>
+            )}
+
+            {/* Empty state while searching */}
+            {!hasResults && query && (
+              <div className="px-5 py-8">
+                <p className="font-mono text-[11px] text-ink-faint text-center mb-4">
+                  No results for <span className="text-ink">&ldquo;{query}&rdquo;</span>
+                </p>
+
+                {suggestions.length > 0 && (
+                  <div className="flex flex-col gap-1.5">
+                    <p className="font-mono text-[9px] text-ink-faint uppercase tracking-widest text-center mb-2">
+                      Did you mean?
+                    </p>
+                    <div className="flex flex-wrap gap-2 justify-center">
+                      {suggestions.map(s => (
+                        <button
+                          key={s}
+                          onClick={() => setQuery(s)}
+                          className="font-mono text-[11px] text-accent border border-dashed border-accent px-3 py-1 hover:bg-accent-light transition-colors"
+                          style={{ borderRadius: 6 }}
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
+            )}
+
+            {/* Footer hints */}
+            <div
+              className="flex items-center gap-4 px-5 py-2.5"
+              style={{ borderTop: "1px dashed rgba(26,26,26,0.08)", background: "rgba(26,26,26,0.02)" }}
+            >
+              <Hint keys={["↵"]}       label="open"     />
+              <Hint keys={["↑", "↓"]}  label="navigate" />
+              {mode === "all" && query.toLowerCase().includes("gar") && <Hint keys={["⇥"]} label="lock mode" />}
+              <Hint keys={["esc"]}      label="close"    />
             </div>
           </div>
         </div>
       )}
+
+      <style>{`
+        @keyframes spot-in {
+          from { opacity:0; transform:scale(0.96) translateY(-8px); }
+          to   { opacity:1; transform:scale(1)    translateY(0);    }
+        }
+      `}</style>
     </>
+  );
+}
+
+// ── Sub-components ────────────────────────────────────────────────────────
+
+function SectionHeader({ label }: { label: string }) {
+  return (
+    <div className="px-5 pt-3 pb-1 font-mono text-[9px] text-ink-faint uppercase tracking-widest flex items-center gap-2">
+      <span>{label}</span>
+      <span className="flex-1 border-t border-dashed" style={{ borderColor: "rgba(26,26,26,0.1)" }} />
+    </div>
+  );
+}
+
+function Row({ r, idx, isActive, onClick, onHover, highlight }: {
+  r: ResultItem;
+  idx: number;
+  isActive: boolean;
+  onClick: () => void;
+  onHover: () => void;
+  highlight: (t: string) => React.ReactNode;
+}) {
+  const tag = r.kind === "project" ? (r.item as ProjectItem).tag : "garden";
+
+  return (
+    <button
+      data-idx={idx}
+      onClick={onClick}
+      onMouseEnter={onHover}
+      className="w-full flex items-center gap-3 px-5 py-2.5 text-left transition-all"
+      style={{
+        background:  isActive ? "rgba(0,71,255,0.055)" : "transparent",
+        borderLeft:  `2px solid ${isActive ? "var(--accent)" : "transparent"}`,
+      }}
+    >
+      <div
+        className="w-8 h-8 shrink-0 rounded-lg flex items-center justify-center transition-colors"
+        style={{
+          background:   isActive ? "rgba(0,71,255,0.1)"  : "rgba(26,26,26,0.04)",
+          border:       "1px dashed",
+          borderColor:  isActive ? "rgba(0,71,255,0.28)" : "rgba(26,26,26,0.13)",
+        }}
+      >
+        <span className={isActive ? "text-accent" : "text-ink-faint"}>
+          {r.kind === "project"
+            ? <FolderOpen size={14} strokeWidth={1.5} />
+            : <BookOpen   size={14} strokeWidth={1.5} />}
+        </span>
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <div className="font-mono text-[12px] text-ink truncate">{highlight(r.item.name)}</div>
+        <div className="font-mono text-[10px] text-ink-faint truncate">{highlight(r.item.desc)}</div>
+      </div>
+
+      <div
+        className="shrink-0 flex items-center gap-1 font-mono text-[8px] px-2 py-0.5 border border-dashed transition-colors"
+        style={{
+          color:       isActive ? "var(--accent)"           : "var(--ink-faint)",
+          borderColor: isActive ? "rgba(0,71,255,0.28)"     : "rgba(26,26,26,0.14)",
+          background:  isActive ? "rgba(0,71,255,0.06)"     : "transparent",
+          borderRadius: 4,
+        }}
+      >
+        <span>{TAG_ICON[tag]}</span>
+        <span>{tag}</span>
+      </div>
+    </button>
+  );
+}
+
+function Hint({ keys, label }: { keys: string[]; label: string }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      {keys.map(k => (
+        <kbd
+          key={k}
+          className="font-mono text-[9px] text-ink-faint flex items-center justify-center"
+          style={{
+            border: "1px dashed rgba(26,26,26,0.18)",
+            borderRadius: 4,
+            padding: "1px 5px",
+            background: "rgba(26,26,26,0.04)",
+            minWidth: 20,
+          }}
+        >
+          {k}
+        </kbd>
+      ))}
+      <span className="font-mono text-[9px] text-ink-faint">{label}</span>
+    </div>
   );
 }

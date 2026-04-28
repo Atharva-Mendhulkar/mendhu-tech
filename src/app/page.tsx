@@ -173,7 +173,7 @@ export default function Home() {
           {/* ─── FOOTER ─── */}
           <footer className="pt-20 pb-8 flex justify-between items-center border-t border-dashed border-border-strong mt-12">
             <div className="font-mono text-[10px] text-ink-faint uppercase tracking-widest flex items-center gap-4">
-              <button onClick={() => window.dispatchEvent(new Event('toggle-terminal'))} className="hover:text-ink transition-colors cursor-pointer">$ terminal</button>
+              <button onClick={() => window.dispatchEvent(new Event('toggle-terminal'))} className="hover:text-ink transition-colors cursor-pointer">[⌘K] search</button>
               <span className="text-border-strong">|</span>
               <button onClick={handleExit} className="hover:text-ink transition-colors cursor-pointer">$ exit</button>
               <span className="text-border-strong">|</span>
@@ -214,9 +214,6 @@ export default function Home() {
         ))}
       </div>
       <Terminal 
-        onNavigate={(target) => {
-          // Additional logic if needed
-        }}
         onOpenProject={(id) => setActiveModalId(id)}
         onOpenGarden={(fileId) => {
           setIsGardenOpen(true);
