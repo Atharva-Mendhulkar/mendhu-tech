@@ -26,7 +26,7 @@ const GARDEN_FILES = rawResearchData.nodes.map((n: any) => ({
 const COMMANDS = [
   { id: "projects", name: "type projects",  desc: "View modular technical research labs" },
   { id: "garden",   name: "type garden",    desc: "Access the research knowledge garden" },
-  { id: "resume",   name: "open resume",    desc: "View official PDF credentials directly" },
+  { id: "resume",   name: "open resume",    desc: "Download official credentials natively" },
   { id: "linkedin", name: "goto linkedin",  desc: "Redirect to standard network links" },
   { id: "github",   name: "goto github",    desc: "Explore active version control hubs" },
   { id: "twitter",  name: "goto twitter",   desc: "Follow research updates online" },
@@ -100,7 +100,6 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
   const [query,  setQuery]  = useState("");
   const [cursor, setCursor] = useState(0);
   const [mode,   setMode]   = useState<"all" | "garden">("all");
-  const [isShowingResume, setIsShowingResume] = useState(false);
   
   // Pagination limits for 'Show More'
   const [visibleCount, setVisibleCount] = useState(5);
@@ -156,7 +155,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
   const placeholders = useMemo(() => [
     "type 'projects' to view build logs",
     "type 'garden' to access maps",
-    "type 'open resume' for credentials",
+    "type 'open resume' to download",
     "search physics pipelines",
   ], []);
 
@@ -189,13 +188,13 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
     const availableProjects = mode === "all" ? PROJECTS : [];
     const availableGarden   = GARDEN_FILES;
 
-    // Direct command filters natively mapped
+    // Command matching
     const matchedCommands: ResultItem[] = COMMANDS.filter(cmd => {
       if (q === "show commands" || q === "help" || q === "commands") return true;
       return cmd.name.toLowerCase().includes(q) || cmd.desc.toLowerCase().includes(q);
     }).map(item => ({ kind: "command" as const, item }));
 
-    // Projects boosted directly if query matches 'project'
+    // Scoring & Boosts
     const scored: { r: ResultItem; s: number }[] = [
       ...availableProjects.map(item => ({
         r: { kind: "project" as const, item },
@@ -234,11 +233,11 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
   // ── Open / close ──────────────────────────────────────────────────────────
 
   const open_ = useCallback(() => { 
-    setOpen(true); setQuery(""); setMode("all"); setCursor(0); setIsShowingResume(false); 
+    setOpen(true); setQuery(""); setMode("all"); setCursor(0); 
   }, []);
   
   const close_ = useCallback(() => { 
-    setOpen(false); setQuery(""); setMode("all"); setCursor(0); setIsShowingResume(false); 
+    setOpen(false); setQuery(""); setMode("all"); setCursor(0); 
   }, []);
 
   useEffect(() => {
@@ -313,7 +312,14 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
       } else if (r.item.id === "projects") {
         setQuery("project");
       } else if (r.item.id === "resume") {
-        setIsShowingResume(true);
+        // Enforce Native PDF Download
+        const link = document.createElement('a');
+        link.href = '/Atharva%20Mendhulkar%20Resume.pdf';
+        link.download = 'Atharva_Mendhulkar_Resume.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        close_();
       } else if (r.item.id === "linkedin") {
         window.open("https://linkedin.com/in/mendhu36/", "_blank");
         close_();
@@ -360,29 +366,8 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
         />
       )}
 
-      {/* PDF Viewer Overlay */}
-      {isShowingResume && (
-        <div className="fixed inset-0 z-[100000] bg-paper/95 backdrop-blur-md p-8 flex flex-col items-center justify-center">
-          <div className="w-full max-w-4xl flex justify-between items-center pb-4 mb-4 border-b border-dashed border-border-strong">
-            <h2 className="font-mono text-base font-bold text-ink flex items-center gap-2">
-              <FileText size={18} className="text-accent" /> Atharva Mendhulkar Resume.pdf
-            </h2>
-            <button 
-              onClick={() => setIsShowingResume(false)}
-              className="flex items-center gap-2 font-mono text-[11px] text-ink border border-dashed border-border-strong px-3 py-1.5 hover:text-accent hover:border-accent transition-all rounded cursor-pointer select-none"
-            >
-              <X size={14} /> Close
-            </button>
-          </div>
-          <iframe 
-            src="/Atharva%20Mendhulkar%20Resume.pdf" 
-            className="w-full max-w-4xl h-[78vh] border border-dashed border-border-strong rounded shadow-xl"
-          />
-        </div>
-      )}
-
       {/* Panel with Increased Glassmorphism Transparency */}
-      {open && !isShowingResume && (
+      {open && (
         <div
           className="fixed z-[99999] left-1/2"
           style={{ 
@@ -395,7 +380,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
           onMouseDown={handleMouseDown}
         >
           <div style={{
-            background: "rgba(253, 253, 251, 0.1)",
+            background: "rgba(253, 253, 251, 0.12)",
             backdropFilter: "blur(24px)",
             WebkitBackdropFilter: "blur(24px)",
             border: "1px dashed rgba(26, 26, 26, 0.15)",
