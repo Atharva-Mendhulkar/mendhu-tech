@@ -275,7 +275,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize }: GardenModal
       
       ctx.clearRect(0, 0, lw, lh);
 
-      const k = 0.02, damping = 0.8, repulsion = 2500, centerPull = 0.008, linkDist = 200;
+      const k = 0.02, damping = 0.8, repulsion = 7500, centerPull = 0.004, linkDist = 260;
 
       for (let i = 0; i < simNodes.length; i++) {
         const n1 = simNodes[i];
