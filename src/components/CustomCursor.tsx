@@ -9,14 +9,14 @@ export default function CustomCursor() {
   const [isGrabbing, setIsGrabbing] = useState(false);
 
   useEffect(() => {
-    const updatePosition = (e: MouseEvent) => {
+    const updatePosition = (e: MouseEvent | PointerEvent) => {
       if (cursorRef.current) {
         cursorRef.current.style.left = `${e.clientX}px`;
         cursorRef.current.style.top = `${e.clientY}px`;
       }
     };
 
-    const updateHoverState = (e: MouseEvent) => {
+    const updateHoverState = (e: MouseEvent | PointerEvent) => {
       const target = e.target as HTMLElement;
       if (!target) return;
       
@@ -31,12 +31,14 @@ export default function CustomCursor() {
     const handleMouseUp = () => setIsGrabbing(false);
 
     window.addEventListener("mousemove", updatePosition, { passive: true });
+    window.addEventListener("pointermove", updatePosition, { passive: true });
     window.addEventListener("mouseover", updateHoverState, { passive: true });
     window.addEventListener("mousedown", handleMouseDown);
     window.addEventListener("mouseup", handleMouseUp);
 
     return () => {
       window.removeEventListener("mousemove", updatePosition);
+      window.removeEventListener("pointermove", updatePosition);
       window.removeEventListener("mouseover", updateHoverState);
       window.removeEventListener("mousedown", handleMouseDown);
       window.removeEventListener("mouseup", handleMouseUp);
