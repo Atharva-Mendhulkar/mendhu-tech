@@ -18,12 +18,7 @@ export default function Home() {
   const [minimizedItems, setMinimizedItems] = useState<{ id: string, title: string, type: 'garden' | 'project' }[]>([]);
   const [restoredId, setRestoredId] = useState<string | null>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
-  
-  // Typewriter Loop
-  const phrases = ["Search", "[Ctrl + `]"];
   const [displayText, setDisplayText] = useState("");
-  const [phraseIndex, setPhraseIndex] = useState(0);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,32 +30,44 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
-    const currentPhrase = phrases[phraseIndex];
-    
-    const handleType = () => {
-      if (!isDeleting) {
-        setDisplayText(currentPhrase.substring(0, displayText.length + 1));
-        if (displayText.length + 1 === currentPhrase.length) {
-          timer = setTimeout(() => setIsDeleting(true), 2500);
-          return;
-        }
+    const phrases = ["Search", "[Ctrl + `]"];
+    let currentPhraseIndex = 0;
+    let currentText = "";
+    let isDeletingText = false;
+    let timeoutId: NodeJS.Timeout;
+
+    const type = () => {
+      const fullPhrase = phrases[currentPhraseIndex];
+
+      if (isDeletingText) {
+        currentText = fullPhrase.substring(0, currentText.length - 1);
       } else {
-        setDisplayText(currentPhrase.substring(0, displayText.length - 1));
-        if (displayText.length === 0) {
-          setIsDeleting(false);
-          setPhraseIndex((prev) => (prev + 1) % phrases.length);
-          return;
-        }
+        currentText = fullPhrase.substring(0, currentText.length + 1);
       }
-      
-      const speed = isDeleting ? 40 : 80;
-      timer = setTimeout(handleType, speed);
+
+      setDisplayText(currentText);
+
+      let typeSpeed = 80;
+
+      if (isDeletingText) {
+        typeSpeed = 40;
+      }
+
+      if (!isDeletingText && currentText === fullPhrase) {
+        typeSpeed = 2500; 
+        isDeletingText = true;
+      } else if (isDeletingText && currentText === "") {
+        isDeletingText = false;
+        currentPhraseIndex = (currentPhraseIndex + 1) % phrases.length;
+        typeSpeed = 500; 
+      }
+
+      timeoutId = setTimeout(type, typeSpeed);
     };
 
-    timer = setTimeout(handleType, isDeleting ? 40 : 80);
-    return () => clearTimeout(timer);
-  }, [displayText, isDeleting, phraseIndex]);
+    timeoutId = setTimeout(type, 500);
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   const handleMinimizeModal = (id: string, title: string, type: 'garden' | 'project') => {
     if (type === 'garden') setIsGardenOpen(false);
