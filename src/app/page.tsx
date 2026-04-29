@@ -17,6 +17,15 @@ export default function Home() {
   const [activeGardenFileId, setActiveGardenFileId] = useState<string | undefined>(undefined);
   const [minimizedItems, setMinimizedItems] = useState<{ id: string, title: string, type: 'garden' | 'project' }[]>([]);
   const [restoredId, setRestoredId] = useState<string | null>(null);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 120);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleMinimizeModal = (id: string, title: string, type: 'garden' | 'project') => {
     if (type === 'garden') setIsGardenOpen(false);
@@ -90,14 +99,18 @@ export default function Home() {
         <div className="relative z-10 px-8 lg:px-14 py-12">
           
           {/* Spotlight Quick-Trigger */}
-          <div className="md:absolute md:top-1 md:right-8 lg:right-14 z-[210] flex flex-col items-center md:items-end gap-1 mb-8 md:mb-0 w-full md:w-auto">
+          <div className={`md:absolute md:top-1 md:right-8 lg:right-14 z-[210] flex flex-col items-center md:items-end gap-1 mb-8 md:mb-0 w-full md:w-auto ${
+            scrolled 
+              ? "fixed bottom-6 right-6 top-auto left-auto w-auto mb-0 md:absolute md:bottom-auto md:top-1 md:right-8 lg:right-14" 
+              : ""
+          }`}>
             {/* Arrow + text ABOVE the button */}
             <svg 
               width="300" 
               height="110" 
               viewBox="0 0 300 110" 
               xmlns="http://www.w3.org/2000/svg"
-              className="select-none pointer-events-none mb-[-12px] md:mr-[-35px]"
+              className={`select-none pointer-events-none mb-[-12px] md:mr-[-35px] md:opacity-100 md:scale-100 transition-all duration-300 ${scrolled ? 'opacity-0 scale-95 hidden md:block' : 'opacity-100 scale-100'}`}
             >
               {/* Text at the top */}
               <text 
@@ -138,10 +151,28 @@ export default function Home() {
             {/* Pill Button */}
             <button 
               onClick={() => window.dispatchEvent(new Event('toggle-terminal'))}
-              className="flex items-center gap-3 px-5 py-2 border border-dashed border-border-strong bg-paper/80 backdrop-blur-sm rounded-full shadow-sm hover:text-accent hover:border-accent transition-all cursor-pointer font-mono select-none"
+              className={`flex items-center gap-3 transition-all duration-300 cursor-pointer font-mono select-none ${
+                scrolled 
+                  ? "w-12 h-12 justify-center rounded-full border border-solid border-accent bg-paper/60 backdrop-blur-md shadow-lg hover:bg-paper/80 md:w-auto md:h-auto md:px-5 md:py-2 md:rounded-full md:border-dashed md:border-border-strong md:bg-paper/80 md:shadow-sm" 
+                  : "px-5 py-2 border border-dashed border-border-strong bg-paper/80 backdrop-blur-sm rounded-full shadow-sm hover:text-accent hover:border-accent"
+              }`}
             >
-              <span className="text-[12px] font-normal text-ink">Search</span>
-              <span className="text-[13px] font-bold text-accent">[Ctrl + `]</span>
+              {scrolled ? (
+                <>
+                  {/* Mobile: Icon */}
+                  <div className="md:hidden">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-accent animate-modal-enter"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                  </div>
+                  {/* Desktop: Standard pill */}
+                  <span className="hidden md:inline text-[12px] font-normal text-ink">Search</span>
+                  <span className="hidden md:inline text-[13px] font-bold text-accent">[Ctrl + `]</span>
+                </>
+              ) : (
+                <>
+                  <span className="text-[12px] font-normal text-ink">Search</span>
+                  <span className="hidden md:inline text-[13px] font-bold text-accent">[Ctrl + `]</span>
+                </>
+              )}
             </button>
           </div>
           
