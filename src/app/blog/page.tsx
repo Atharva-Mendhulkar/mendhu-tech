@@ -168,7 +168,7 @@ export default async function BlogIndex({ searchParams }: PageProps) {
               <span>|</span>
               <span>mendhu.tech/blog</span>
               <span>|</span>
-              <a href="https://blog.mendhu.tech" className="hover:text-accent transition-colors" target="_blank" rel="noopener noreferrer">hashnode ↗</a>
+              <a href="https://atharvarta.hashnode.dev/" className="hover:text-accent transition-colors" target="_blank" rel="noopener noreferrer">hashnode ↗</a>
             </div>
           </footer>
 

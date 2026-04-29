@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import CustomCursor from "@/components/CustomCursor";
 import BlogSection from "@/components/BlogSection";
 import SystemsLab from "@/components/SystemsLab";
@@ -13,6 +14,7 @@ import DraggablePorygon from '@/components/DraggablePorygon';
 import Terminal from "@/components/Terminal";
 
 export default function Home() {
+  const router = useRouter();
   const [activeModalId, setActiveModalId] = useState<string | null>(null);
   const [isGardenOpen, setIsGardenOpen] = useState(false);
   const [activeGardenFileId, setActiveGardenFileId] = useState<string | undefined>(undefined);
@@ -20,6 +22,7 @@ export default function Home() {
   const [restoredId, setRestoredId] = useState<string | null>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [displayText, setDisplayText] = useState("");
+  const [isNavigatingToBlog, setIsNavigatingToBlog] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -200,8 +203,9 @@ export default function Home() {
               className="px-5 py-2 border border-dashed border-border-strong bg-paper/60 backdrop-blur-md rounded-full shadow-sm hover:text-accent hover:border-accent flex items-center justify-center cursor-pointer font-mono select-none min-w-[130px]"
             >
               <span className="text-[12px] font-normal text-ink text-center flex items-center justify-center">
-                <span>{displayText}</span>
-                <span className="animate-pulse text-accent ml-0.5 font-bold">|</span>
+                <span className="hidden md:inline">{displayText}</span>
+                <span className="inline md:hidden">Search.</span>
+                <span className="animate-pulse text-accent ml-0.5 font-bold hidden md:inline">|</span>
               </span>
             </button>
           </div>
@@ -273,13 +277,16 @@ export default function Home() {
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
                   <span>email ↗</span>
                 </a>
-                <Link 
-                  href="/blog" 
-                  className="group flex items-center gap-2 font-mono text-[11px] text-accent border border-dashed border-accent px-4 py-2 hover:bg-accent-light hover:border-solid transition-all"
+                <button 
+                  onClick={() => {
+                    setIsNavigatingToBlog(true);
+                    setTimeout(() => router.push("/blog"), 500);
+                  }}
+                  className="group flex items-center gap-2 font-mono text-[11px] text-accent border border-dashed border-accent px-4 py-2 hover:bg-accent-light hover:border-solid transition-all cursor-pointer"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5z"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path><path d="M6.5 18H20"></path></svg>
                   <span>blogs ↗</span>
-                </Link>
+                </button>
                 <a 
                   href="https://drive.google.com/file/d/1fRhtpOOUqrIayHYB34IQtjnDG0x1sL3l/view?usp=sharing" 
                   target="_blank"
@@ -359,6 +366,24 @@ export default function Home() {
           setActiveGardenFileId(fileId);
         }}
       />
+
+      {isNavigatingToBlog && (
+        <div 
+          className="fixed inset-0 z-[1000] flex items-center justify-center"
+          style={{
+            backgroundColor: "var(--paper)",
+            animation: "fadeInBlog 0.6s ease-in-out forwards",
+          }}
+        >
+          <div className="font-serif text-[24px] italic text-accent animate-pulse">Entering Intellectual Log...</div>
+          <style>{`
+            @keyframes fadeInBlog {
+              from { opacity: 0; }
+              to { opacity: 1; }
+            }
+          `}</style>
+        </div>
+      )}
     </main>
   );
 }
