@@ -6,6 +6,7 @@ import Link              from "next/link";
 import PostBody          from "@/components/blog/PostBody";
 import TableOfContents   from "@/components/blog/TableOfContents";
 import SeriesNav         from "@/components/blog/SeriesNav";
+import CustomCursor     from "@/components/CustomCursor";
 
 // ── SSG ────────────────────────────────────────────────────────────────────
 export async function generateStaticParams() {
@@ -91,7 +92,8 @@ export default async function PostPage({ params }: { params: { slug: string } })
   };
 
   return (
-    <main>
+    <main className="relative">
+      <CustomCursor />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       {/* Outer shell */}

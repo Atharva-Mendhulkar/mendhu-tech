@@ -1,16 +1,63 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-const logItems = [
-  { text: "CAPS: Context-Aware Agentic Payment System", date: "May 2026", href: "https://github.com/Atharva-Mendhulkar/CAPS" },
-  { text: "AVARA Runtime Governance for LLM Agents", date: "Apr 2026", href: "https://github.com/Atharva-Mendhulkar" },
-  { text: "K-PHD: Linux Kernel Starvation Monitoring", date: "Mar 2026", href: "https://github.com/Atharva-Mendhulkar/K-PHD" }
+interface LogItem {
+  text: string;
+  date: string;
+  href: string;
+}
+
+const FALLBACK_LOGS: LogItem[] = [
+  { text: "AI Agent Security Threats: The Complete Landscape", date: "Apr 2026", href: "/blog/ai-agent-security-threats" },
+  { text: "Building an Offline AR Heritage Guide — Samsung PRISM", date: "Apr 2026", href: "/blog/building-offline-ar-heritage-guide" }
 ];
 
 export default function LogBar() {
-  // Duplicate items for seamless marquee loop
-  const displayItems = [...logItems, ...logItems];
+  const [items, setItems] = useState<LogItem[]>(FALLBACK_LOGS);
+
+  useEffect(() => {
+    async function fetchLatestBlogs() {
+      try {
+        const query = `
+          query {
+            publication(host: "atharva.hashnode.dev") {
+              posts(first: 4) {
+                edges {
+                  node {
+                    title
+                    publishedAt
+                    slug
+                  }
+                }
+              }
+            }
+          }
+        `;
+        const res = await fetch('https://gql.hashnode.com', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query }),
+        });
+        const json = await res.json();
+        const edges = json.data?.publication?.posts?.edges || [];
+        if (edges.length > 0) {
+          const parsed = edges.map((e: any) => ({
+            text: e.node.title,
+            date: new Date(e.node.publishedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+            href: `/blog/${e.node.slug}`
+          }));
+          setItems(parsed);
+        }
+      } catch (err) {
+        console.error("LogBar fetch failed:", err);
+      }
+    }
+    fetchLatestBlogs();
+  }, []);
+
+  // Triple items for continuous seamless marquee loop
+  const displayItems = [...items, ...items, ...items];
 
   return (
     <div className="log-bar sticky top-0 z-[100] border-b border-dashed border-[rgba(0,71,255,0.3)] bg-[rgba(253,253,251,0.92)] backdrop-blur-[4px] overflow-hidden">
@@ -28,8 +75,6 @@ export default function LogBar() {
             <div className="w-[3px] h-[3px] rounded-full bg-accent" />
             <a 
               href={item.href} 
-              target="_blank" 
-              rel="noopener noreferrer"
               className="group hover:text-ink transition-colors"
             >
               <span className="border-b border-dashed border-border-strong group-hover:border-accent text-ink pb-0.5 transition-colors">{item.text}</span> — {item.date}

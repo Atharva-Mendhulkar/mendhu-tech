@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 const HASHNODE_QUERY = `
   query {
-    publication(host: "blog.mendhu.tech") {
+    publication(host: "atharva.hashnode.dev") {
       posts(first: 2) {
         edges {
           node {
@@ -33,20 +33,20 @@ interface Post {
 
 const FALLBACK_POSTS: Post[] = [
   {
-    title: "Physics-Informed Neural Networks for Urban Air Quality Modeling",
-    brief: "Exploring the intersection of fluid dynamics and deep learning...",
-    publishedAt: new Date().toISOString(),
-    tags: [{ name: 'PM2.5' }, { name: 'PDE' }, { name: 'ML' }],
-    readTimeInMinutes: 12,
-    slug: "physics-informed-neural-networks-urban-air-quality"
+    title: "AI Agent Security Threats: The Complete Landscape, Real Risks, and Why Most Defenses Fail",
+    brief: "Autonomous AI agents are no longer experimental. They are deployed across production systems with access to APIs...",
+    publishedAt: "2026-04-29T00:00:00.000Z",
+    tags: [{ name: 'Security' }, { name: 'AI' }, { name: 'Agents' }],
+    readTimeInMinutes: 15,
+    slug: "ai-agent-security-threats"
   },
   {
-    title: "Architecting AVARA: Runtime Security for Autonomous AI Agents",
-    brief: "Developing a governance layer for machine-speed agent ecosystems...",
-    publishedAt: new Date().toISOString(),
-    tags: [{ name: 'Security' }, { name: 'AI' }],
-    readTimeInMinutes: 8,
-    slug: "architecting-avara-runtime-security"
+    title: "Building an Offline AR Heritage Guide — From Hackathon Idea to Samsung PRISM Finalist",
+    brief: "Most campus tours are forgettable. This is the story of how we built an offline-first augmented reality system...",
+    publishedAt: "2026-04-28T00:00:00.000Z",
+    tags: [{ name: 'AR' }, { name: 'Android' }, { name: 'Mobile' }],
+    readTimeInMinutes: 10,
+    slug: "building-offline-ar-heritage-guide"
   }
 ];
 
@@ -63,8 +63,16 @@ export default function BlogSection() {
         });
         const json = await response.json();
         const fetchedPosts = json.data?.publication?.posts?.edges?.map((e: any) => e.node) || [];
-        if (fetchedPosts.length > 0) {
-          setPosts(fetchedPosts);
+        
+        // Filter for featured tags specifically
+        const featured = fetchedPosts.filter((p: any) => 
+          p.tags?.some((t: any) => t.name.toLowerCase() === 'featured')
+        );
+
+        if (featured.length > 0) {
+          setPosts(featured);
+        } else if (fetchedPosts.length > 0) {
+          setPosts(fetchedPosts.slice(0, 4)); // newest 4 additions
         }
       } catch (err) {
         console.error('Error fetching Hashnode posts:', err);
