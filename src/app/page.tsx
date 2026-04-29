@@ -30,7 +30,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const phrases = ["Search", "[Ctrl + `]"];
+    const phrases = ["Click Here", "[Ctrl + `]"];
     let currentPhraseIndex = 0;
     let currentText = "";
     let isDeletingText = false;

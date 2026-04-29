@@ -8,6 +8,8 @@ import TableOfContents   from "@/components/blog/TableOfContents";
 import SeriesNav         from "@/components/blog/SeriesNav";
 import CustomCursor     from "@/components/CustomCursor";
 
+export const dynamic = "force-dynamic";
+
 // ── SSG ────────────────────────────────────────────────────────────────────
 export async function generateStaticParams() {
   try {
@@ -23,13 +25,14 @@ export async function generateStaticParams() {
 export const revalidate = 3600;
 
 // ── Metadata ────────────────────────────────────────────────────────────────
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const post = await getPost(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> | { slug: string } }): Promise<Metadata> {
+  const resolvedParams = await params;
+  const post = await getPost(resolvedParams.slug);
   if (!post) return { title: "Post not found" };
 
   const seoTitle = post.seo?.title ?? `${post.title} — Atharva Mendhulkar`;
   const seoDesc  = post.seo?.description ?? post.brief;
-  const url      = `https://mendhu.tech/blog/${post.slug}`;
+  const url      = `https://mendhu.tech/blog/${resolvedParams.slug}`;
 
   return {
     title:       seoTitle,
@@ -58,11 +61,12 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 // ── Page ────────────────────────────────────────────────────────────────────
-export default async function PostPage({ params }: { params: { slug: string } }) {
-  const post = await getPost(params.slug);
+export default async function PostPage({ params }: { params: Promise<{ slug: string }> | { slug: string } }) {
+  const resolvedParams = await params;
+  const post = await getPost(resolvedParams.slug);
   if (!post) notFound();
 
-  const related = await getRelatedPosts(post.slug, post.tags, 2);
+  const related = await getRelatedPosts(resolvedParams.slug, post.tags, 2);
 
   // JSON-LD structured data
   const jsonLd = {

@@ -1,8 +1,9 @@
 // lib/hashnode.ts
 // Typed GraphQL client for Hashnode API → mendhu.tech/blog
+import { localBlogs } from "@/lib/localBlogs";
 
 const ENDPOINT = "https://gql.hashnode.com";
-const HOST     = "atharva.hashnode.dev";
+const HOST     = "atharvarta.hashnode.dev";
 
 // ── Core fetcher — ISR revalidates every hour ──────────────────────────────
 async function gql<T>(query: string, variables: Record<string, unknown> = {}): Promise<T> {
@@ -77,14 +78,16 @@ export async function getAllPosts(): Promise<Post[]> {
       }
     }
   `);
-  if (!data || !data.publication) {
-    console.error(`Invalid HOST or publication missing: ${HOST}`);
-    return [];
+  const remotePosts = data?.publication?.posts?.edges?.map(e => e.node) || [];
+  const localPosts  = localBlogs;
+  
+  const combined = [...remotePosts];
+  for (const lp of localPosts) {
+    if (!combined.some(p => p.slug === lp.slug)) {
+      combined.push(lp as unknown as Post);
+    }
   }
-  if (!data.publication.posts?.edges) {
-    return [];
-  }
-  return data.publication.posts.edges.map(e => e.node);
+  return combined;
 }
 
 /** Single post by slug — for individual post pages */
@@ -107,10 +110,13 @@ export async function getPost(slug: string): Promise<PostWithSeries | null> {
         }
       }
     `, { slug });
-    return data?.publication?.post ?? null;
+    const remote = data?.publication?.post ?? null;
+    if (remote) return remote;
+    
+    return (localBlogs.find(p => p.slug === slug) as unknown as PostWithSeries) ?? null;
   } catch (err) {
     console.error(`getPost error for slug ${slug}:`, err);
-    return null;
+    return (localBlogs.find(p => p.slug === slug) as unknown as PostWithSeries) ?? null;
   }
 }
 

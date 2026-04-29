@@ -23,11 +23,12 @@ const FILTERS = [
 ];
 
 interface PageProps {
-  searchParams: { tag?: string };
+  searchParams: Promise<{ tag?: string }> | { tag?: string };
 }
 
 export default async function BlogIndex({ searchParams }: PageProps) {
-  const activeTag = searchParams.tag ?? "all";
+  const resolvedSearchParams = await searchParams;
+  const activeTag = resolvedSearchParams.tag ?? "all";
   const allPosts  = await getAllPosts();
   const posts     = activeTag === "all"
     ? allPosts
