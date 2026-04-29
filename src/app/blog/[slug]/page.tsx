@@ -39,6 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     description: seoDesc,
     keywords:    [...post.tags.map(t => t.name), "Atharva Mendhulkar", "Atharva blogs", "Atharva Mendhulkar blogs", "mendhu blogs", "engineering blog"],
     authors:     [{ name: "Atharva Mendhulkar", url: "https://mendhu.tech" }],
+    alternates:  { canonical: url },
     openGraph: {
       title:         post.title,
       description:   seoDesc,
@@ -56,7 +57,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       description: seoDesc,
       images:      post.coverImage ? [post.coverImage.url] : ["/og-default.png"],
     },
-    alternates: { canonical: url },
   };
 }
 
