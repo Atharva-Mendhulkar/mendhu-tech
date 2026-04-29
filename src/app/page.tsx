@@ -162,13 +162,23 @@ export default function Home() {
               className="select-none pointer-events-none mb-[-12px] md:mr-[-35px]"
             >
               {/* Text at the top */}
+              <style>{`
+                @keyframes handWiggle {
+                  0%, 100% { transform: rotate(-2deg) translate(0, 0); }
+                  33% { transform: rotate(-1deg) translate(0.5px, -0.5px); }
+                  66% { transform: rotate(-3deg) translate(-0.5px, 0.5px); }
+                }
+                .hand-drawn-wiggle {
+                  animation: handWiggle 1.2s ease-in-out infinite;
+                  transform-origin: 50px 25px;
+                }
+              `}</style>
               <text 
                 x="10" 
                 y="30" 
                 fill="var(--accent)" 
-                className="text-[26px] md:text-[16px]"
+                className="text-[26px] md:text-[16px] hand-drawn-wiggle"
                 fontFamily="Caveat, cursive"
-                transform="rotate(-2 10,30)"
                 opacity="0.85"
               >
                 need to find something fast?
