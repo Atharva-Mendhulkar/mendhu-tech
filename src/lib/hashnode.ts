@@ -29,7 +29,7 @@ async function gql<T>(query: string, variables: Record<string, unknown> = {}): P
 }
 
 // ── Types ──────────────────────────────────────────────────────────────────
-export interface Tag   { name: string; slug: string }
+export interface Tag   { name: string; slug?: string }
 export interface Series {
   name:  string;
   slug:  string;
@@ -58,7 +58,7 @@ export interface PostWithSeries extends Post {
 const POST_CARD_FIELDS = `
   title slug brief publishedAt updatedAt
   readTimeInMinutes
-  tags { name slug }
+  tags { name }
   coverImage { url }
   series { name slug }
 `;

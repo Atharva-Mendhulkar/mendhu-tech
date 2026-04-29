@@ -68,7 +68,7 @@ export default async function BlogIndex({ searchParams }: PageProps) {
 
           {/* Header */}
           <h1 className="font-serif text-[42px] font-normal tracking-[-0.02em] leading-[1.1] mb-3 text-ink">
-            Research & Build Logs
+            Blogs
           </h1>
           <p className="font-mono text-[12px] text-ink-muted mb-10 max-w-[520px]">
             Physics-informed ML · Linux kernel systems · AI agent security · SaaS engineering.
@@ -135,9 +135,10 @@ export default async function BlogIndex({ searchParams }: PageProps) {
                           {/* Tags */}
                           <div className="flex gap-2 flex-wrap">
                             {post.tags.map(tag => {
-                              const c = TAG_COLORS[tag.slug] ?? defaultTagColor;
+                              const tSlug = tag.slug || tag.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+                              const c = TAG_COLORS[tSlug] ?? defaultTagColor;
                               return (
-                                <span key={tag.slug} className="font-mono text-[9px] px-2 py-0.5"
+                                <span key={tSlug} className="font-mono text-[9px] px-2 py-0.5"
                                   style={{ background: c.bg, border: `1px dashed ${c.border}`, color: c.text, borderRadius: 2 }}>
                                   {tag.name}
                                 </span>

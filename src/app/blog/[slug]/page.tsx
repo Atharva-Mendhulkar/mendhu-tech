@@ -113,7 +113,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           {/* Two-column layout with left gutter: spacer + prose + sticky ToC */}
           <div className="flex gap-0">
             {/* Left Gutter spacer */}
-            <div className="hidden md:block md:w-16 lg:w-24 border-r border-dashed border-border-strong/30 relative" aria-hidden />
+            <div className="hidden md:block md:w-16 lg:w-24 border-r border-dashed border-border-strong relative" aria-hidden />
 
             {/* article */}
             <article className="flex-1 min-w-0 px-8 lg:px-16 py-16">
@@ -151,9 +151,10 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
               {/* Tags */}
               <div className="flex gap-2 flex-wrap mb-8">
                 {post.tags.map(tag => {
-                  const c = TAG_COLORS[tag.slug] ?? defaultTagColor;
+                  const tSlug = tag.slug || tag.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+                  const c = TAG_COLORS[tSlug] ?? defaultTagColor;
                   return (
-                    <Link key={tag.slug} href={`/blog?tag=${tag.slug}`}
+                    <Link key={tSlug} href={`/blog?tag=${tSlug}`}
                       className="font-mono text-[9px] px-2 py-0.5 hover:border-solid transition-all"
                       style={{ background: c.bg, border: `1px dashed ${c.border}`, color: c.text, borderRadius: 2 }}>
                       {tag.name}
@@ -187,7 +188,8 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                   <div className="section-tag mb-6">[related_posts]</div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {related.map(r => {
-                      const c = r.tags[0] ? (TAG_COLORS[r.tags[0].slug] ?? defaultTagColor) : defaultTagColor;
+                      const rSlug = r.tags[0] ? (r.tags[0].slug || r.tags[0].name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")) : "";
+                      const c = rSlug ? (TAG_COLORS[rSlug] ?? defaultTagColor) : defaultTagColor;
                       return (
                         <Link key={r.slug} href={`/blog/${r.slug}`}
                           className="block p-4 border border-dashed border-border-strong hover:border-solid transition-all"
