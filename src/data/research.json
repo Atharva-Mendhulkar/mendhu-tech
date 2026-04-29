@@ -171,11 +171,15 @@
     },
     {
       "id": "deterministic-control-plane",
-      "name": "deterministic-control-plane",
-      "group": "general",
-      "color": "#BDBDBD",
-      "description": "",
-      "tags": []
+      "name": "deterministic control plane",
+      "group": "ai",
+      "description": "an orchestration layer that enforces predictable, rule-driven behavior across distributed or autonomous systems.",
+      "tags": [
+        "ai",
+        "agents",
+        "infrastructure",
+        "security"
+      ]
     },
     {
       "id": "distributed-systems",
@@ -1110,10 +1114,10 @@
       "html": "\n# Control Plane vs Data Plane\n\nSystems separate:\n\n* Control Plane → decisions, policies\n* Data Plane → execution\n\nCore Features\n\n* clear separation of concerns\n* scalable execution\n* centralized decision logic\n\nIntegration\n\nCore to:\n\n* <span class=\"wiki-link\" data-id=\"policy-engine\">policy-engine</span>\n* <span class=\"wiki-link\" data-id=\"reasoning-vs-execution\">reasoning-vs-execution</span>\n\n```mermaid\nflowchart LR\n    Control --> Decision --> Data --> Execution\n```\n\nSee also\n\n* <span class=\"wiki-link\" data-id=\"deterministic-control-plane\">deterministic-control-plane</span>\n"
     },
     "deterministic-control-plane": {
-      "title": "deterministic-control-plane",
+      "title": "deterministic control plane",
       "header": "deterministic-control-plane.md",
-      "markdown": "",
-      "html": ""
+      "markdown": "# **Deterministic Control Plane**\n\nA deterministic control plane is an orchestration layer that enforces predictable, rule-driven behavior across distributed or autonomous systems.\n\nInstead of relying on probabilistic or emergent decisions, it uses explicit policies, state machines, and verifiable workflows to ensure consistent execution, auditability, and safety, especially in complex environments like AI agents or distributed infrastructure.\n\n  \n\n",
+      "html": "# **Deterministic Control Plane**\n\nA deterministic control plane is an orchestration layer that enforces predictable, rule-driven behavior across distributed or autonomous systems.\n\nInstead of relying on probabilistic or emergent decisions, it uses explicit policies, state machines, and verifiable workflows to ensure consistent execution, auditability, and safety, especially in complex environments like AI agents or distributed infrastructure.\n\n  \n\n"
     },
     "distributed-systems": {
       "title": "Distributed Systems",
