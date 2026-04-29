@@ -18,7 +18,12 @@ export default function Home() {
   const [minimizedItems, setMinimizedItems] = useState<{ id: string, title: string, type: 'garden' | 'project' }[]>([]);
   const [restoredId, setRestoredId] = useState<string | null>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [showShortcut, setShowShortcut] = useState(false);
+  
+  // Typewriter Loop
+  const phrases = ["Search", "[Ctrl + `]"];
+  const [displayText, setDisplayText] = useState("");
+  const [phraseIndex, setPhraseIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,11 +35,32 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setShowShortcut(prev => !prev);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
+    let timer: NodeJS.Timeout;
+    const currentPhrase = phrases[phraseIndex];
+    
+    const handleType = () => {
+      if (!isDeleting) {
+        setDisplayText(currentPhrase.substring(0, displayText.length + 1));
+        if (displayText.length + 1 === currentPhrase.length) {
+          timer = setTimeout(() => setIsDeleting(true), 2500);
+          return;
+        }
+      } else {
+        setDisplayText(currentPhrase.substring(0, displayText.length - 1));
+        if (displayText.length === 0) {
+          setIsDeleting(false);
+          setPhraseIndex((prev) => (prev + 1) % phrases.length);
+          return;
+        }
+      }
+      
+      const speed = isDeleting ? 40 : 80;
+      timer = setTimeout(handleType, speed);
+    };
+
+    timer = setTimeout(handleType, isDeleting ? 40 : 80);
+    return () => clearTimeout(timer);
+  }, [displayText, isDeleting, phraseIndex]);
 
   const handleMinimizeModal = (id: string, title: string, type: 'garden' | 'project') => {
     if (type === 'garden') setIsGardenOpen(false);
@@ -163,10 +189,11 @@ export default function Home() {
             {/* Pill Button */}
             <button 
               onClick={() => window.dispatchEvent(new Event('toggle-terminal'))}
-              className="px-5 py-2 border border-dashed border-border-strong bg-paper/60 backdrop-blur-md rounded-full shadow-sm hover:text-accent hover:border-accent flex items-center justify-center cursor-pointer font-mono select-none min-w-[120px]"
+              className="px-5 py-2 border border-dashed border-border-strong bg-paper/60 backdrop-blur-md rounded-full shadow-sm hover:text-accent hover:border-accent flex items-center justify-center cursor-pointer font-mono select-none min-w-[130px]"
             >
-              <span className="text-[12px] font-normal text-ink text-center">
-                {showShortcut ? "[Ctrl + `]" : "Search"}
+              <span className="text-[12px] font-normal text-ink text-center flex items-center justify-center">
+                <span>{displayText}</span>
+                <span className="animate-pulse text-accent ml-0.5 font-bold">|</span>
               </span>
             </button>
           </div>
