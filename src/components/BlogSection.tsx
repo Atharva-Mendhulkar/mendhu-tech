@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 const HASHNODE_QUERY = `
   query {
@@ -13,7 +14,7 @@ const HASHNODE_QUERY = `
             publishedAt
             tags { name }
             readTimeInMinutes
-            url
+            slug
           }
         }
       }
@@ -27,7 +28,7 @@ interface Post {
   publishedAt: string;
   tags: { name: string }[];
   readTimeInMinutes: number;
-  url: string;
+  slug: string;
 }
 
 const FALLBACK_POSTS: Post[] = [
@@ -37,7 +38,7 @@ const FALLBACK_POSTS: Post[] = [
     publishedAt: new Date().toISOString(),
     tags: [{ name: 'PM2.5' }, { name: 'PDE' }, { name: 'ML' }],
     readTimeInMinutes: 12,
-    url: "https://blog.mendhu.tech"
+    slug: "physics-informed-neural-networks-urban-air-quality"
   },
   {
     title: "Architecting AVARA: Runtime Security for Autonomous AI Agents",
@@ -45,12 +46,11 @@ const FALLBACK_POSTS: Post[] = [
     publishedAt: new Date().toISOString(),
     tags: [{ name: 'Security' }, { name: 'AI' }],
     readTimeInMinutes: 8,
-    url: "https://blog.mendhu.tech"
+    slug: "architecting-avara-runtime-security"
   }
 ];
 
 export default function BlogSection() {
-  // Start with fallback data immediately — no empty state
   const [posts, setPosts] = useState<Post[]>(FALLBACK_POSTS);
 
   useEffect(() => {
@@ -68,7 +68,6 @@ export default function BlogSection() {
         }
       } catch (err) {
         console.error('Error fetching Hashnode posts:', err);
-        // Keep fallback data
       }
     }
     fetchPosts();
@@ -85,11 +84,9 @@ export default function BlogSection() {
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-[10px]">
         {posts.map((post, i) => (
-          <a 
+          <Link 
             key={i}
-            href={post.url}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={`/blog/${post.slug}`}
             className="fade-in border border-dashed border-border-strong p-8 bg-[rgba(253,253,251,0.72)] hover:bg-[rgba(0,71,255,0.025)] hover:border-solid hover:border-accent transition-all duration-300 flex flex-col justify-between group cursor-pointer relative rounded-2xl overflow-hidden"
           >
             {/* Corner Marks */}
@@ -98,7 +95,7 @@ export default function BlogSection() {
             
             <div className="relative z-10">
               <div className="font-mono text-[9.5px] text-ink-faint mb-2 tracking-wider uppercase">
-                latest draft · blog.mendhu.tech
+                latest draft · mendhu.tech/blog
               </div>
               <div className="font-serif text-[18px] text-ink font-medium mb-4 group-hover:text-accent transition-colors italic leading-snug">
                 {post.title}
@@ -118,7 +115,7 @@ export default function BlogSection() {
                 Read →
               </div>
             </div>
-          </a>
+          </Link>
         ))}
       </div>
     </section>
