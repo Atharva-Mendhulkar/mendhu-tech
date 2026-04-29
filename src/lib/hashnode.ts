@@ -1,5 +1,5 @@
 // lib/hashnode.ts
-// Typed GraphQL client for Hashnode API → mendhu.tech/blog
+import { localBlogs } from './localBlogs';
 
 const ENDPOINT = "https://gql.hashnode.com";
 const HOST     = "atharvarta.hashnode.dev";
@@ -67,21 +67,48 @@ const POST_CARD_FIELDS = `
 
 /** All posts — for index page + generateStaticParams */
 export async function getAllPosts(): Promise<Post[]> {
-  const data = await gql<{
-    publication: {
-      posts: { edges: { node: Post }[] }
-    } | null
-  }>(`
-    query {
-      publication(host: "${HOST}") {
-        posts(first: 50) {
-          edges { node { ${POST_CARD_FIELDS} } }
+  let remotePosts: Post[] = [];
+  try {
+    const data = await gql<{
+      publication: {
+        posts: { edges: { node: Post }[] }
+      } | null
+    }>(`
+      query {
+        publication(host: "${HOST}") {
+          posts(first: 50) {
+            edges { node { ${POST_CARD_FIELDS} } }
+          }
         }
       }
+    `);
+    remotePosts = data?.publication?.posts?.edges?.map(e => e.node) || [];
+  } catch (err) {
+    console.error("Hashnode API failed, using fallback:", err);
+  }
+
+  // Map localBlogs to standard Post type
+  const localMapped: Post[] = localBlogs.map(lb => ({
+    title: lb.title,
+    slug: lb.slug,
+    brief: lb.brief,
+    publishedAt: lb.publishedAt,
+    updatedAt: lb.updatedAt,
+    readTimeInMinutes: lb.readTimeInMinutes,
+    tags: lb.tags,
+    coverImage: null,
+    series: lb.series || null
+  }));
+
+  // Merge datasets ensuring no duplicate slugs
+  const combined = [...remotePosts];
+  for (const local of localMapped) {
+    if (!combined.some(p => p.slug === local.slug)) {
+      combined.push(local);
     }
-  `);
-  const remotePosts = data?.publication?.posts?.edges?.map(e => e.node) || [];
-  return remotePosts;
+  }
+
+  return combined;
 }
 
 /** Single post by slug — for individual post pages */
@@ -104,11 +131,43 @@ export async function getPost(slug: string): Promise<PostWithSeries | null> {
         }
       }
     `, { slug });
-    return data?.publication?.post ?? null;
+    
+    if (data?.publication?.post) {
+      return data.publication.post;
+    }
   } catch (err) {
-    console.error(`getPost error for slug ${slug}:`, err);
-    return null;
+    console.error(`Hashnode getPost failed for slug ${slug}:`, err);
   }
+
+  // Look for it in localBlogs as fallback
+  const local = localBlogs.find(lb => lb.slug === slug);
+  if (local) {
+    return {
+      title: local.title,
+      slug: local.slug,
+      brief: local.brief,
+      publishedAt: local.publishedAt,
+      updatedAt: local.updatedAt,
+      readTimeInMinutes: local.readTimeInMinutes,
+      tags: local.tags,
+      coverImage: null,
+      series: local.series ? {
+        name: local.series.name,
+        slug: local.series.slug,
+        posts: { edges: [] }
+      } : null,
+      content: {
+        html: local.content,
+        markdown: local.content
+      },
+      seo: {
+        title: local.title,
+        description: local.brief
+      }
+    };
+  }
+
+  return null;
 }
 
 /** Posts by tag slug — for tag filter on index */
