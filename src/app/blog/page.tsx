@@ -30,21 +30,14 @@ export default async function BlogIndex({ searchParams }: PageProps) {
   const activeTag = resolvedSearchParams.tag ?? "all";
   const allPosts  = await getAllPosts();
 
-  // Extract unique tags dynamically from live posts
-  const dynamicTagsMap = new Map<string, string>();
-  allPosts.forEach(post => {
-    post.tags.forEach(t => {
-      const tSlug = t.slug || t.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-      dynamicTagsMap.set(tSlug, t.name);
-    });
-  });
-
-  const dynamicFilters = [
-    { label: "all", slug: "all" },
-    ...Array.from(dynamicTagsMap.entries()).map(([slug, name]) => ({
-      label: name.toLowerCase(),
-      slug: slug
-    }))
+  const FILTERS = [
+    { label: "all",             slug: "all"             },
+    { label: "build-log",       slug: "build-log"       },
+    { label: "deep-dive",       slug: "deep-dive"       },
+    { label: "research",        slug: "research"        },
+    { label: "paper-companion", slug: "paper-companion" },
+    { label: "notes",           slug: "notes"           },
+    { label: "explained",       slug: "explained"       },
   ];
 
   const posts     = activeTag === "all"
@@ -83,7 +76,7 @@ export default async function BlogIndex({ searchParams }: PageProps) {
           </Link>
 
           {/* Section tag */}
-          <div className="section-tag mb-8">[05_INTELLECTUAL_LOG]</div>
+          <div className="section-tag mb-8">[02_INTELLECTUAL_LOG]</div>
 
           {/* Header */}
           <h1 className="font-serif text-[42px] font-normal tracking-[-0.02em] leading-[1.1] mb-3 text-ink">
@@ -96,7 +89,7 @@ export default async function BlogIndex({ searchParams }: PageProps) {
 
           {/* Tag filters */}
           <div className="flex gap-2 flex-wrap mb-12">
-            {dynamicFilters.map((f: { label: string; slug: string }) => {
+            {FILTERS.map((f: { label: string; slug: string }) => {
               const isActive = f.slug === activeTag;
               const col = f.slug !== "all" ? (TAG_COLORS[f.slug] ?? defaultTagColor) : null;
               return (

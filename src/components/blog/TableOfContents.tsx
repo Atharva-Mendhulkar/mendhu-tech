@@ -82,7 +82,19 @@ export default function TableOfContents({ html }: { html: string }) {
               }}
               onClick={e => {
                 e.preventDefault();
-                document.getElementById(h.id)?.scrollIntoView({ behavior: "smooth" });
+                const el = document.getElementById(h.id);
+                if (el) {
+                  const offset = 40; // padding offset
+                  const bodyRect = document.body.getBoundingClientRect().top;
+                  const elementRect = el.getBoundingClientRect().top;
+                  const elementPosition = elementRect - bodyRect;
+                  const offsetPosition = elementPosition - offset;
+
+                  window.scrollTo({
+                    top: offsetPosition,
+                    behavior: "smooth"
+                  });
+                }
               }}
             >
               {h.text.length > 36 ? h.text.slice(0, 33) + "…" : h.text}
