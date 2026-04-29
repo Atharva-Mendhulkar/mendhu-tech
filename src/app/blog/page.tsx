@@ -23,6 +23,8 @@ const FILTERS = [
   { label: "paper-companion", slug: "paper-companion" },
 ];
 
+export const revalidate = 3600;
+
 interface PageProps {
   searchParams: Promise<{ tag?: string }> | { tag?: string };
 }

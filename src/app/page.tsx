@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from 'next/link';
 import CustomCursor from "@/components/CustomCursor";
 import BlogSection from "@/components/BlogSection";
 import SystemsLab from "@/components/SystemsLab";
@@ -272,6 +273,13 @@ export default function Home() {
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
                   <span>email ↗</span>
                 </a>
+                <Link 
+                  href="/blog" 
+                  className="group flex items-center gap-2 font-mono text-[11px] text-accent border border-dashed border-accent px-4 py-2 hover:bg-accent-light hover:border-solid transition-all"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5z"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path><path d="M6.5 18H20"></path></svg>
+                  <span>blogs ↗</span>
+                </Link>
                 <a 
                   href="https://drive.google.com/file/d/1fRhtpOOUqrIayHYB34IQtjnDG0x1sL3l/view?usp=sharing" 
                   target="_blank"
