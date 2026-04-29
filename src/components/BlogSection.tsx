@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 const HASHNODE_QUERY = `
   query {
-    publication(host: "atharva.hashnode.dev") {
+    publication(host: "atharvarta.hashnode.dev") {
       posts(first: 2) {
         edges {
           node {
@@ -39,7 +39,10 @@ export default function BlogSection() {
       try {
         const response = await fetch('https://gql.hashnode.com', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': '0cb3d74f-1448-421d-b181-962fd449b69e'
+          },
           body: JSON.stringify({ query: HASHNODE_QUERY }),
         });
         const json = await response.json();
@@ -51,9 +54,9 @@ export default function BlogSection() {
         );
 
         if (featured.length > 0) {
-          setPosts(featured);
+          setPosts(featured.slice(0, 2));
         } else if (fetchedPosts.length > 0) {
-          setPosts(fetchedPosts.slice(0, 4)); // newest 4 additions
+          setPosts(fetchedPosts.slice(0, 2)); // newest 2 additions
         }
       } catch (err) {
         console.error('Error fetching Hashnode posts:', err);

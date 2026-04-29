@@ -32,7 +32,13 @@ export default function PostBody({ html }: Props) {
       {isHtml ? (
         <div
           className="post-body"
-          dangerouslySetInnerHTML={{ __html: html }}
+          dangerouslySetInnerHTML={{ 
+            __html: html.replace(/<h([23])([^>]*)>([\s\S]*?)<\/h\1>/gi, (match, level, attrs, text) => {
+              const cleanText = text.replace(/<[^>]*>/g, '').trim();
+              const id = cleanText.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+              return `<h${level} id="${id}"${attrs}>${text}</h${level}>`;
+            })
+          }}
         />
       ) : (
         <div className="post-body">
