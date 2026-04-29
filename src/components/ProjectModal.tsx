@@ -117,7 +117,7 @@ export default function ProjectModal({ activeId, onClose, onMinimize, skipBoot }
             <div className="w-3 h-3 rounded-full border border-green-500/30 bg-green-500/10" />
           </div>
           
-          <div className="flex-1 text-center font-mono text-[10px] text-ink-faint uppercase tracking-[0.2em] flex items-center justify-center gap-2">
+          <div className="flex-1 text-center font-mono text-[10px] text-ink-faint uppercase tracking-[0.2em] hidden sm:flex items-center justify-center gap-2">
             <Terminal size={12} />
             {project.slug}.sys_inspect
           </div>
