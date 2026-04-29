@@ -18,6 +18,7 @@ export default function Home() {
   const [minimizedItems, setMinimizedItems] = useState<{ id: string, title: string, type: 'garden' | 'project' }[]>([]);
   const [restoredId, setRestoredId] = useState<string | null>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [showShortcut, setShowShortcut] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,6 +27,13 @@ export default function Home() {
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setShowShortcut(prev => !prev);
+    }, 3000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleMinimizeModal = (id: string, title: string, type: 'garden' | 'project') => {
@@ -155,10 +163,11 @@ export default function Home() {
             {/* Pill Button */}
             <button 
               onClick={() => window.dispatchEvent(new Event('toggle-terminal'))}
-              className="px-5 py-2 border border-dashed border-border-strong bg-paper/80 backdrop-blur-sm rounded-full shadow-sm hover:text-accent hover:border-accent flex items-center gap-3 transition-all cursor-pointer font-mono select-none"
+              className="px-5 py-2 border border-dashed border-border-strong bg-paper/60 backdrop-blur-md rounded-full shadow-sm hover:text-accent hover:border-accent flex items-center justify-center cursor-pointer font-mono select-none min-w-[120px]"
             >
-              <span className="text-[12px] font-normal text-ink">Search</span>
-              <span className="hidden md:inline text-[13px] font-bold text-accent">[Ctrl + `]</span>
+              <span className="text-[12px] font-normal text-ink text-center">
+                {showShortcut ? "[Ctrl + `]" : "Search"}
+              </span>
             </button>
           </div>
 
