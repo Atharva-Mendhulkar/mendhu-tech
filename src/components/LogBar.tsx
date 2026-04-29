@@ -8,10 +8,25 @@ interface LogItem {
   href: string;
 }
 
-export default function LogBar() {
-  const [items, setItems] = useState<LogItem[]>([]);
+interface LogBarProps {
+  mode?: 'blogs' | 'projects';
+}
+
+const FEATURED_PROJECTS: LogItem[] = [
+  { text: "CAPS — Agentic UPI for cross-border fintech payloads", date: "Jan 2025", href: "#" },
+  { text: "AVARA — Agent Runtime Security Authority mapping", date: "Nov 2024", href: "#" },
+  { text: "K-PHD — Kernel Predictive Hang Detector for Linux subsystems", date: "Sep 2024", href: "#" }
+];
+
+export default function LogBar({ mode = 'blogs' }: LogBarProps) {
+  const [items, setItems] = useState<LogItem[]>(mode === 'projects' ? FEATURED_PROJECTS : []);
 
   useEffect(() => {
+    if (mode === 'projects') {
+      setItems(FEATURED_PROJECTS);
+      return;
+    }
+
     async function fetchLatestBlogs() {
       try {
         const query = `
@@ -52,7 +67,7 @@ export default function LogBar() {
       }
     }
     fetchLatestBlogs();
-  }, []);
+  }, [mode]);
 
   // Triple items for continuous seamless marquee loop
   const displayItems = [...items, ...items, ...items];

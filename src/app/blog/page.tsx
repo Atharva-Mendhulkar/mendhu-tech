@@ -3,6 +3,7 @@ import { getAllPosts, formatDate, TAG_COLORS, defaultTagColor } from "@/lib/hash
 import type { Metadata } from "next";
 import Link from "next/link";
 import CustomCursor from "@/components/CustomCursor";
+import LogBar from "@/components/LogBar";
 
 export const metadata: Metadata = {
   title: "Atharva Mendhulkar Blogs | Technical Essays & ML Research",
@@ -50,6 +51,7 @@ export default async function BlogIndex({ searchParams }: PageProps) {
   return (
     <main className="relative">
       <CustomCursor />
+      <LogBar mode="blogs" />
       {/* Outer shell — same as portfolio, body dot grid shows on margins */}
       <div className="max-w-[960px] mx-auto border-x border-dashed border-border-strong min-h-screen relative">
 

@@ -50,7 +50,8 @@ type CommandItem  = typeof COMMANDS[number];
 type ResultItem   =
   | { kind: "project"; item: ProjectItem }
   | { kind: "garden";  item: GardenItem  }
-  | { kind: "command"; item: CommandItem };
+  | { kind: "command"; item: CommandItem }
+  | { kind: "blog";    item: { id: string; name: string; desc: string; keywords: string[] } };
 
 interface SpotlightProps {
   onOpenProject: (id: string) => void;
@@ -100,9 +101,55 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
   const [query,  setQuery]  = useState("");
   const [cursor, setCursor] = useState(0);
   const [mode,   setMode]   = useState<"all" | "garden">("all");
+  const [blogs,  setBlogs]  = useState<{ id: string; name: string; desc: string; keywords: string[] }[]>([]);
   
   // Pagination limits for 'Show More'
   const [visibleCount, setVisibleCount] = useState(5);
+
+  useEffect(() => {
+    async function fetchBlogs() {
+      try {
+        const queryGql = `
+          query {
+            publication(host: "atharvarta.hashnode.dev") {
+              posts(first: 20) {
+                edges {
+                  node {
+                    title
+                    brief
+                    slug
+                    tags { name }
+                  }
+                }
+              }
+            }
+          }
+        `;
+        const res = await fetch('https://gql.hashnode.com', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': '0cb3d74f-1448-421d-b181-962fd449b69e'
+          },
+          body: JSON.stringify({ query: queryGql }),
+        });
+        const json = await res.json();
+        const edges = json.data?.publication?.posts?.edges || [];
+        if (edges.length > 0) {
+          const parsed = edges.map((e: any) => ({
+            id: e.node.slug,
+            name: e.node.title,
+            desc: e.node.brief,
+            keywords: e.node.tags ? e.node.tags.map((t: any) => t.name) : []
+          }));
+          setBlogs(parsed);
+        }
+      } catch (err) {
+        console.error('Error fetching blogs for Spotlight:', err);
+      }
+    }
+    fetchBlogs();
+  }, []);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef  = useRef<HTMLDivElement>(null);
@@ -203,6 +250,10 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
       ...availableGarden.map(item => ({
         r: { kind: "garden" as const, item },
         s: scoreItem(q, item.name, item.desc, item.keywords),
+      })),
+      ...blogs.map(item => ({
+        r: { kind: "blog" as const, item },
+        s: q.includes("blog") ? 500 : scoreItem(q, item.name, item.desc, item.keywords),
       })),
     ];
 
@@ -330,6 +381,9 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
         window.open("https://x.com/atharvarta", "_blank");
         close_();
       }
+    } else if (r.kind === "blog") {
+      close_();
+      window.location.href = `/blog/${r.item.id}`;
     }
   };
 
@@ -353,6 +407,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
   const commandResults = results.filter(r => r.kind === "command");
   const projectResults = results.filter(r => r.kind === "project");
   const gardenResults  = results.filter(r => r.kind === "garden");
+  const blogResults    = results.filter(r => r.kind === "blog");
   const hasResults     = results.length > 0;
 
   return (
@@ -499,6 +554,24 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
                   </>
                 )}
 
+                {/* Blogs section */}
+                {blogResults.length > 0 && (
+                  <>
+                    <SectionHeader label="Blogs" />
+                    {blogResults.slice(0, visibleCount).map(r => (
+                      <Row
+                        key={r.item.id}
+                        r={r}
+                        idx={results.indexOf(r)}
+                        isActive={cursor === results.indexOf(r)}
+                        onClick={() => activate(r)}
+                        onHover={() => setCursor(results.indexOf(r))}
+                        highlight={highlight}
+                      />
+                    ))}
+                  </>
+                )}
+
                 <div className="h-1" />
               </div>
             )}
@@ -575,7 +648,7 @@ function Row({ r, idx, isActive, onClick, onHover, highlight }: {
   onHover: () => void;
   highlight: (t: string) => React.ReactNode;
 }) {
-  const tag = r.kind === "project" ? (r.item as ProjectItem).tag : r.kind === "garden" ? "garden" : "command";
+  const tag = r.kind === "project" ? (r.item as ProjectItem).tag : r.kind === "garden" ? "garden" : r.kind === "blog" ? "blog" : "command";
 
   return (
     <button
@@ -601,7 +674,9 @@ function Row({ r, idx, isActive, onClick, onHover, highlight }: {
             ? <FolderOpen size={14} strokeWidth={1.5} />
             : r.kind === "garden"
               ? <BookOpen size={14} strokeWidth={1.5} />
-              : <TermIcon size={14} strokeWidth={1.5} />}
+              : r.kind === "blog"
+                ? <FileText size={14} strokeWidth={1.5} />
+                : <TermIcon size={14} strokeWidth={1.5} />}
         </span>
       </div>
 
