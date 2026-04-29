@@ -104,7 +104,7 @@ export default function Home() {
                 x="10" 
                 y="30" 
                 fill="var(--accent)" 
-                className="text-[20px] md:text-[16px]"
+                className="text-[26px] md:text-[16px]"
                 fontFamily="Caveat, cursive"
                 transform="rotate(-2 10,30)"
                 opacity="0.85"
