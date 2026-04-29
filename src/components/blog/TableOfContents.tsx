@@ -4,17 +4,35 @@ import { useEffect, useState } from "react";
 
 interface Heading { id: string; text: string; level: 2 | 3 }
 
-function extractHeadings(html: string): Heading[] {
-  if (typeof window === "undefined") return [];
-  const div = document.createElement("div");
-  div.innerHTML = html;
+function extractHeadings(content: string): Heading[] {
+  if (!content) return [];
   const headings: Heading[] = [];
-  div.querySelectorAll("h2, h3").forEach(el => {
-    const text  = el.textContent ?? "";
-    const id    = el.id || text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-    const level = parseInt(el.tagName[1]) as 2 | 3;
-    headings.push({ id, text, level });
-  });
+  
+  // Try Markdown parsing
+  const mdLines = content.split("\n");
+  for (const line of mdLines) {
+    const trimmed = line.trim();
+    const match = trimmed.match(/^(#{2,3})\s+(.+)$/);
+    if (match) {
+      const level = match[1].length as 2 | 3;
+      const text = match[2].trim();
+      const id = text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      headings.push({ id, text, level });
+    }
+  }
+
+  // Fallback to HTML parsing
+  if (headings.length === 0 && typeof window !== "undefined") {
+    const div = document.createElement("div");
+    div.innerHTML = content;
+    div.querySelectorAll("h2, h3").forEach(el => {
+      const text  = el.textContent ?? "";
+      const id    = el.id || text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      const level = parseInt(el.tagName[1]) as 2 | 3;
+      headings.push({ id, text, level });
+    });
+  }
+  
   return headings;
 }
 

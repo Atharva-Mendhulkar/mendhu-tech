@@ -5,11 +5,12 @@ import Link from "next/link";
 import CustomCursor from "@/components/CustomCursor";
 
 export const metadata: Metadata = {
-  title: "Blog — Atharva Mendhulkar",
-  description: "Research explainers, build logs, and technical essays on physics-informed ML, kernel systems, AI security, anything.",
+  title: "Atharva Mendhulkar Blogs | Technical Essays & ML Research",
+  description: "Official blogs of Atharva Mendhulkar. Deep dives in physics-informed ML, distributed networks, AI security architectures, and autonomous agent safety.",
+  keywords: ["Atharva Mendhulkar", "Atharva blogs", "Atharva Mendhulkar blogs", "mendhu blogs", "engineering", "ML Research", "AI Security"],
   openGraph: {
-    title: "Blog — Atharva Mendhulkar",
-    description: "Research explainers, build logs, and technical essays.",
+    title: "Atharva Mendhulkar Blogs | Technical Essays & ML Research",
+    description: "Official blogs of Atharva Mendhulkar. Covering AI, ML, and systems engineering.",
     url: "https://mendhu.tech/blog",
   },
 };

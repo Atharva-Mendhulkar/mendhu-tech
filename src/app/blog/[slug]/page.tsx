@@ -35,9 +35,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const url      = `https://mendhu.tech/blog/${resolvedParams.slug}`;
 
   return {
-    title:       seoTitle,
+    title:       `${post.title} | Atharva Mendhulkar Blogs`,
     description: seoDesc,
-    keywords:    post.tags.map(t => t.name),
+    keywords:    [...post.tags.map(t => t.name), "Atharva Mendhulkar", "Atharva blogs", "Atharva Mendhulkar blogs", "mendhu blogs", "engineering blog"],
     authors:     [{ name: "Atharva Mendhulkar", url: "https://mendhu.tech" }],
     openGraph: {
       title:         post.title,
@@ -110,11 +110,13 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
         <div className="relative" style={{ zIndex: 1 }}>
 
-          {/* Two-column layout: prose + sticky ToC */}
+          {/* Two-column layout with left gutter: spacer + prose + sticky ToC */}
           <div className="flex gap-0">
+            {/* Left Gutter spacer */}
+            <div className="hidden md:block md:w-16 lg:w-24 border-r border-dashed border-border-strong/30 relative" aria-hidden />
 
-            {/* LEFT — article */}
-            <article className="flex-1 min-w-0 px-8 lg:px-12 py-16">
+            {/* article */}
+            <article className="flex-1 min-w-0 px-8 lg:px-16 py-16">
 
               {/* Back */}
               <Link href="/blog" className="font-mono text-[10px] text-ink-faint hover:text-accent transition-colors mb-10 block w-fit"

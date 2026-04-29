@@ -36,7 +36,22 @@ export default function PostBody({ html }: Props) {
         />
       ) : (
         <div className="post-body">
-          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+          <ReactMarkdown 
+            remarkPlugins={[remarkGfm]} 
+            rehypePlugins={[rehypeRaw]}
+            components={{
+              h2: ({ children }) => {
+                const text = Array.isArray(children) ? children.join("") : String(children);
+                const id = text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+                return <h2 id={id}>{children}</h2>;
+              },
+              h3: ({ children }) => {
+                const text = Array.isArray(children) ? children.join("") : String(children);
+                const id = text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+                return <h3 id={id}>{children}</h3>;
+              }
+            }}
+          >
             {html}
           </ReactMarkdown>
         </div>

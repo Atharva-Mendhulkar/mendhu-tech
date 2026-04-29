@@ -31,27 +31,8 @@ interface Post {
   slug: string;
 }
 
-const FALLBACK_POSTS: Post[] = [
-  {
-    title: "AI Agent Security Threats: The Complete Landscape, Real Risks, and Why Most Defenses Fail",
-    brief: "Autonomous AI agents are no longer experimental. They are deployed across production systems with access to APIs...",
-    publishedAt: "2026-04-29T00:00:00.000Z",
-    tags: [{ name: 'Security' }, { name: 'AI' }, { name: 'Agents' }],
-    readTimeInMinutes: 15,
-    slug: "ai-agent-security-threats"
-  },
-  {
-    title: "Building an Offline AR Heritage Guide — From Hackathon Idea to Samsung PRISM Finalist",
-    brief: "Most campus tours are forgettable. This is the story of how we built an offline-first augmented reality system...",
-    publishedAt: "2026-04-28T00:00:00.000Z",
-    tags: [{ name: 'AR' }, { name: 'Android' }, { name: 'Mobile' }],
-    readTimeInMinutes: 10,
-    slug: "building-offline-ar-heritage-guide"
-  }
-];
-
 export default function BlogSection() {
-  const [posts, setPosts] = useState<Post[]>(FALLBACK_POSTS);
+  const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
     async function fetchPosts() {

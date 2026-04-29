@@ -8,21 +8,16 @@ interface LogItem {
   href: string;
 }
 
-const FALLBACK_LOGS: LogItem[] = [
-  { text: "AI Agent Security Threats: The Complete Landscape", date: "Apr 2026", href: "/blog/ai-agent-security-threats" },
-  { text: "Building an Offline AR Heritage Guide — Samsung PRISM", date: "Apr 2026", href: "/blog/building-offline-ar-heritage-guide" }
-];
-
 export default function LogBar() {
-  const [items, setItems] = useState<LogItem[]>(FALLBACK_LOGS);
+  const [items, setItems] = useState<LogItem[]>([]);
 
   useEffect(() => {
     async function fetchLatestBlogs() {
       try {
         const query = `
           query {
-            publication(host: "atharva.hashnode.dev") {
-              posts(first: 4) {
+            publication(host: "atharvarta.hashnode.dev") {
+              posts(first: 3) {
                 edges {
                   node {
                     title
@@ -36,7 +31,10 @@ export default function LogBar() {
         `;
         const res = await fetch('https://gql.hashnode.com', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': '0cb3d74f-1448-421d-b181-962fd449b69e'
+          },
           body: JSON.stringify({ query }),
         });
         const json = await res.json();
@@ -47,10 +45,10 @@ export default function LogBar() {
             date: new Date(e.node.publishedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
             href: `/blog/${e.node.slug}`
           }));
-          setItems(parsed);
+          setItems(parsed.slice(0, 3));
         }
       } catch (err) {
-        console.error("LogBar fetch failed:", err);
+        console.error('Error fetching Hashnode posts for LogBar:', err);
       }
     }
     fetchLatestBlogs();
