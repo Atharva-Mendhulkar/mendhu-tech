@@ -75,9 +75,10 @@ export default function TableOfContents({ html }: { html: string }) {
               href={`#${h.id}`}
               className="block font-mono text-[10px] py-1 transition-colors leading-[1.5]"
               style={{
-                paddingLeft:  h.level === 3 ? "12px" : "0px",
+                paddingLeft:  h.level === 3 ? "16px" : "10px",
                 color:        isActive ? "var(--accent)" : "var(--ink-faint)",
                 borderLeft:   isActive ? "2px dashed var(--accent)" : "2px solid transparent",
+                marginLeft:   "-2px",
               }}
               onClick={e => {
                 e.preventDefault();

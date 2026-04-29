@@ -19,14 +19,6 @@ export const metadata: Metadata = {
   },
 };
 
-const FILTERS = [
-  { label: "all",             slug: "all"             },
-  { label: "research",        slug: "research"        },
-  { label: "build-log",       slug: "build-log"       },
-  { label: "explained",       slug: "explained"       },
-  { label: "paper-companion", slug: "paper-companion" },
-];
-
 export const revalidate = 3600;
 
 interface PageProps {
@@ -37,6 +29,24 @@ export default async function BlogIndex({ searchParams }: PageProps) {
   const resolvedSearchParams = await searchParams;
   const activeTag = resolvedSearchParams.tag ?? "all";
   const allPosts  = await getAllPosts();
+
+  // Extract unique tags dynamically from live posts
+  const dynamicTagsMap = new Map<string, string>();
+  allPosts.forEach(post => {
+    post.tags.forEach(t => {
+      const tSlug = t.slug || t.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      dynamicTagsMap.set(tSlug, t.name);
+    });
+  });
+
+  const dynamicFilters = [
+    { label: "all", slug: "all" },
+    ...Array.from(dynamicTagsMap.entries()).map(([slug, name]) => ({
+      label: name.toLowerCase(),
+      slug: slug
+    }))
+  ];
+
   const posts     = activeTag === "all"
     ? allPosts
     : allPosts.filter(p => p.tags.some(t => {
@@ -86,7 +96,7 @@ export default async function BlogIndex({ searchParams }: PageProps) {
 
           {/* Tag filters */}
           <div className="flex gap-2 flex-wrap mb-12">
-            {FILTERS.map(f => {
+            {dynamicFilters.map((f: { label: string; slug: string }) => {
               const isActive = f.slug === activeTag;
               const col = f.slug !== "all" ? (TAG_COLORS[f.slug] ?? defaultTagColor) : null;
               return (
