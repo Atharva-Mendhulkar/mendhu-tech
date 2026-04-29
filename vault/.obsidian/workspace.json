@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "reasoning-vs-execution.md",
+                "file": "deterministic-control-plane.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "reasoning-vs-execution"
+              "title": "deterministic-control-plane"
             }
           }
         ]
@@ -179,8 +179,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -196,15 +195,16 @@
   },
   "active": "c26c2e942b572b99",
   "lastOpenFiles": [
+    "control-plane-vs-data-plane.md",
+    "deterministic-control-plane.md",
+    "distributed-systems.md",
+    "reasoning-vs-execution.md",
     "multi-agent-systems.md",
     "policy-engine.md",
     "failure-cascades.md",
-    "control-plane-vs-data-plane.md",
-    "distributed-systems.md",
     "api-gateway-pattern.md",
     "agent-identity-iam.md",
     "agent-systems.md",
-    "deterministic-control-plane.md",
     "atharva.md",
     "autonomous-agents.md",
     "approval-workflows.md",
@@ -215,7 +215,6 @@
     "prompt-injection.md",
     "rag-systems.md",
     "tool-augmented-agents.md",
-    "reasoning-vs-execution.md",
     "llm-as-untrusted-component.md",
     "badmosi.md",
     "CAPS.md",
