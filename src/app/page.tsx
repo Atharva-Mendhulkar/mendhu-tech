@@ -17,13 +17,14 @@ export default function Home() {
   const [activeGardenFileId, setActiveGardenFileId] = useState<string | undefined>(undefined);
   const [minimizedItems, setMinimizedItems] = useState<{ id: string, title: string, type: 'garden' | 'project' }[]>([]);
   const [restoredId, setRestoredId] = useState<string | null>(null);
-  const [scrolled, setScrolled] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 120);
+      const pct = Math.max(0, Math.min(1, window.scrollY / 150));
+      setScrollProgress(pct);
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -98,19 +99,22 @@ export default function Home() {
 
         <div className="relative z-10 px-8 lg:px-14 py-12">
           
-          {/* Spotlight Quick-Trigger */}
-          <div className={`md:absolute md:top-1 md:right-8 lg:right-14 z-[210] flex flex-col items-center md:items-end gap-1 mb-8 md:mb-0 w-full md:w-auto ${
-            scrolled 
-              ? "fixed bottom-6 right-6 top-auto left-auto w-auto mb-0 md:absolute md:bottom-auto md:top-1 md:right-8 lg:right-14" 
-              : ""
-          }`}>
+          {/* Spotlight Quick-Trigger (Top Pill) */}
+          <div 
+            className="md:absolute md:top-1 md:right-8 lg:right-14 z-[210] flex flex-col items-center md:items-end gap-1 mb-8 md:mb-0 w-full md:w-auto transition-all duration-300"
+            style={{
+              opacity: 1 - scrollProgress,
+              transform: `scale(${1 - scrollProgress * 0.15})`,
+              pointerEvents: scrollProgress > 0.8 ? 'none' : 'auto'
+            }}
+          >
             {/* Arrow + text ABOVE the button */}
             <svg 
               width="300" 
               height="110" 
               viewBox="0 0 300 110" 
               xmlns="http://www.w3.org/2000/svg"
-              className={`select-none pointer-events-none mb-[-12px] md:mr-[-35px] md:opacity-100 md:scale-100 transition-all duration-300 ${scrolled ? 'opacity-0 scale-95 hidden md:block' : 'opacity-100 scale-100'}`}
+              className="select-none pointer-events-none mb-[-12px] md:mr-[-35px]"
             >
               {/* Text at the top */}
               <text 
@@ -151,26 +155,25 @@ export default function Home() {
             {/* Pill Button */}
             <button 
               onClick={() => window.dispatchEvent(new Event('toggle-terminal'))}
-              className={`flex items-center justify-center transition-all duration-500 cursor-pointer font-mono select-none border border-dashed ${
-                scrolled 
-                  ? "fixed bottom-6 right-6 w-12 h-12 rounded-full border-accent bg-paper/60 backdrop-blur-md shadow-lg hover:bg-paper/80 z-[220] md:relative md:bottom-auto md:right-auto md:w-auto md:h-auto md:px-5 md:py-2 md:rounded-full md:border-border-strong md:bg-paper/80 md:shadow-sm" 
-                  : "px-5 py-2 border-border-strong bg-paper/80 backdrop-blur-sm rounded-full shadow-sm hover:text-accent hover:border-accent"
-              }`}
+              className="px-5 py-2 border border-dashed border-border-strong bg-paper/80 backdrop-blur-sm rounded-full shadow-sm hover:text-accent hover:border-accent flex items-center gap-3 transition-all cursor-pointer font-mono select-none"
             >
-              <div className="relative flex items-center justify-center w-full h-full">
-                {/* Standard Text */}
-                <span className={`transition-all duration-500 flex items-center gap-2 whitespace-nowrap ${scrolled ? 'opacity-0 scale-75 pointer-events-none md:opacity-100 md:scale-100 md:pointer-events-auto' : 'opacity-100 scale-100'}`}>
-                  <span className="text-[12px] font-normal text-ink">Search</span>
-                  <span className="hidden md:inline text-[13px] font-bold text-accent">[Ctrl + `]</span>
-                </span>
-
-                {/* Search Icon */}
-                <span className={`transition-all duration-500 absolute flex items-center justify-center ${scrolled ? 'opacity-100 scale-100 md:opacity-0 md:scale-75 md:pointer-events-none' : 'opacity-0 scale-75 pointer-events-none'}`}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-accent md:hidden"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                </span>
-              </div>
+              <span className="text-[12px] font-normal text-ink">Search</span>
+              <span className="hidden md:inline text-[13px] font-bold text-accent">[Ctrl + `]</span>
             </button>
           </div>
+
+          {/* Floating Bottom-Right Search Icon (Mobile Only) */}
+          <button 
+            onClick={() => window.dispatchEvent(new Event('toggle-terminal'))}
+            className="md:hidden fixed bottom-6 right-6 w-12 h-12 rounded-full border border-dashed border-accent bg-paper/60 backdrop-blur-md shadow-lg flex items-center justify-center hover:bg-paper/80 z-[220] transition-all duration-300"
+            style={{
+              opacity: scrollProgress,
+              transform: `scale(${0.7 + scrollProgress * 0.3})`,
+              pointerEvents: scrollProgress < 0.2 ? 'none' : 'auto'
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-accent"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </button>
           
           {/* Introduction Section with Header and Meta Links */}
           <section className="fade-in flex flex-col md:flex-row justify-between items-center gap-8 md:gap-12 mb-8 pb-8 border-b border-dashed border-border-strong relative z-[200]">
