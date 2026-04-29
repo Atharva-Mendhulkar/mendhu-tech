@@ -39,7 +39,10 @@ export default async function BlogIndex({ searchParams }: PageProps) {
   const allPosts  = await getAllPosts();
   const posts     = activeTag === "all"
     ? allPosts
-    : allPosts.filter(p => p.tags.some(t => t.slug === activeTag));
+    : allPosts.filter(p => p.tags.some(t => {
+        const tSlug = t.slug || t.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+        return tSlug === activeTag;
+      }));
 
   return (
     <main className="relative">
