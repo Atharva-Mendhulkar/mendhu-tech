@@ -213,7 +213,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
       setActiveFileId(initialFileId);
     }
   }, [initialFileId, fileKeys]);
-  const [showGraph, setShowGraph]       = useState(false);
+  const [showGraph, setShowGraph]       = useState(true);
   const [isMaxGraph, setIsMaxGraph]     = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMounted, setIsMounted]       = useState(false);
@@ -326,6 +326,9 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
       return {gx:(mx-t.x)/t.scale,gy:(my-t.y)/t.scale};
     };
 
+    let touchStartDist = 0;
+    let touchStartScale = 1;
+
     const onDown=(e:MouseEvent)=>{
       energyRef.current = 1.0;
       const r=canvas.getBoundingClientRect();
@@ -360,10 +363,80 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
       const ns=Math.max(0.1,Math.min(5,t.scale*(e.deltaY<0?1.12:0.88)));
       t.x=mx-gx*ns;t.y=my-gy*ns;t.scale=ns;
     };
+
+    const onTouchStart=(e:TouchEvent)=>{
+      energyRef.current = 1.0;
+      const r=canvas.getBoundingClientRect();
+      if (e.touches.length === 1) {
+        const touch = e.touches[0];
+        const {gx,gy}=getGraph(touch.clientX-r.left, touch.clientY-r.top);
+        const s=settingsRef.current;
+        const hit=simNodesRef.current.find(n=>Math.hypot(n.x-gx,n.y-gy)<(n.isTag?n.r*1.5:n.r)*s.nodeSize+12);
+        if(hit){
+          dragNodeRef.current=hit;
+          if(!hit.isTag) {
+            setActiveFileId(hit.id);
+            setActiveTag(null);
+          } else {
+            setActiveTag(prev => prev === hit.label ? null : hit.label);
+          }
+        } else {
+          isPanRef.current=true;
+          panStartRef.current={x:(touch.clientX-r.left)-transformRef.current.x,y:(touch.clientY-r.top)-transformRef.current.y};
+        }
+      } else if (e.touches.length === 2) {
+        isPanRef.current=false;
+        dragNodeRef.current=null;
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+        touchStartDist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+        touchStartScale = transformRef.current.scale;
+      }
+    };
+
+    const onTouchMove=(e:TouchEvent)=>{
+      const r=canvas.getBoundingClientRect();
+      if (e.touches.length === 1) {
+        const touch = e.touches[0];
+        const {gx,gy}=getGraph(touch.clientX-r.left, touch.clientY-r.top);
+        if(dragNodeRef.current){
+          dragNodeRef.current.x=gx;dragNodeRef.current.y=gy;dragNodeRef.current.vx=0;dragNodeRef.current.vy=0; energyRef.current = 1.0;
+        } else if(isPanRef.current){
+          const mx=touch.clientX-r.left, my=touch.clientY-r.top;
+          transformRef.current.x=mx-panStartRef.current.x;transformRef.current.y=my-panStartRef.current.y; energyRef.current = 1.0;
+        }
+      } else if (e.touches.length === 2) {
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+        const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+        const factor = dist / (touchStartDist || 1);
+        
+        const mx = (t1.clientX + t2.clientX) / 2 - r.left;
+        const my = (t1.clientY + t2.clientY) / 2 - r.top;
+        
+        const t=transformRef.current;
+        const gx=(mx-t.x)/t.scale,gy=(my-t.y)/t.scale;
+        
+        const ns=Math.max(0.1,Math.min(5, touchStartScale * factor));
+        t.x=mx-gx*ns;t.y=my-gy*ns;t.scale=ns;
+        energyRef.current = 1.0;
+      }
+    };
+
+    const onTouchEnd=()=>{
+      dragNodeRef.current=null;
+      isPanRef.current=false; 
+      energyRef.current = 1.0;
+    };
+
     canvas.addEventListener('mousedown',onDown);
     window.addEventListener('mousemove',onMove);
     window.addEventListener('mouseup',onUp);
     canvas.addEventListener('wheel',onWheel,{passive:false});
+    
+    canvas.addEventListener('touchstart',onTouchStart,{passive:false});
+    canvas.addEventListener('touchmove',onTouchMove,{passive:false});
+    canvas.addEventListener('touchend',onTouchEnd);
 
     const tick=()=>{
       const s=settingsRef.current;   // LIVE — reads ref, not stale closure
@@ -516,6 +589,10 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
       window.removeEventListener('mousemove',onMove);
       window.removeEventListener('mouseup',onUp);
       canvas.removeEventListener('wheel',onWheel);
+      
+      canvas.removeEventListener('touchstart',onTouchStart);
+      canvas.removeEventListener('touchmove',onTouchMove);
+      canvas.removeEventListener('touchend',onTouchEnd);
     };
   },[showGraph,isOpen]); // intentionally minimal — all live values via refs
 
@@ -577,9 +654,14 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
             <span className="font-mono text-[10px] tracking-[0.3em] text-ink-muted uppercase font-bold">Knowledge Garden // {fileKeys.length} nodes</span>
           </div>
           <div className="flex gap-2">
-            {showGraph&&<button onClick={()=>setIsMaxGraph(!isMaxGraph)} className={`font-mono text-[9px] px-3 py-1 border border-dashed border-border-strong flex items-center gap-1.5 transition-all hover:border-accent hover:text-accent ${isMaxGraph?'bg-accent-light text-accent':'text-ink-muted'}`}>{isMaxGraph?<Minimize2 size={11}/>:<Maximize2 size={11}/>}<span className="hidden sm:inline">{isMaxGraph?'restore':'max graph'}</span></button>}
-            <button onClick={()=>{if(showGraph)setIsMaxGraph(false);setShowGraph(!showGraph);}} className="font-mono text-[9px] px-3 py-1 border border-dashed border-border-strong text-ink-muted hover:border-accent hover:text-accent transition-all">[{showGraph?'hide graph':'show graph'}]</button>
-            <button onClick={()=>setIsSidebarOpen(!isSidebarOpen)} className="lg:hidden font-mono text-[9px] px-3 py-1 border border-dashed border-border-strong text-ink-muted hover:text-accent">[menu]</button>
+            <button 
+              onClick={() => setIsMaxGraph(!isMaxGraph)} 
+              className={`font-mono text-[9px] px-3 py-1 border border-dashed border-border-strong flex items-center gap-1.5 transition-all hover:border-accent hover:text-accent ${isMaxGraph ? 'bg-accent-light text-accent' : 'text-ink-muted'}`}
+            >
+              {isMaxGraph ? <Minimize2 size={11}/> : <Maximize2 size={11}/>}
+              <span className="hidden sm:inline">{isMaxGraph ? 'restore' : 'max graph'}</span>
+            </button>
+            <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="lg:hidden font-mono text-[9px] px-3 py-1 border border-dashed border-border-strong text-ink-muted hover:text-accent">[menu]</button>
           </div>
         </div>
 

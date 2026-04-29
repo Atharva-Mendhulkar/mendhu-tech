@@ -122,24 +122,35 @@ export default function ProjectModal({ activeId, onClose, onMinimize, skipBoot }
             {project.slug}.sys_inspect
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 flex-wrap shrink-0">
             {/* Analysis button ONLY on mobile description */}
             <button 
               onClick={() => setShowMetrics(!showMetrics)}
-              className={`md:hidden font-mono text-[10px] px-3 py-1.5 transition-all flex items-center gap-2 border border-dashed ${showMetrics ? 'bg-accent text-white border-accent' : 'text-ink-muted border-border-strong hover:bg-accent-light hover:border-solid hover:text-accent'}`}
+              className={`md:hidden font-mono text-[9px] px-2.5 py-1.5 transition-all flex items-center gap-1.5 border border-dashed shrink-0 ${showMetrics ? 'bg-accent text-white border-accent' : 'text-ink-muted border-border-strong hover:bg-accent-light hover:border-solid hover:text-accent'}`}
             >
-              <Layout size={12} />
-              <span>{showMetrics ? 'HIDE ANALYSIS' : 'VIEW ANALYSIS'}</span>
+              <Layout size={11} />
+              <span>{showMetrics ? 'HIDE' : 'ANALYZE'}</span>
             </button>
+            {project.links.demo && (
+              <a 
+                href={project.links.demo} 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-[9px] text-white bg-accent border border-solid border-accent px-2.5 py-1.5 transition-all cursor-pointer flex items-center gap-1.5 hover:bg-accent/90 shrink-0 shadow-sm"
+              >
+                <ExternalLink size={11} />
+                <span>DEMO</span>
+              </a>
+            )}
             {project.links.github && (
               <a 
                 href={project.links.github} 
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-mono text-[10px] text-ink-muted hover:text-accent border border-dashed border-border-strong px-3 py-1.5 transition-all cursor-pointer flex items-center gap-2 hover:bg-accent-light hover:border-solid"
+                className="font-mono text-[9px] text-ink-muted hover:text-accent border border-dashed border-border-strong px-2.5 py-1.5 transition-all cursor-pointer flex items-center gap-1.5 hover:bg-accent-light hover:border-solid shrink-0"
               >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
-                <span className="hidden sm:inline">CODE</span>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                <span>CODE</span>
               </a>
             )}
           </div>
