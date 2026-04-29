@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Blog — Atharva Mendhulkar",
-  description: "Research explainers, build logs, and technical essays on physics-informed ML, kernel systems, and AI security.",
+  description: "Research explainers, build logs, and technical essays on physics-informed ML, kernel systems, AI security, anything.",
   openGraph: {
     title: "Blog — Atharva Mendhulkar",
     description: "Research explainers, build logs, and technical essays.",

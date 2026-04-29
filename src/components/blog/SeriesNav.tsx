@@ -8,7 +8,8 @@ interface SeriesProps {
 }
 
 export default function SeriesNav({ series, currentSlug }: SeriesProps) {
-  const posts   = series.posts.edges.map(e => e.node);
+  const posts   = series?.posts?.edges?.map(e => e.node) ?? [];
+  if (posts.length === 0) return null;
   const currIdx = posts.findIndex(p => p.slug === currentSlug);
   const prev    = posts[currIdx - 1] ?? null;
   const next    = posts[currIdx + 1] ?? null;
