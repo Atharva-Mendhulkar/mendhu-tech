@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { projects } from '@/data/projects';
 
 interface LogItem {
   text: string;
@@ -9,11 +10,11 @@ interface LogItem {
   href: string;
 }
 
-const PROJECT_ITEMS: LogItem[] = [
-  { text: "Building offline AR heritage architectures", date: "Samsung PRISM", href: "/#projects" },
-  { text: "Deployed full-stack LLM behavioral safeguards", date: "Production", href: "/#projects" },
-  { text: "Tuning complex vector memory storage algorithms", date: "Optimization", href: "/#projects" },
-];
+const PROJECT_ITEMS: LogItem[] = projects.map(p => ({
+  text: `${p.title} — ${p.oneLiner}`,
+  date: p.statusLabel,
+  href: `/#projects`
+}));
 
 export default function LogBar() {
   const pathname = usePathname();
