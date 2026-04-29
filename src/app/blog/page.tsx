@@ -122,7 +122,7 @@ export default async function BlogIndex({ searchParams }: PageProps) {
                           </div>
 
                           {/* Title */}
-                          <h2 className="font-serif text-[22px] font-normal leading-[1.3] text-ink mb-3 group-hover:italic transition-all">
+                          <h2 className="font-serif text-[22px] font-normal leading-[1.3] text-ink mb-3 group-hover:text-accent transition-all">
                             {post.title}
                           </h2>
 

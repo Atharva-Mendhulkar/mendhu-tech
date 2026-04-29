@@ -101,14 +101,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       {/* Outer shell */}
-      <div className="max-w-[960px] mx-auto border-x border-dashed border-border-strong min-h-screen relative">
-
-        {/* Inner paper + diagonal hatch */}
-        <div aria-hidden style={{
-          position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0,
-          backgroundColor: "var(--paper)",
-          backgroundImage: `repeating-linear-gradient(-45deg,rgba(0,0,0,0.055) 0px,rgba(0,0,0,0.055) 1px,transparent 1px,transparent 9px)`,
-        }} />
+      <div className="w-full min-h-screen relative" style={{ backgroundColor: "var(--paper)" }}>
 
         {/* Corner marks */}
         {[{t:2,l:4},{t:2,r:4},{b:2,l:4},{b:2,r:4}].map((pos,i) => (

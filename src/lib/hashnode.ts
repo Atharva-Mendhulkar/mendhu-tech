@@ -1,6 +1,5 @@
 // lib/hashnode.ts
 // Typed GraphQL client for Hashnode API → mendhu.tech/blog
-import { localBlogs } from "@/lib/localBlogs";
 
 const ENDPOINT = "https://gql.hashnode.com";
 const HOST     = "atharvarta.hashnode.dev";
@@ -9,7 +8,10 @@ const HOST     = "atharvarta.hashnode.dev";
 async function gql<T>(query: string, variables: Record<string, unknown> = {}): Promise<T> {
   const res = await fetch(ENDPOINT, {
     method:  "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      "Authorization": "0cb3d74f-1448-421d-b181-962fd449b69e"
+    },
     body:    JSON.stringify({ query, variables }),
     next:    { revalidate: 3600 },
   });
@@ -79,15 +81,7 @@ export async function getAllPosts(): Promise<Post[]> {
     }
   `);
   const remotePosts = data?.publication?.posts?.edges?.map(e => e.node) || [];
-  const localPosts  = localBlogs;
-  
-  const combined = [...remotePosts];
-  for (const lp of localPosts) {
-    if (!combined.some(p => p.slug === lp.slug)) {
-      combined.push(lp as unknown as Post);
-    }
-  }
-  return combined;
+  return remotePosts;
 }
 
 /** Single post by slug — for individual post pages */
@@ -110,13 +104,10 @@ export async function getPost(slug: string): Promise<PostWithSeries | null> {
         }
       }
     `, { slug });
-    const remote = data?.publication?.post ?? null;
-    if (remote) return remote;
-    
-    return (localBlogs.find(p => p.slug === slug) as unknown as PostWithSeries) ?? null;
+    return data?.publication?.post ?? null;
   } catch (err) {
     console.error(`getPost error for slug ${slug}:`, err);
-    return (localBlogs.find(p => p.slug === slug) as unknown as PostWithSeries) ?? null;
+    return null;
   }
 }
 
