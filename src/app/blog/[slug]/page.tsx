@@ -40,6 +40,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     keywords:    [...post.tags.map(t => t.name), "Atharva Mendhulkar", "Atharva blogs", "Atharva Mendhulkar blogs", "mendhu blogs", "engineering blog"],
     authors:     [{ name: "Atharva Mendhulkar", url: "https://mendhu.tech" }],
     alternates:  { canonical: url },
+    robots:      { index: true, follow: true },
     openGraph: {
       title:         post.title,
       description:   seoDesc,
@@ -71,7 +72,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   // JSON-LD structured data
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "TechArticle",
+    "@type": "BlogPosting",
     headline:    post.title,
     description: post.brief,
     author: {
@@ -145,7 +146,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                 <span className="text-border-strong">·</span>
                 <span>{post.readTimeInMinutes} min read</span>
                 <span className="text-border-strong">·</span>
-                <span>Atharva Mendhulkar</span>
+                <span>Written by Atharva Mendhulkar</span>
               </div>
 
               {/* Tags */}

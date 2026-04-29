@@ -8,6 +8,10 @@ export const metadata: Metadata = {
   title: "Atharva Mendhulkar Blogs | Technical Essays & ML Research",
   description: "Official blogs of Atharva Mendhulkar. Deep dives in physics-informed ML, distributed networks, AI security architectures, and autonomous agent safety.",
   keywords: ["Atharva Mendhulkar", "Atharva blogs", "Atharva Mendhulkar blogs", "mendhu blogs", "engineering", "ML Research", "AI Security"],
+  robots: {
+    index: true,
+    follow: true
+  },
   openGraph: {
     title: "Atharva Mendhulkar Blogs | Technical Essays & ML Research",
     description: "Official blogs of Atharva Mendhulkar. Covering AI, ML, and systems engineering.",
