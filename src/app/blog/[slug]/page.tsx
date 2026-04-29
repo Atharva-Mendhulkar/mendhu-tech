@@ -117,7 +117,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             <div className="hidden md:block md:w-16 lg:w-24 border-r border-dashed border-border-strong relative" aria-hidden />
 
             {/* article */}
-            <article className="flex-1 min-w-0 px-8 lg:px-16 py-16">
+            <article className="flex-1 min-w-0 px-8 lg:pl-16 lg:pr-24 py-16">
 
               {/* Back */}
               <Link href="/blog" className="font-mono text-[10px] text-ink-faint hover:text-accent transition-colors mb-10 block w-fit"
