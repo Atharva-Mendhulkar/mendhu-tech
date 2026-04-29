@@ -5,13 +5,15 @@ import { usePathname } from 'next/navigation';
 import { projects } from '@/data/projects';
 
 interface LogItem {
-  text: string;
+  name: string;
+  subtitle: string;
   date: string;
   href: string;
 }
 
 const PROJECT_ITEMS: LogItem[] = projects.map(p => ({
-  text: `${p.title} — ${p.oneLiner}`,
+  name: p.title,
+  subtitle: p.subtitle,
   date: p.statusLabel,
   href: `/#projects`
 }));
@@ -50,7 +52,8 @@ export default function LogBar() {
         const edges = json.data?.publication?.posts?.edges || [];
         if (edges.length > 0) {
           const parsed = edges.map((e: any) => ({
-            text: e.node.title,
+            name: e.node.title,
+            subtitle: "",
             date: new Date(e.node.publishedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
             href: `/blog/${e.node.slug}`
           }));
@@ -86,7 +89,9 @@ export default function LogBar() {
               href={item.href} 
               className="group hover:text-ink transition-colors"
             >
-              <span className="border-b border-dashed border-border-strong group-hover:border-accent text-ink pb-0.5 transition-colors">{item.text}</span> — {item.date}
+              <span className="font-bold text-ink group-hover:text-accent transition-colors">{item.name}</span>
+              {item.subtitle && <span className="text-ink-muted"> — {item.subtitle}</span>}
+              {item.date && <span className="text-ink-faint"> ({item.date})</span>}
             </a>
           </div>
         ))}
