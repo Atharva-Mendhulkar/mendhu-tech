@@ -93,9 +93,9 @@ export default function Home() {
           <div className="md:absolute md:top-1 md:right-8 lg:right-14 z-[210] flex flex-col items-center md:items-end gap-1 mb-8 md:mb-0 w-full md:w-auto">
             {/* Arrow + text ABOVE the button */}
             <svg 
-              width="240" 
+              width="300" 
               height="110" 
-              viewBox="0 0 240 110" 
+              viewBox="0 0 300 110" 
               xmlns="http://www.w3.org/2000/svg"
               className="select-none pointer-events-none mb-[-12px] md:mr-[-35px]"
             >
@@ -114,7 +114,7 @@ export default function Home() {
 
               {/* Dashed Path */}
               <path 
-                d="M60,45 C90,45 135,50 135,88"
+                d="M100,45 C130,45 175,50 175,88"
                 fill="none" 
                 stroke="var(--accent)" 
                 strokeWidth="2"
@@ -125,7 +125,7 @@ export default function Home() {
 
               {/* Arrowhead */}
               <path 
-                d="M127,86 L135,95 L143,86" 
+                d="M167,86 L175,95 L183,86" 
                 fill="none" 
                 stroke="var(--accent)" 
                 strokeWidth="2"
