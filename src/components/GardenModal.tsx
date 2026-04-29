@@ -675,22 +675,35 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
               </div>
             </div>
             <div className="p-3 space-y-3">
-              {Object.entries(categories).map(([cat,ids])=>(
-                <div key={cat}>
-                  <button onClick={()=>setExpandedFolders(p=>({...p,[cat]:!p[cat]}))} className={`w-full flex items-center gap-2 px-2 py-1.5 font-mono text-[9.5px] tracking-widest uppercase transition-all ${expandedFolders[cat]?'text-accent':'text-ink-muted hover:text-ink'}`}>
-                    {expandedFolders[cat]?<ChevronDown size={11}/>:<ChevronRight size={11}/>}{cat}<span className="ml-auto text-ink-faint">{ids.length}</span>
-                  </button>
-                  {expandedFolders[cat]&&(
-                    <div className="ml-4 pl-3 border-l border-dashed border-border-strong/50 space-y-0.5 mt-1">
-                      {ids.map(id=>{const f=data.files[id];if(!f)return null;return(
-                        <button key={id} onClick={()=>{setActiveFileId(id);setIsSidebarOpen(false);}} className={`w-full text-left flex items-center gap-2 px-2 py-1.5 font-mono text-[10px] rounded-[2px] transition-all truncate ${activeFileId===id?'bg-accent text-white':'text-ink-muted hover:text-accent hover:bg-accent-light'}`}>
-                          <FileText size={9} className={activeFileId===id?'text-white shrink-0':'shrink-0 opacity-40'}/><span className="truncate">{f.title}</span>
-                        </button>
-                      );})}
-                    </div>
-                  )}
-                </div>
-              ))}
+              {Object.entries(categories).map(([cat,ids])=>{
+                const q = settings.searchQuery.toLowerCase();
+                const filtered = ids.filter(id => {
+                  const f = data.files[id];
+                  if (!f) return false;
+                  const node = data.nodes.find(n => n.id === id);
+                  const tags = node?.tags ?? [];
+                  return !q || f.title.toLowerCase().includes(q) || tags.some(t => t.toLowerCase().includes(q));
+                });
+                if (filtered.length === 0) return null;
+                const isExpanded = expandedFolders[cat] || q.length > 0;
+                
+                return (
+                  <div key={cat}>
+                    <button onClick={()=>setExpandedFolders(p=>({...p,[cat]:!p[cat]}))} className={`w-full flex items-center gap-2 px-2 py-1.5 font-mono text-[9.5px] tracking-widest uppercase transition-all ${isExpanded?'text-accent':'text-ink-muted hover:text-ink'}`}>
+                      {isExpanded?<ChevronDown size={11}/>:<ChevronRight size={11}/>}{cat}<span className="ml-auto text-ink-faint">{filtered.length}</span>
+                    </button>
+                    {isExpanded&&(
+                      <div className="ml-4 pl-3 border-l border-dashed border-border-strong/50 space-y-0.5 mt-1">
+                        {filtered.map(id=>{const f=data.files[id];if(!f)return null;return(
+                          <button key={id} onClick={()=>{setActiveFileId(id);setIsSidebarOpen(false);}} className={`w-full text-left flex items-center gap-2 px-2 py-1.5 font-mono text-[10px] rounded-[2px] transition-all truncate ${activeFileId===id?'bg-accent text-white':'text-ink-muted hover:text-accent hover:bg-accent-light'}`}>
+                            <FileText size={9} className={activeFileId===id?'text-white shrink-0':'shrink-0 opacity-40'}/><span className="truncate">{f.title}</span>
+                          </button>
+                        );})}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
           {isSidebarOpen&&<div className="absolute inset-0 z-10 lg:hidden" onClick={()=>setIsSidebarOpen(false)}/>}
