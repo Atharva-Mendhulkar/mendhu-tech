@@ -15,7 +15,7 @@ const PROJECT_ITEMS: LogItem[] = projects.map(p => ({
   name: p.title,
   subtitle: p.subtitle,
   date: p.statusLabel,
-  href: `/#projects`
+  href: p.links.github || `/#projects`
 }));
 
 export default function LogBar() {
@@ -87,9 +87,11 @@ export default function LogBar() {
             <div className="w-[3px] h-[3px] rounded-full bg-accent" />
             <a 
               href={item.href} 
+              target={item.href.startsWith('http') ? '_blank' : undefined}
+              rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
               className="group hover:text-ink transition-colors"
             >
-              <span className="font-bold text-ink group-hover:text-accent transition-colors">{item.name}</span>
+              <span className="font-bold text-ink border-b border-dashed border-border-strong group-hover:border-accent transition-colors">{item.name}</span>
               {item.subtitle && <span className="text-ink-muted"> — {item.subtitle}</span>}
               {item.date && <span className="text-ink-faint"> ({item.date})</span>}
             </a>
