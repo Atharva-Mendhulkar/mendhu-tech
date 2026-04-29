@@ -2,7 +2,7 @@
 // Typed GraphQL client for Hashnode API → mendhu.tech/blog
 
 const ENDPOINT = "https://gql.hashnode.com";
-const HOST     = "blog.mendhu.tech";
+const HOST     = "atharva.hashnode.dev";
 
 // ── Core fetcher — ISR revalidates every hour ──────────────────────────────
 async function gql<T>(query: string, variables: Record<string, unknown> = {}): Promise<T> {
@@ -12,10 +12,17 @@ async function gql<T>(query: string, variables: Record<string, unknown> = {}): P
     body:    JSON.stringify({ query, variables }),
     next:    { revalidate: 3600 },
   });
-  if (!res.ok) throw new Error(`Hashnode API error: ${res.status}`);
-  const { data, errors } = await res.json();
-  if (errors?.length) throw new Error(errors[0].message);
-  return data as T;
+  if (!res.ok) {
+    throw new Error(`Hashnode API HTTP error: ${res.status}`);
+  }
+  const json = await res.json();
+  if (json.errors?.length) {
+    throw new Error(`Hashnode GraphQL error: ${json.errors[0].message}`);
+  }
+  if (!json.data) {
+    throw new Error("Hashnode returned no data");
+  }
+  return json.data as T;
 }
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -57,7 +64,11 @@ const POST_CARD_FIELDS = `
 
 /** All posts — for index page + generateStaticParams */
 export async function getAllPosts(): Promise<Post[]> {
-  const data = await gql<{ publication: { posts: { edges: { node: Post }[] } } }>(`
+  const data = await gql<{
+    publication: {
+      posts: { edges: { node: Post }[] }
+    } | null
+  }>(`
     query {
       publication(host: "${HOST}") {
         posts(first: 50) {
@@ -66,29 +77,41 @@ export async function getAllPosts(): Promise<Post[]> {
       }
     }
   `);
+  if (!data || !data.publication) {
+    console.error(`Invalid HOST or publication missing: ${HOST}`);
+    return [];
+  }
+  if (!data.publication.posts?.edges) {
+    return [];
+  }
   return data.publication.posts.edges.map(e => e.node);
 }
 
 /** Single post by slug — for individual post pages */
 export async function getPost(slug: string): Promise<PostWithSeries | null> {
-  const data = await gql<{ publication: { post: PostWithSeries | null } }>(`
-    query GetPost($slug: String!) {
-      publication(host: "${HOST}") {
-        post(slug: $slug) {
-          ${POST_CARD_FIELDS}
-          series {
-            name slug
-            posts(first: 20) {
-              edges { node { title slug } }
+  try {
+    const data = await gql<{ publication: { post: PostWithSeries | null } | null }>(`
+      query GetPost($slug: String!) {
+        publication(host: "${HOST}") {
+          post(slug: $slug) {
+            ${POST_CARD_FIELDS}
+            series {
+              name slug
+              posts(first: 20) {
+                edges { node { title slug } }
+              }
             }
+            content { html markdown }
+            seo { title description }
           }
-          content { html markdown }
-          seo { title description }
         }
       }
-    }
-  `, { slug });
-  return data.publication.post ?? null;
+    `, { slug });
+    return data?.publication?.post ?? null;
+  } catch (err) {
+    console.error(`getPost error for slug ${slug}:`, err);
+    return null;
+  }
 }
 
 /** Posts by tag slug — for tag filter on index */
