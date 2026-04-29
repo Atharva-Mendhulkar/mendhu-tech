@@ -12,7 +12,6 @@ import ProjectModal from "@/components/ProjectModal";
 import MinimizedPill from "@/components/MinimizedPill";
 import DraggablePorygon from '@/components/DraggablePorygon';
 import Terminal from "@/components/Terminal";
-import LogBar from "@/components/LogBar";
 
 export default function Home() {
   const router = useRouter();
@@ -142,8 +141,6 @@ export default function Home() {
               }),
             }}
           />
-
-        <LogBar mode="projects" />
 
         <div className="relative z-10 px-8 lg:px-14 py-12">
           

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 interface LogItem {
   text: string;
@@ -8,25 +9,17 @@ interface LogItem {
   href: string;
 }
 
-interface LogBarProps {
-  mode?: 'blogs' | 'projects';
-}
-
-const FEATURED_PROJECTS: LogItem[] = [
-  { text: "CAPS — Agentic UPI for cross-border fintech payloads", date: "Jan 2025", href: "#" },
-  { text: "AVARA — Agent Runtime Security Authority mapping", date: "Nov 2024", href: "#" },
-  { text: "K-PHD — Kernel Predictive Hang Detector for Linux subsystems", date: "Sep 2024", href: "#" }
+const PROJECT_ITEMS: LogItem[] = [
+  { text: "Building offline AR heritage architectures", date: "Samsung PRISM", href: "/#projects" },
+  { text: "Deployed full-stack LLM behavioral safeguards", date: "Production", href: "/#projects" },
+  { text: "Tuning complex vector memory storage algorithms", date: "Optimization", href: "/#projects" },
 ];
 
-export default function LogBar({ mode = 'blogs' }: LogBarProps) {
-  const [items, setItems] = useState<LogItem[]>(mode === 'projects' ? FEATURED_PROJECTS : []);
+export default function LogBar() {
+  const pathname = usePathname();
+  const [blogItems, setBlogItems] = useState<LogItem[]>([]);
 
   useEffect(() => {
-    if (mode === 'projects') {
-      setItems(FEATURED_PROJECTS);
-      return;
-    }
-
     async function fetchLatestBlogs() {
       try {
         const query = `
@@ -60,17 +53,19 @@ export default function LogBar({ mode = 'blogs' }: LogBarProps) {
             date: new Date(e.node.publishedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
             href: `/blog/${e.node.slug}`
           }));
-          setItems(parsed.slice(0, 3));
+          setBlogItems(parsed.slice(0, 3));
         }
       } catch (err) {
         console.error('Error fetching Hashnode posts for LogBar:', err);
       }
     }
     fetchLatestBlogs();
-  }, [mode]);
+  }, []);
+
+  const items = (pathname === '/' || !pathname.startsWith('/blog')) ? PROJECT_ITEMS : blogItems;
 
   // Triple items for continuous seamless marquee loop
-  const displayItems = [...items, ...items, ...items];
+  const displayItems = items.length > 0 ? [...items, ...items, ...items] : [];
 
   return (
     <div className="log-bar sticky top-0 z-[100] border-b border-dashed border-[rgba(0,71,255,0.3)] bg-[rgba(253,253,251,0.92)] backdrop-blur-[4px] overflow-hidden">
