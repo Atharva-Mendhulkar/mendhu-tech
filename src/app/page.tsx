@@ -248,7 +248,6 @@ export default function Home() {
           setActiveGardenFileId(undefined); // Reset linked state on close
         }} 
         onMinimize={(id, title) => handleMinimizeModal(id, title, 'garden')}
-        onFileChange={(id) => setActiveGardenFileId(id)}
         initialFileId={activeGardenFileId}
       />
       <ProjectModal 
