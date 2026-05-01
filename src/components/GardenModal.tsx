@@ -802,7 +802,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
                   <div className="flex-1 h-px bg-accent/20"/>
                   <button 
                     onClick={() => {
-                      const url = window.location.origin + '/blog/' + activeFileId;
+                      const url = window.location.origin + '/garden/' + activeFileId;
                       navigator.clipboard.writeText(url);
                       setShowCopyToast(true);
                       setTimeout(() => setShowCopyToast(false), 2000);

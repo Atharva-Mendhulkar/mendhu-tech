@@ -24,6 +24,24 @@ export default function Home() {
   const [minimizedItems, setMinimizedItems] = useState<{ id: string, title: string, type: 'garden' | 'project' }[]>([]);
   const [restoredId, setRestoredId] = useState<string | null>(null);
   const [isNavigatingToBlog, setIsNavigatingToBlog] = useState(false);
+  const [hasInitialGardenOpened, setHasInitialGardenOpened] = useState(false);
+
+  // Handle URL-based Garden opening (e.g. /garden/some-id rewritten to /?garden=some-id)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !hasInitialGardenOpened) {
+      const params = new URLSearchParams(window.location.search);
+      const gardenId = params.get('garden');
+      if (gardenId) {
+        setActiveGardenFileId(gardenId);
+        setIsGardenOpen(true);
+        setHasInitialGardenOpened(true);
+        
+        // Clean up URL without refreshing
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, '', newUrl);
+      }
+    }
+  }, [hasInitialGardenOpened]);
 
   const handleMinimizeModal = (id: string, title: string, type: 'garden' | 'project') => {
     if (type === 'garden') setIsGardenOpen(false);
