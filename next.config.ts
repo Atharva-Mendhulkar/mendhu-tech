@@ -9,14 +9,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  async rewrites() {
-    return [
-      {
-        source: '/garden/:id',
-        destination: '/?garden=:id',
-      },
-    ];
-  },
 };
 
 export default nextConfig;
