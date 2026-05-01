@@ -723,17 +723,24 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
           <div className="flex gap-2">
             <button 
               onClick={() => {
-                setShowGraph(!showGraph);
-                if (showGraph) setIsMaxGraph(false); // Reset max mode when hiding from header
+                const isMobile = window.innerWidth < 1024;
+                if (isMobile) {
+                  const nextState = !showGraph;
+                  setShowGraph(nextState);
+                  setIsMaxGraph(nextState);
+                } else {
+                  setShowGraph(!showGraph);
+                  if (showGraph) setIsMaxGraph(false);
+                }
               }} 
               className={`font-mono text-[9px] px-3 py-1 border border-dashed border-border-strong flex items-center gap-1.5 transition-all hover:border-accent hover:text-accent ${showGraph ? 'bg-accent-light text-accent' : 'text-ink-muted'}`}
             >
-              <span className="hidden sm:inline">{showGraph ? 'hide graph' : 'show graph'}</span>
+              <span>{showGraph ? 'hide graph' : 'show graph'}</span>
             </button>
             {showGraph && (
               <button 
                 onClick={() => setIsMaxGraph(!isMaxGraph)} 
-                className={`font-mono text-[9px] px-3 py-1 border border-dashed border-border-strong flex items-center gap-1.5 transition-all hover:border-accent hover:text-accent ${isMaxGraph ? 'bg-accent-light text-accent' : 'text-ink-muted'}`}
+                className={`hidden lg:flex font-mono text-[9px] px-3 py-1 border border-dashed border-border-strong items-center gap-1.5 transition-all hover:border-accent hover:text-accent ${isMaxGraph ? 'bg-accent-light text-accent' : 'text-ink-muted'}`}
               >
                 {isMaxGraph ? <Minimize2 size={11}/> : <Maximize2 size={11}/>}
                 <span className="hidden sm:inline">{isMaxGraph ? 'restore' : 'max graph'}</span>
