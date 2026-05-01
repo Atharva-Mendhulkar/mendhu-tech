@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Share2 } from 'lucide-react';
 
 const HASHNODE_QUERY = `
   query {
@@ -36,6 +37,7 @@ export default function BlogSection() {
   const router = useRouter();
   const [posts, setPosts] = useState<Post[]>([]);
   const [isNavigating, setIsNavigating] = useState(false);
+  const [showCopyToast, setShowCopyToast] = useState(false);
 
   useEffect(() => {
     async function fetchPosts() {
@@ -95,8 +97,22 @@ export default function BlogSection() {
             <span className="absolute top-1 right-1 font-mono text-[8px] text-ink-faint opacity-30">+</span>
             
             <div className="relative z-10">
-              <div className="font-mono text-[9.5px] text-ink-faint mb-2 tracking-wider uppercase">
-                latest draft · mendhu.tech/blog
+              <div className="font-mono text-[9.5px] text-ink-faint mb-2 tracking-wider uppercase flex justify-between items-center w-full">
+                <span>latest draft · mendhu.tech/blog</span>
+                <button 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const url = window.location.origin + '/blog/' + post.slug;
+                    navigator.clipboard.writeText(url);
+                    setShowCopyToast(true);
+                    setTimeout(() => setShowCopyToast(false), 2000);
+                  }}
+                  className="p-1.5 rounded-full hover:bg-accent/10 text-ink-faint hover:text-accent transition-all relative z-20 group/share"
+                  title="Copy share link"
+                >
+                  <Share2 size={11} />
+                </button>
               </div>
               <div className="font-serif text-[18px] text-ink font-medium mb-4 group-hover:text-accent transition-colors italic leading-snug">
                 {post.title}
@@ -135,6 +151,16 @@ export default function BlogSection() {
               to { opacity: 1; }
             }
           `}</style>
+        </div>
+      )}
+
+      {/* Copy Toast */}
+      {showCopyToast && (
+        <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-[10000] animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="px-6 py-2.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] flex items-center gap-2.5 overflow-hidden">
+            <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+            <span className="font-mono text-[11px] tracking-wider text-ink font-medium uppercase">link copied to clipboard</span>
+          </div>
         </div>
       )}
     </section>
