@@ -272,12 +272,20 @@ interface Props { isOpen:boolean; onClose:()=>void; onMinimize:(id:string,title:
 export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId }: Props) {
   const fileKeys = useMemo(() => Object.keys(data.files), []);
   const [activeFileId, setActiveFileId] = useState(fileKeys[0]??'');
+  const hasAppliedInitialFileId = useRef(false);
 
+  // Apply initialFileId only ONCE on first open — never again.
+  // Do NOT put activeFileId in the dependency array or it will fight navigation.
   useEffect(() => {
-    if (initialFileId && initialFileId !== activeFileId && fileKeys.includes(initialFileId)) {
+    if (
+      !hasAppliedInitialFileId.current &&
+      initialFileId &&
+      fileKeys.includes(initialFileId)
+    ) {
       setActiveFileId(initialFileId);
+      hasAppliedInitialFileId.current = true;
     }
-  }, [initialFileId, activeFileId, fileKeys]);
+  }, [initialFileId, fileKeys]);
   const [showGraph, setShowGraph]       = useState(false);
   const [isMaxGraph, setIsMaxGraph]     = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -356,8 +364,13 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
   );
 
   useEffect(()=>{
-    if(isOpen) setTimeout(()=>setIsMounted(true),10);
-    else setIsMounted(false);
+    if (isOpen) {
+      setTimeout(()=>setIsMounted(true), 10);
+    } else {
+      setIsMounted(false);
+      // Reset so the next open with a different initialFileId applies correctly
+      hasAppliedInitialFileId.current = false;
+    }
   },[isOpen]);
 
   useEffect(()=>{
