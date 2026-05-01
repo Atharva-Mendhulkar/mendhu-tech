@@ -7,6 +7,10 @@ import rehypeRaw from 'rehype-raw';
 import { ChevronRight, ChevronDown, FileText, Maximize2, Minimize2, Share2, Globe, Minus, X, Settings, Search } from 'lucide-react';
 import rawResearchData from '@/data/research.json';
 
+import { cachedTagColor, cachedAlpha } from '@/lib/graph/colors';
+import { buildQuadtree, applyRepulsion, type SimNode as BaseSimNode, type QNode } from '@/lib/graph/quadtree';
+import { runPhysicsStep, warmupAsync, type SimLink } from '@/lib/graph/physics';
+
 // ── Mermaid ────────────────────────────────────────────────────────────────
 
 const MermaidBlock = ({ chart }: { chart: string }) => {
@@ -62,47 +66,24 @@ interface ResearchData {
 }
 const data = rawResearchData as unknown as ResearchData;
 
-interface SimNode {
-  id: string; label: string; color: string; group: string; tags: string[];
-  x: number; y: number; vx: number; vy: number;
-  r: number; isTag: boolean; revealAt: number;
+interface SimNode extends BaseSimNode {
+  label: string;
+  group: string;
+  tags: string[];
+  r: number;
+  revealAt: number;
+  isTag: boolean;
+  _fillColor?: string;
+  _ringColor?: string;
+  _glowColor?: string;
+  _labelColor?: string;
 }
-interface SimLink { source: SimNode; target: SimNode }
+
 interface GraphSettings {
   nodeSize: number; linkThickness: number; centerForce: number;
   repelForce: number; linkForce: number; linkDistance: number;
   groupByTags: boolean; searchQuery: string;
 }
-
-const TAG_COLORS: Record<string, string> = {
-  ai:'#00FF88', agents:'#FFBD2E', systems:'#FF5F57',
-  security:'#CC77FF', ml:'#0047FF', physics:'#20C9A6',
-};
-const getTagColor = (t: string) => {
-  const clean = t.replace('#','').toLowerCase();
-  if (TAG_COLORS[clean]) return TAG_COLORS[clean];
-  let hash = 0;
-  for (let i = 0; i < clean.length; i++) {
-    hash = clean.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const h = Math.abs(hash % 360);
-  // Maintain high vibrancy and professional lightness
-  return `hsl(${h}, 75%, 55%)`;
-};
-
-const getAlphaColor = (color: string, alpha: string) => {
-  if (color.startsWith('#')) {
-    let hex = color.slice(1);
-    if (hex.length === 3) {
-      hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
-    } else if (hex.length === 4) {
-      hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2]+hex[3]+hex[3];
-    }
-    if (hex.length === 6) return `#${hex}${alpha}`;
-    if (hex.length === 8) return `#${hex.slice(0,6)}${alpha}`;
-  }
-  return color;
-};
 
 const DEFAULT: GraphSettings = {
   nodeSize:1.0, linkThickness:1.0, centerForce:0.003,
@@ -110,93 +91,71 @@ const DEFAULT: GraphSettings = {
   groupByTags:true, searchQuery:'',
 };
 
-function buildSimGraph(raw: ResearchData, groupByTags: boolean, W: number, H: number, existing: SimNode[]) {
+function buildSimGraph(raw: ResearchData, W: number, H: number, existing: SimNode[]) {
   const cx = W/2, cy = H/2;
   const existingById = new Map(existing.map(n => [n.id, n]));
   
   const fileNodes: SimNode[] = raw.nodes.map((n) => {
     const ex = existingById.get(n.id);
-    const node: SimNode = ex ?? {
-      id:n.id, label:n.name??n.label??n.id, 
-      color: n.color ?? (n.tags?.[0] ? getTagColor(n.tags[0]) : '#888'),
-      group:n.group, tags:n.tags??[],
-      x:cx+(Math.random()-.5)*300, y:cy+(Math.random()-.5)*300,
-      vx:0, vy:0, r:8, isTag:false, revealAt:0,
-    };
-    // Ensure properties are updated even if node existed
+    const node: SimNode = (ex ? { ...ex } : {
+      id:n.id, x:cx+(Math.random()-.5)*300, y:cy+(Math.random()-.5)*300,
+      vx:0, vy:0, revealAt:0, isTag: false,
+    }) as SimNode;
+    
     node.label = n.name??n.label??n.id;
-    node.color = n.color ?? (n.tags?.[0] ? getTagColor(n.tags[0]) : '#888');
+    node.color = n.color ?? (n.tags?.[0] ? cachedTagColor(n.tags[0]) : '#888');
+    node.group = n.group;
     node.tags = n.tags ?? [];
+    node.r = 8;
+    node.isTag = false;
+    
+    node._fillColor = cachedAlpha(node.color, '44');
+    node._ringColor = cachedAlpha(node.color, '80');
+    node._labelColor = '#555555';
+    
     return node;
   });
+
   const fileLinks: SimLink[] = raw.links.flatMap(l => {
     const s=fileNodes.find(n=>n.id===l.source), t=fileNodes.find(n=>n.id===l.target);
     return s&&t?[{source:s,target:t}]:[];
   });
-  if (!groupByTags) return { nodes:fileNodes, links:fileLinks };
 
   const allTags = new Set<string>();
   fileNodes.forEach(n => n.tags.forEach(t => allTags.add(t.replace('#','').toLowerCase())));
-  const tagNodes: SimNode[] = [...allTags].map((tag,i) => {
-    const id = `#${tag}`;
+
+  const tagNodes: SimNode[] = Array.from(allTags).map(t => {
+    const id = `tag-${t}`;
     const ex = existingById.get(id);
-    const node: SimNode = ex ?? {
-      id, label:id, color:getTagColor(tag), group:'tag', tags:[],
-      x:cx+Math.cos((i/allTags.size)*Math.PI*2)*160,
-      y:cy+Math.sin((i/allTags.size)*Math.PI*2)*160,
-      vx:0, vy:0, r:20, isTag:true, revealAt:0,
-    };
-    node.label = id;
-    node.color = getTagColor(tag);
+    const node: SimNode = (ex ? { ...ex } : {
+      id, x: cx+(Math.random()-.5)*600, y: cy+(Math.random()-.5)*600,
+      vx: 0, vy: 0, revealAt: 0, isTag: true,
+    }) as SimNode;
+    
+    node.label = `#${t}`;
+    node.color = cachedTagColor(t);
+    node.group = 'tag';
+    node.tags = [];
+    node.r = 14;
+    node.isTag = true;
+    
+    node._fillColor = cachedAlpha(node.color, '44');
+    node._ringColor = cachedAlpha(node.color, '80');
+    node._labelColor = node.color;
+    
     return node;
   });
+
   const tagLinks: SimLink[] = [];
   fileNodes.forEach(fn => {
     fn.tags.forEach(t => {
-      const tid=t.replace('#','').toLowerCase();
-      const hub=tagNodes.find(n=>n.id===`#${tid}`);
-      if(hub) tagLinks.push({source:hub, target:fn});
+      const cleanT = t.replace('#','').toLowerCase();
+      const tn = tagNodes.find(tag => tag.label === `#${cleanT}`);
+      if (tn) tagLinks.push({ source: fn, target: tn, isTag: true });
     });
   });
 
-  const nodes = [...tagNodes, ...fileNodes];
-  const links = [...fileLinks, ...tagLinks];
-
-  // Physics Warm-up (Synchronous pre-calculation)
-  // This makes the graph "aware of physics on loading" by pre-settling it
-  if (existing.length === 0) {
-    const repel = 12000, lDist = 280, lForce = 0.02, cForce = 0.003;
-    for (let iter = 0; iter < 120; iter++) {
-      for(let i=0;i<nodes.length;i++){
-        const n1=nodes[i];
-        n1.vx+=(cx-n1.x)*cForce*(n1.isTag?4:1);
-        n1.vy+=(cy-n1.y)*cForce*(n1.isTag?4:1);
-        for(let j=i+1;j<nodes.length;j++){
-          const n2=nodes[j];
-          const dx=n1.x-n2.x,dy=n1.y-n2.y;
-          const d2=dx*dx+dy*dy+1, d=Math.sqrt(d2);
-          const f=repel/d2;
-          const fx=(dx/d)*f, fy=(dy/d)*f;
-          n1.vx+=fx; n1.vy+=fy; n2.vx-=fx; n2.vy-=fy;
-        }
-      }
-      links.forEach(l=>{
-        const dx=l.source.x-l.target.x, dy=l.source.y-l.target.y;
-        const d=Math.sqrt(dx*dx+dy*dy)||1;
-        const f=(d-lDist)*lForce;
-        const fx=(dx/d)*f, fy=(dy/d)*f;
-        l.source.vx-=fx; l.source.vy-=fy;
-        l.target.vx+=fx; l.target.vy+=fy;
-      });
-      const damp=0.82;
-      nodes.forEach(n=>{
-        n.vx*=damp; n.vy*=damp;
-        n.x+=n.vx; n.y+=n.vy;
-      });
-    }
-  }
-
-  return { nodes, links };
+  return { fileNodes, fileLinks, tagNodes, tagLinks };
 }
 
 interface SliderRowProps {
@@ -274,8 +233,27 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
   const [activeFileId, setActiveFileId] = useState(fileKeys[0]??'');
   const hasAppliedInitialFileId = useRef(false);
 
-  // Apply initialFileId only ONCE on first open — never again.
-  // Do NOT put activeFileId in the dependency array or it will fight navigation.
+  // Phase 1: Energy Gating
+  const SLEEP_THRESHOLD = 0.002;
+  const sleepRef = useRef(false);
+  const energyRef = useRef(1.0);
+  const dirtyRef = useRef(true);
+
+  // Phase 9d: Connected-IDs Lookup
+  const connectedIds = useMemo(() => {
+    const s = new Set<string>();
+    if (!activeFileId) return s;
+    data.links.forEach(l => {
+      const srcId = typeof l.source === 'string' ? l.source : (l.source as any).id;
+      const tgtId = typeof l.target === 'string' ? l.target : (l.target as any).id;
+      if (srcId === activeFileId) s.add(tgtId);
+      if (tgtId === activeFileId) s.add(srcId);
+    });
+    return s; 
+  }, [activeFileId]);
+  const connectedIdsRef = useRef(connectedIds);
+  useEffect(() => { connectedIdsRef.current = connectedIds; }, [connectedIds]);
+
   useEffect(() => {
     if (
       !hasAppliedInitialFileId.current &&
@@ -286,12 +264,12 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
       hasAppliedInitialFileId.current = true;
     }
   }, [initialFileId, fileKeys]);
+
   const [showGraph, setShowGraph]       = useState(false);
   const [isMaxGraph, setIsMaxGraph]     = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMounted, setIsMounted]       = useState(false);
 
-  // Sync active file with URL
   useEffect(() => {
     if (isOpen && activeFileId) {
       const newUrl = `/garden/${activeFileId}`;
@@ -301,7 +279,6 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
     }
   }, [activeFileId, isOpen]);
 
-  // Return to home URL when closed
   useEffect(() => {
     if (!isOpen && isMounted) {
       if (window.location.pathname.startsWith('/garden/')) {
@@ -318,19 +295,31 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
   const activeTagRef = useRef<string | null>(null);
   useEffect(()=>{activeTagRef.current=activeTag;},[activeTag]);
 
-  // KEY FIX: update both state (for UI) AND ref (for RAF loop)
   const updateSetting = <K extends keyof GraphSettings>(k: K, v: GraphSettings[K]) => {
     settingsRef.current = {...settingsRef.current, [k]:v};
-    setSettings(s => ({...s,[k]:v}));
+    dirtyRef.current = true;
     energyRef.current = 1.0;
+    if (sleepRef.current && tickRef.current) {
+      sleepRef.current = false;
+      rafRef.current = requestAnimationFrame(tickRef.current);
+    }
+    if (isSettingsOpen) {
+      setSettings(s => ({...s,[k]:v}));
+    }
   };
 
   const canvasRef    = useRef<HTMLCanvasElement>(null);
   const rafRef       = useRef<number|null>(null);
   const simNodesRef  = useRef<SimNode[]>([]);
   const simLinksRef  = useRef<SimLink[]>([]);
+  
+  const fileNodesRef = useRef<SimNode[]>([]);
+  const tagNodesRef  = useRef<SimNode[]>([]);
+  const fileLinksRef = useRef<SimLink[]>([]);
+  const tagLinksRef  = useRef<SimLink[]>([]);
+
   const dragNodeRef  = useRef<SimNode|null>(null);
-  const energyRef    = useRef<number>(1.0); // Start with high energy for loading physics
+  const tickRef      = useRef<(()=>void)|null>(null);
   const transformRef = useRef({scale:1,x:0,y:0});
   const isPanRef     = useRef(false);
   const panStartRef  = useRef({x:0,y:0});
@@ -368,7 +357,6 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
       setTimeout(()=>setIsMounted(true), 10);
     } else {
       setIsMounted(false);
-      // Reset so the next open with a different initialFileId applies correctly
       hasAppliedInitialFileId.current = false;
     }
   },[isOpen]);
@@ -387,6 +375,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
   const handleGroupToggle = (v:boolean)=>{
     updateSetting('groupByTags',v);
   };
+
   const triggerAnimate = () => {
     setIsSettingsOpen(false);
     const now = Date.now();
@@ -394,7 +383,26 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
       n.revealAt = now + (n.isTag ? 0 : i * 50);
     });
     energyRef.current = 1.0;
+    dirtyRef.current = true;
+    if (sleepRef.current && tickRef.current) {
+      sleepRef.current = false;
+      rafRef.current = requestAnimationFrame(tickRef.current);
+    }
   };
+
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.hidden) {
+        if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      } else {
+        energyRef.current = 0.5;
+        dirtyRef.current = true;
+        if (tickRef.current) rafRef.current = requestAnimationFrame(tickRef.current);
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, []);
 
   // ── SIMULATION ───────────────────────────────────────────────────────────
   useEffect(()=>{
@@ -410,16 +418,55 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
       ctx.setTransform(dpr,0,0,dpr,0,0);
     });
     ro.observe(canvas.parentElement!);
-    const p=canvas.parentElement!;
-    canvas.width=p.clientWidth*dpr; canvas.height=p.clientHeight*dpr;
-    canvas.style.width=`${p.clientWidth}px`; canvas.style.height=`${p.clientHeight}px`;
-    ctx.setTransform(dpr,0,0,dpr,0,0);
 
-    const rebuild=()=>{
-      const {nodes,links}=buildSimGraph(data,settingsRef.current.groupByTags,p.clientWidth,p.clientHeight,simNodesRef.current);
-      simNodesRef.current=nodes; simLinksRef.current=links;
+    const rebuildView = () => {
+      const s = settingsRef.current;
+      simNodesRef.current = s.groupByTags
+        ? [...tagNodesRef.current, ...fileNodesRef.current]
+        : [...fileNodesRef.current];
+      simLinksRef.current = s.groupByTags
+        ? [...fileLinksRef.current, ...tagLinksRef.current]
+        : [...fileLinksRef.current];
+      dirtyRef.current = true;
     };
-    if(simNodesRef.current.length===0) rebuild();
+
+    const rebuild = () => {
+      const p = canvas.parentElement!;
+      const { fileNodes, fileLinks, tagNodes, tagLinks } = buildSimGraph(data, p.clientWidth, p.clientHeight, fileNodesRef.current);
+      
+      fileNodesRef.current = fileNodes;
+      fileLinksRef.current = fileLinks;
+      tagNodesRef.current = tagNodes;
+      tagLinksRef.current = tagLinks;
+      
+      rebuildView();
+
+      if (fileNodes.length > 0 && fileNodes[0].vx === 0 && fileNodes[0].vy === 0) {
+        const cx = p.clientWidth / 2;
+        const cy = p.clientHeight / 2;
+        
+        warmupAsync(
+          simNodesRef.current, 
+          simLinksRef.current, 
+          cx, cy, 
+          () => {
+            const now = Date.now();
+            simNodesRef.current.forEach((n, i) => {
+              n.revealAt = now + (n.isTag ? 0 : i * 20);
+            });
+            energyRef.current = 1.0;
+            dirtyRef.current = true;
+          },
+          (nodes) => {
+            const W = p.clientWidth, H = p.clientHeight;
+            const padding = 100;
+            const qt = buildQuadtree(nodes, { x: -padding, y: -padding, w: W + padding*2, h: H + padding*2 });
+            return (body) => applyRepulsion(qt, body, 12000);
+          }
+        );
+      }
+    };
+    if(fileNodesRef.current.length === 0) rebuild();
 
     const getGraph=(mx:number,my:number)=>{
       const t=transformRef.current;
@@ -430,7 +477,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
     let touchStartScale = 1;
 
     const onDown=(e:MouseEvent)=>{
-      energyRef.current = 1.0;
+      energyRef.current = 1.0; sleepRef.current = false;
       const r=canvas.getBoundingClientRect();
       const {gx,gy}=getGraph(e.clientX-r.left,e.clientY-r.top);
       const s=settingsRef.current;
@@ -445,27 +492,36 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
         }
       }
       else{isPanRef.current=true;panStartRef.current={x:(e.clientX-r.left)-transformRef.current.x,y:(e.clientY-r.top)-transformRef.current.y};}
+      dirtyRef.current = true;
     };
     const onMove=(e:MouseEvent)=>{
       const r=canvas.getBoundingClientRect();
       const {gx,gy}=getGraph(e.clientX-r.left,e.clientY-r.top);
-      if(dragNodeRef.current){dragNodeRef.current.x=gx;dragNodeRef.current.y=gy;dragNodeRef.current.vx=0;dragNodeRef.current.vy=0; energyRef.current = 1.0;}
-      else if(isPanRef.current){const mx=e.clientX-r.left,my=e.clientY-r.top;transformRef.current.x=mx-panStartRef.current.x;transformRef.current.y=my-panStartRef.current.y; energyRef.current = 1.0;}
+      if(dragNodeRef.current){
+        dragNodeRef.current.x=gx;dragNodeRef.current.y=gy;dragNodeRef.current.vx=0;dragNodeRef.current.vy=0; 
+        energyRef.current = 1.0; sleepRef.current = false; dirtyRef.current = true;
+      }
+      else if(isPanRef.current){
+        const mx=e.clientX-r.left,my=e.clientY-r.top;
+        transformRef.current.x=mx-panStartRef.current.x;transformRef.current.y=my-panStartRef.current.y; 
+        energyRef.current = 1.0; sleepRef.current = false; dirtyRef.current = true;
+      }
     };
-    const onUp=()=>{dragNodeRef.current=null;isPanRef.current=false; energyRef.current = 1.0;};
+    const onUp=()=>{dragNodeRef.current=null;isPanRef.current=false; energyRef.current = 1.0; sleepRef.current = false; dirtyRef.current = true;};
     const onWheel=(e:WheelEvent)=>{
       e.preventDefault();
-      energyRef.current = 1.0;
+      energyRef.current = 1.0; sleepRef.current = false;
       const r=canvas.getBoundingClientRect();
       const mx=e.clientX-r.left,my=e.clientY-r.top;
       const t=transformRef.current;
       const gx=(mx-t.x)/t.scale,gy=(my-t.y)/t.scale;
       const ns=Math.max(0.1,Math.min(5,t.scale*(e.deltaY<0?1.12:0.88)));
       t.x=mx-gx*ns;t.y=my-gy*ns;t.scale=ns;
+      dirtyRef.current = true;
     };
 
     const onTouchStart=(e:TouchEvent)=>{
-      energyRef.current = 1.0;
+      energyRef.current = 1.0; sleepRef.current = false;
       const r=canvas.getBoundingClientRect();
       if (e.touches.length === 1) {
         const touch = e.touches[0];
@@ -492,6 +548,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
         touchStartDist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
         touchStartScale = transformRef.current.scale;
       }
+      dirtyRef.current = true;
     };
 
     const onTouchMove=(e:TouchEvent)=>{
@@ -500,187 +557,190 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
         const touch = e.touches[0];
         const {gx,gy}=getGraph(touch.clientX-r.left, touch.clientY-r.top);
         if(dragNodeRef.current){
-          dragNodeRef.current.x=gx;dragNodeRef.current.y=gy;dragNodeRef.current.vx=0;dragNodeRef.current.vy=0; energyRef.current = 1.0;
+          dragNodeRef.current.x=gx;dragNodeRef.current.y=gy;dragNodeRef.current.vx=0;dragNodeRef.current.vy=0; 
+          energyRef.current = 1.0; sleepRef.current = false;
         } else if(isPanRef.current){
           const mx=touch.clientX-r.left, my=touch.clientY-r.top;
-          transformRef.current.x=mx-panStartRef.current.x;transformRef.current.y=my-panStartRef.current.y; energyRef.current = 1.0;
+          transformRef.current.x=mx-panStartRef.current.x;transformRef.current.y=my-panStartRef.current.y; 
+          energyRef.current = 1.0; sleepRef.current = false;
         }
       } else if (e.touches.length === 2) {
         const t1 = e.touches[0];
         const t2 = e.touches[1];
         const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
         const factor = dist / (touchStartDist || 1);
-        
         const mx = (t1.clientX + t2.clientX) / 2 - r.left;
         const my = (t1.clientY + t2.clientY) / 2 - r.top;
-        
         const t=transformRef.current;
         const gx=(mx-t.x)/t.scale,gy=(my-t.y)/t.scale;
-        
         const ns=Math.max(0.1,Math.min(5, touchStartScale * factor));
         t.x=mx-gx*ns;t.y=my-gy*ns;t.scale=ns;
-        energyRef.current = 1.0;
+        energyRef.current = 1.0; sleepRef.current = false;
       }
+      dirtyRef.current = true;
     };
 
     const onTouchEnd=()=>{
       dragNodeRef.current=null;
       isPanRef.current=false; 
-      energyRef.current = 1.0;
+      energyRef.current = 1.0; sleepRef.current = false;
+      dirtyRef.current = true;
     };
 
     canvas.addEventListener('mousedown',onDown);
     window.addEventListener('mousemove',onMove);
     window.addEventListener('mouseup',onUp);
     canvas.addEventListener('wheel',onWheel,{passive:false});
-    
     canvas.addEventListener('touchstart',onTouchStart,{passive:false});
     canvas.addEventListener('touchmove',onTouchMove,{passive:false});
     canvas.addEventListener('touchend',onTouchEnd);
 
     const tick=()=>{
-      const s=settingsRef.current;   // LIVE — reads ref, not stale closure
-      const now=Date.now();
+      tickRef.current = tick;
+      const s=settingsRef.current;
       const W=canvas.width/dpr, H=canvas.height/dpr;
-      const nodes=simNodesRef.current, links=simLinksRef.current;
+      const nodes = simNodesRef.current as SimNode[];
+      const links = simLinksRef.current as any[];
 
-      // Rebuild if groupByTags changed
-      const hasTagNodes=nodes.some(n=>n.isTag);
-      if(s.groupByTags!==hasTagNodes) rebuild();
+      const hasTagNodes = nodes.some(n => n.isTag);
+      if (s.groupByTags !== hasTagNodes) rebuildView();
 
-      ctx.clearRect(0,0,W,H);
-
-      ctx.save();
-      const t=transformRef.current;
-      ctx.translate(t.x,t.y);ctx.scale(t.scale,t.scale);
-
-      if (energyRef.current > 0.005) {
+      if (energyRef.current > SLEEP_THRESHOLD || dragNodeRef.current) {
         energyRef.current *= 0.96;
-        const cx=W/2,cy=H/2;
-        for(let i=0;i<nodes.length;i++){
-          const n1=nodes[i];
-          if(n1===dragNodeRef.current) continue;
-          n1.vx+=(cx-n1.x)*s.centerForce*(n1.isTag?4:1);
-          n1.vy+=(cy-n1.y)*s.centerForce*(n1.isTag?4:1);
-          for(let j=i+1;j<nodes.length;j++){
-            const n2=nodes[j];
-            const dx=n1.x-n2.x,dy=n1.y-n2.y;
-            const d2=dx*dx+dy*dy+1,d=Math.sqrt(d2);
-            const f=s.repelForce/d2;
-            const fx=(dx/d)*f,fy=(dy/d)*f;
-            n1.vx+=fx;n1.vy+=fy;n2.vx-=fx;n2.vy-=fy;
-          }
-        }
-        links.forEach(l=>{
-          const dx=l.source.x-l.target.x,dy=l.source.y-l.target.y;
-          const d=Math.sqrt(dx*dx+dy*dy)||1;
-          const f=(d-s.linkDistance)*s.linkForce;
-          const fx=(dx/d)*f,fy=(dy/d)*f;
-          if(l.source!==dragNodeRef.current){l.source.vx-=fx;l.source.vy-=fy;}
-          if(l.target!==dragNodeRef.current){l.target.vx+=fx;l.target.vy+=fy;}
-        });
-        const damp=0.82,maxV=12;
-        nodes.forEach(n=>{
-          if(n===dragNodeRef.current) return;
-          n.vx=Math.max(-maxV,Math.min(maxV,n.vx*damp));
-          n.vy=Math.max(-maxV,Math.min(maxV,n.vy*damp));
-          n.x+=n.vx;n.y+=n.vy;
-          n.x=Math.max(24,Math.min(W-24,n.x));
-          n.y=Math.max(24,Math.min(H-24,n.y));
-        });
+        const cx=W/2, cy=H/2;
+        
+        const padding = 100;
+        const qt = buildQuadtree(nodes, { x: -padding, y: -padding, w: W + padding*2, h: H + padding*2 });
+
+        runPhysicsStep(nodes, links, cx, cy, { 
+          repelForce: s.repelForce,
+          linkDistance: s.linkDistance,
+          linkForce: s.linkForce,
+          centerForce: s.centerForce,
+          damping: 0.82 
+        }, (body) => applyRepulsion(qt, body, s.repelForce));
+        
+        dirtyRef.current = true;
+      } else {
+        sleepRef.current = true;
       }
 
-      const activeId=activeIdRef.current;
-      const q=s.searchQuery.toLowerCase();
+      if (!dirtyRef.current) {
+        rafRef.current = requestAnimationFrame(tick);
+        return;
+      }
+
+      ctx.clearRect(0, 0, W, H);
+      ctx.save();
+      const t = transformRef.current;
+      ctx.translate(t.x, t.y); ctx.scale(t.scale, t.scale);
+
+      const now = Date.now();
+      const activeId = activeIdRef.current;
+      const q = s.searchQuery.toLowerCase();
 
       // Draw edges
-      links.forEach(l=>{
-        if(now<l.source.revealAt||now<l.target.revealAt) return;
+      links.forEach(l => {
+        if (now < l.source.revealAt || now < l.target.revealAt) return;
         
         const isTagActive = activeTagRef.current && (
           l.source.label === activeTagRef.current || 
           l.target.label === activeTagRef.current ||
-          l.source.tags.map(t=>`#${t.replace('#','').toLowerCase()}`).includes(activeTagRef.current.toLowerCase()) ||
-          l.target.tags.map(t=>`#${t.replace('#','').toLowerCase()}`).includes(activeTagRef.current.toLowerCase())
+          l.source.tags.map((t: string) => `#${t.replace('#','').toLowerCase()}`).includes(activeTagRef.current.toLowerCase()) ||
+          l.target.tags.map((t: string) => `#${t.replace('#','').toLowerCase()}`).includes(activeTagRef.current.toLowerCase())
         );
         
-        const active=l.source.id===activeId||l.target.id===activeId || isTagActive;
-        const matches=!q||l.source.label.toLowerCase().includes(q)||l.target.label.toLowerCase().includes(q);
-        ctx.globalAlpha=matches?1:0.07;
-        ctx.setLineDash(active?[]:[3,5]);
-        ctx.lineWidth=(active?2.2:1.0)*s.linkThickness;
+        const active = l.source.id === activeId || l.target.id === activeId || isTagActive;
+        const matches = !q || l.source.label.toLowerCase().includes(q) || l.target.label.toLowerCase().includes(q);
+        ctx.globalAlpha = matches ? 1 : 0.07;
+        ctx.setLineDash(active ? [] : [3, 5]);
+        ctx.lineWidth = (active ? 2.2 : 1.0) * s.linkThickness;
         
-        if(active) ctx.strokeStyle='rgba(0,71,255,0.85)';
-        else if(l.source.isTag||l.target.isTag){
-          const hub=l.source.isTag?l.source:l.target;
-          ctx.strokeStyle=getAlphaColor(hub.color, '44');
-        } else ctx.strokeStyle='rgba(26,26,26,0.3)';
-        ctx.beginPath();ctx.moveTo(l.source.x,l.source.y);ctx.lineTo(l.target.x,l.target.y);ctx.stroke();
+        if (active) ctx.strokeStyle = 'rgba(0,71,255,0.85)';
+        else if (l.isTag) {
+          ctx.strokeStyle = cachedAlpha(l.target.color, '44');
+        } else ctx.strokeStyle = 'rgba(26,26,26,0.3)';
+
+        ctx.beginPath();
+        ctx.moveTo(l.source.x, l.source.y);
+        ctx.lineTo(l.target.x, l.target.y);
+        ctx.stroke();
       });
-      ctx.setLineDash([]);ctx.globalAlpha=1;
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
 
       // Draw nodes
-      nodes.forEach(node=>{
-        if(now<node.revealAt) return;
+      nodes.forEach(node => {
+        if (now < node.revealAt) return;
         
         const isTagActive = activeTagRef.current && (
           node.label === activeTagRef.current ||
           node.tags.map(t=>`#${t.replace('#','').toLowerCase()}`).includes(activeTagRef.current.toLowerCase())
         );
         
-        const isActive=node.id===activeId || isTagActive;
-        const isConn=links.some(l=>(l.source.id===node.id&&l.target.id===activeId)||(l.target.id===node.id&&l.source.id===activeId));
-        const matches=!q||node.label.toLowerCase().includes(q);
-        const nr=node.r*s.nodeSize*(node.isTag?1.6:1);
-        ctx.globalAlpha=matches?1:0.08;
+        const isActive = node.id === activeId || isTagActive;
+        const isConn = links.some(l => (l.source.id === node.id && l.target.id === activeId) || (l.target.id === node.id && l.source.id === activeId));
+        const matches = !q || node.label.toLowerCase().includes(q);
+        const nr = node.r * s.nodeSize * (node.isTag ? 1.6 : 1);
+        ctx.globalAlpha = matches ? 1 : 0.08;
 
         // Glow
-        if(isActive||isConn||node.isTag){
-          ctx.shadowBlur=isActive?30:node.isTag?18:10;
-          ctx.shadowColor=node.isTag?getAlphaColor(node.color, 'BB'):isActive?'rgba(0,71,255,0.5)':getAlphaColor(node.color, '55');
-        } else ctx.shadowBlur=0;
+        if (isActive || isConn || node.isTag) {
+          ctx.shadowBlur = isActive ? 30 : node.isTag ? 18 : 10;
+          ctx.shadowColor = node.isTag ? cachedAlpha(node.color, 'BB') : isActive ? 'rgba(0,71,255,0.5)' : cachedAlpha(node.color, '55');
+        } else ctx.shadowBlur = 0;
 
         // Outer ring (wireframe)
-        const pulse=isActive?Math.sin(now/280)*2.5:0;
-        ctx.beginPath();ctx.setLineDash([2,4]);
-        ctx.strokeStyle=getAlphaColor(node.color, '80');
-        ctx.lineWidth=node.isTag?2:1.2;
-        ctx.arc(node.x,node.y,nr+7+pulse,0,Math.PI*2);ctx.stroke();
+        const pulse = isActive ? Math.sin(now / 280) * 2.5 : 0;
+        ctx.beginPath();
+        ctx.setLineDash([2, 4]);
+        ctx.strokeStyle = cachedAlpha(node.color, '80');
+        ctx.lineWidth = node.isTag ? 2 : 1.2;
+        ctx.arc(node.x, node.y, nr + 7 + pulse, 0, Math.PI * 2);
+        ctx.stroke();
         ctx.setLineDash([]);
 
         // Fill
         ctx.beginPath();
-        if(isActive) ctx.fillStyle=node.color;
-        else if(node.isTag) ctx.fillStyle=node.color;
+        if (isActive) ctx.fillStyle = node.color;
+        else if (node.isTag) ctx.fillStyle = node.color;
         else {
-          const g=ctx.createRadialGradient(node.x-1,node.y-1,0,node.x,node.y,nr);
-          g.addColorStop(0,'#FFFFFF');
-          g.addColorStop(1,isConn?getAlphaColor(node.color, '44'):'#F0EFE8');
-          ctx.fillStyle=g;
+          const g = ctx.createRadialGradient(node.x - 1, node.y - 1, 0, node.x, node.y, nr);
+          g.addColorStop(0, '#FFFFFF');
+          g.addColorStop(1, isConn ? cachedAlpha(node.color, '44') : '#F0EFE8');
+          ctx.fillStyle = g;
         }
-        ctx.strokeStyle=node.isTag?'rgba(255,255,255,0.25)':isActive?node.color:(isConn?node.color:'rgba(26,26,26,0.35)');
-        ctx.lineWidth=isActive||node.isTag?2.5:1.5;
-        ctx.arc(node.x,node.y,nr,0,Math.PI*2);ctx.fill();ctx.stroke();
-        ctx.shadowBlur=0;
+        
+        ctx.strokeStyle = node.isTag ? 'rgba(255,255,255,0.25)' : isActive ? node.color : (isConn ? node.color : 'rgba(26,26,26,0.35)');
+        ctx.lineWidth = isActive || node.isTag ? 2.5 : 1.5;
+        ctx.arc(node.x, node.y, nr, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.shadowBlur = 0;
 
         // Label
-        const lsz=node.isTag?12:isActive?11:10;
-        ctx.font=`${node.isTag||isActive?'700':'500'} ${lsz}px "JetBrains Mono",monospace`;
-        ctx.textAlign='center';
-        if(isActive){
-          const tw=ctx.measureText(node.label).width;
-          ctx.fillStyle='rgba(0,71,255,0.08)';
-          ctx.beginPath();ctx.roundRect(node.x-tw/2-6,node.y+nr+8,tw+12,18,3);ctx.fill();
+        const lsz = node.isTag ? 12 : isActive ? 11 : 10;
+        ctx.font = `${node.isTag || isActive ? '700' : '500'} ${lsz}px var(--font-mono)`;
+        ctx.textAlign = 'center';
+        
+        if (isActive) {
+          const tw = ctx.measureText(node.label).width;
+          ctx.fillStyle = 'rgba(0,71,255,0.08)';
+          ctx.beginPath();
+          ctx.roundRect(node.x - tw / 2 - 6, node.y + nr + 8, tw + 12, 18, 3);
+          ctx.fill();
         }
-        ctx.fillStyle=node.isTag?node.color:isActive?'rgba(0,71,255,1.0)':(isConn?'#1A1A1A':'#555');
-        ctx.fillText(node.label,node.x,node.y+nr+22);
-        ctx.globalAlpha=1;
+        
+        ctx.fillStyle = node.isTag ? node.color : isActive ? 'rgba(0,71,255,1.0)' : (isConn ? '#1A1A1A' : '#555');
+        ctx.fillText(node.label, node.x, node.y + nr + 22);
+        ctx.globalAlpha = 1;
       });
 
       ctx.restore();
-      rafRef.current=requestAnimationFrame(tick);
+      dirtyRef.current = false;
+      rafRef.current = requestAnimationFrame(tick);
     };
-    rafRef.current=requestAnimationFrame(tick);
+    rafRef.current = requestAnimationFrame(tick);
 
     return ()=>{
       if(rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -689,12 +749,11 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
       window.removeEventListener('mousemove',onMove);
       window.removeEventListener('mouseup',onUp);
       canvas.removeEventListener('wheel',onWheel);
-      
       canvas.removeEventListener('touchstart',onTouchStart);
       canvas.removeEventListener('touchmove',onTouchMove);
       canvas.removeEventListener('touchend',onTouchEnd);
     };
-  },[showGraph,isOpen]); // intentionally minimal — all live values via refs
+  },[showGraph,isOpen]); 
 
   const activeFile=data.files[activeFileId];
   const renderedContent = useMemo(() => {
@@ -734,8 +793,6 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
   }, [activeFileId, activeFile]);
 
   if(!isOpen) return null;
-
-
 
   return (
     <div className={`fixed inset-0 z-[9999] flex items-center justify-center p-2 md:p-6 transition-opacity duration-300 ${isMounted?'opacity-100':'opacity-0'}`}>
