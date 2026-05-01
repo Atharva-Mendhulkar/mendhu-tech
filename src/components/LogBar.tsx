@@ -11,6 +11,14 @@ interface LogItem {
   href: string;
 }
 
+interface HashnodePostEdge {
+  node: {
+    title: string;
+    publishedAt: string;
+    slug: string;
+  };
+}
+
 const PROJECT_ITEMS: LogItem[] = projects.map(p => ({
   name: p.title,
   subtitle: p.subtitle,
@@ -51,7 +59,7 @@ export default function LogBar() {
         const json = await res.json();
         const edges = json.data?.publication?.posts?.edges || [];
         if (edges.length > 0) {
-          const parsed = edges.map((e: any) => ({
+          const parsed = edges.map((e: HashnodePostEdge) => ({
             name: e.node.title,
             subtitle: "",
             date: new Date(e.node.publishedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
@@ -91,7 +99,7 @@ export default function LogBar() {
               rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
               className="group hover:text-ink transition-colors"
             >
-              <span className="font-bold text-ink border-b border-dashed border-border-strong group-hover:border-accent transition-colors">{item.name}</span>
+              <span className="font-normal text-ink border-b border-dashed border-border-strong group-hover:border-accent transition-colors">{item.name}</span>
               {item.subtitle && <span className="text-ink-muted"> — {item.subtitle}</span>}
               {item.date && <span className="text-ink-faint"> ({item.date})</span>}
             </a>
