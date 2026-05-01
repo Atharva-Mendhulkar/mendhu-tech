@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const HASHNODE_QUERY = `
   query {
@@ -32,7 +33,9 @@ interface Post {
 }
 
 export default function BlogSection() {
+  const router = useRouter();
   const [posts, setPosts] = useState<Post[]>([]);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   useEffect(() => {
     async function fetchPosts() {
@@ -76,10 +79,15 @@ export default function BlogSection() {
       <h2 className="sr-only">Latest Blogs by Atharva Mendhulkar</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-[10px]">
-        {posts.map((post, i) => (
+        {posts.map((post) => (
           <Link 
-            key={i}
+            key={post.slug}
             href={`/blog/${post.slug}`}
+            onClick={(e) => {
+              e.preventDefault();
+              setIsNavigating(true);
+              setTimeout(() => router.push(`/blog/${post.slug}`), 500);
+            }}
             className="fade-in border border-dashed border-border-strong p-8 bg-[rgba(253,253,251,0.72)] hover:bg-[rgba(0,71,255,0.025)] hover:border-solid hover:border-accent transition-all duration-300 flex flex-col justify-between group cursor-pointer relative rounded-2xl overflow-hidden"
           >
             {/* Corner Marks */}
@@ -111,6 +119,24 @@ export default function BlogSection() {
           </Link>
         ))}
       </div>
+
+      {isNavigating && (
+        <div
+          className="fixed inset-0 z-[1000] flex items-center justify-center"
+          style={{
+            backgroundColor: "var(--paper)",
+            animation: "fadeInBlog 0.6s ease-in-out forwards",
+          }}
+        >
+          <div className="font-serif text-[24px] italic text-accent animate-pulse">Entering Intellectual Log...</div>
+          <style>{`
+            @keyframes fadeInBlog {
+              from { opacity: 0; }
+              to { opacity: 1; }
+            }
+          `}</style>
+        </div>
+      )}
     </section>
   );
 }

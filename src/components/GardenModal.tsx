@@ -77,9 +77,18 @@ interface GraphSettings {
 const TAG_COLORS: Record<string, string> = {
   ai:'#00FF88', agents:'#FFBD2E', systems:'#FF5F57',
   security:'#CC77FF', ml:'#0047FF', physics:'#20C9A6',
-  saas:'#F97316', kernel:'#EF4444', pinn:'#3B82F6',
 };
-const tagColor = (t: string) => TAG_COLORS[t.replace('#','')] ?? '#888888';
+const getTagColor = (t: string) => {
+  const clean = t.replace('#','').toLowerCase();
+  if (TAG_COLORS[clean]) return TAG_COLORS[clean];
+  let hash = 0;
+  for (let i = 0; i < clean.length; i++) {
+    hash = clean.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const h = Math.abs(hash % 360);
+  // Maintain high vibrancy and professional lightness
+  return `hsl(${h}, 75%, 55%)`;
+};
 
 const getAlphaColor = (color: string, alpha: string) => {
   if (color.startsWith('#')) {
@@ -102,15 +111,23 @@ const DEFAULT: GraphSettings = {
 };
 
 function buildSimGraph(raw: ResearchData, groupByTags: boolean, W: number, H: number, existing: SimNode[]) {
-  const cx = W/2, cy = H/2, now = Date.now();
-  const fileNodes: SimNode[] = raw.nodes.map((n,i) => {
-    const ex = existing.find(e => e.id === n.id);
-    return ex ?? {
-      id:n.id, label:n.name??n.label??n.id, color:n.color??'#888',
+  const cx = W/2, cy = H/2;
+  const existingById = new Map(existing.map(n => [n.id, n]));
+  
+  const fileNodes: SimNode[] = raw.nodes.map((n) => {
+    const ex = existingById.get(n.id);
+    const node: SimNode = ex ?? {
+      id:n.id, label:n.name??n.label??n.id, 
+      color: n.color ?? (n.tags?.[0] ? getTagColor(n.tags[0]) : '#888'),
       group:n.group, tags:n.tags??[],
       x:cx+(Math.random()-.5)*300, y:cy+(Math.random()-.5)*300,
       vx:0, vy:0, r:8, isTag:false, revealAt:0,
     };
+    // Ensure properties are updated even if node existed
+    node.label = n.name??n.label??n.id;
+    node.color = n.color ?? (n.tags?.[0] ? getTagColor(n.tags[0]) : '#888');
+    node.tags = n.tags ?? [];
+    return node;
   });
   const fileLinks: SimLink[] = raw.links.flatMap(l => {
     const s=fileNodes.find(n=>n.id===l.source), t=fileNodes.find(n=>n.id===l.target);
@@ -121,13 +138,17 @@ function buildSimGraph(raw: ResearchData, groupByTags: boolean, W: number, H: nu
   const allTags = new Set<string>();
   fileNodes.forEach(n => n.tags.forEach(t => allTags.add(t.replace('#','').toLowerCase())));
   const tagNodes: SimNode[] = [...allTags].map((tag,i) => {
-    const ex = existing.find(e=>e.id===`#${tag}`);
-    return ex ?? {
-      id:`#${tag}`, label:`#${tag}`, color:tagColor(tag), group:'tag', tags:[],
+    const id = `#${tag}`;
+    const ex = existingById.get(id);
+    const node: SimNode = ex ?? {
+      id, label:id, color:getTagColor(tag), group:'tag', tags:[],
       x:cx+Math.cos((i/allTags.size)*Math.PI*2)*160,
       y:cy+Math.sin((i/allTags.size)*Math.PI*2)*160,
-      vx:0, vy:0, r:14, isTag:true, revealAt:0,
+      vx:0, vy:0, r:20, isTag:true, revealAt:0,
     };
+    node.label = id;
+    node.color = getTagColor(tag);
+    return node;
   });
   const tagLinks: SimLink[] = [];
   fileNodes.forEach(fn => {
@@ -137,7 +158,45 @@ function buildSimGraph(raw: ResearchData, groupByTags: boolean, W: number, H: nu
       if(hub) tagLinks.push({source:hub, target:fn});
     });
   });
-  return { nodes:[...tagNodes,...fileNodes], links:[...fileLinks,...tagLinks] };
+
+  const nodes = [...tagNodes, ...fileNodes];
+  const links = [...fileLinks, ...tagLinks];
+
+  // Physics Warm-up (Synchronous pre-calculation)
+  // This makes the graph "aware of physics on loading" by pre-settling it
+  if (existing.length === 0) {
+    const repel = 12000, lDist = 280, lForce = 0.02, cForce = 0.003;
+    for (let iter = 0; iter < 120; iter++) {
+      for(let i=0;i<nodes.length;i++){
+        const n1=nodes[i];
+        n1.vx+=(cx-n1.x)*cForce*(n1.isTag?4:1);
+        n1.vy+=(cy-n1.y)*cForce*(n1.isTag?4:1);
+        for(let j=i+1;j<nodes.length;j++){
+          const n2=nodes[j];
+          const dx=n1.x-n2.x,dy=n1.y-n2.y;
+          const d2=dx*dx+dy*dy+1, d=Math.sqrt(d2);
+          const f=repel/d2;
+          const fx=(dx/d)*f, fy=(dy/d)*f;
+          n1.vx+=fx; n1.vy+=fy; n2.vx-=fx; n2.vy-=fy;
+        }
+      }
+      links.forEach(l=>{
+        const dx=l.source.x-l.target.x, dy=l.source.y-l.target.y;
+        const d=Math.sqrt(dx*dx+dy*dy)||1;
+        const f=(d-lDist)*lForce;
+        const fx=(dx/d)*f, fy=(dy/d)*f;
+        l.source.vx-=fx; l.source.vy-=fy;
+        l.target.vx+=fx; l.target.vy+=fy;
+      });
+      const damp=0.82;
+      nodes.forEach(n=>{
+        n.vx*=damp; n.vy*=damp;
+        n.x+=n.vx; n.y+=n.vy;
+      });
+    }
+  }
+
+  return { nodes, links };
 }
 
 interface SliderRowProps {
@@ -224,6 +283,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMounted, setIsMounted]       = useState(false);
   const [settings, setSettings]         = useState<GraphSettings>({...DEFAULT});
+  const [showCopyToast, setShowCopyToast] = useState(false);
   const settingsRef                     = useRef<GraphSettings>({...DEFAULT});
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -242,7 +302,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
   const simNodesRef  = useRef<SimNode[]>([]);
   const simLinksRef  = useRef<SimLink[]>([]);
   const dragNodeRef  = useRef<SimNode|null>(null);
-  const energyRef    = useRef<number>(0.005);
+  const energyRef    = useRef<number>(1.0); // Start with high energy for loading physics
   const transformRef = useRef({scale:1,x:0,y:0});
   const isPanRef     = useRef(false);
   const panStartRef  = useRef({x:0,y:0});
@@ -662,7 +722,10 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
           </div>
           <div className="flex gap-2">
             <button 
-              onClick={() => setShowGraph(!showGraph)} 
+              onClick={() => {
+                setShowGraph(!showGraph);
+                if (showGraph) setIsMaxGraph(false); // Reset max mode when hiding from header
+              }} 
               className={`font-mono text-[9px] px-3 py-1 border border-dashed border-border-strong flex items-center gap-1.5 transition-all hover:border-accent hover:text-accent ${showGraph ? 'bg-accent-light text-accent' : 'text-ink-muted'}`}
             >
               <span className="hidden sm:inline">{showGraph ? 'hide graph' : 'show graph'}</span>
@@ -730,7 +793,18 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
                 <div className="flex items-center gap-3 mb-8">
                   <span className="font-mono text-[9px] text-accent tracking-[0.25em] uppercase font-bold">{activeFile?.header}</span>
                   <div className="flex-1 h-px bg-accent/20"/>
-                  <Share2 size={12} className="text-ink-faint"/>
+                  <button 
+                    onClick={() => {
+                      const url = window.location.origin + '/blog/' + activeFileId;
+                      navigator.clipboard.writeText(url);
+                      setShowCopyToast(true);
+                      setTimeout(() => setShowCopyToast(false), 2000);
+                    }}
+                    title="Copy share link"
+                    className="p-1 hover:text-accent transition-colors flex items-center justify-center relative"
+                  >
+                    <Share2 size={12} className="text-ink-faint hover:text-accent"/>
+                  </button>
                 </div>
                 {renderedContent}
               </div>
@@ -782,6 +856,16 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
           )}
         </div>
       </div>
+
+      {/* Copy Toast */}
+      {showCopyToast && (
+        <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-[10000] animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="px-6 py-2.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] flex items-center gap-2.5 overflow-hidden">
+            <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+            <span className="font-mono text-[11px] tracking-wider text-ink font-medium uppercase">link copied to clipboard</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
