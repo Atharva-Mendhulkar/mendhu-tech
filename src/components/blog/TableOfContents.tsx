@@ -1,8 +1,10 @@
 // components/blog/TableOfContents.tsx
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface Heading { id: string; text: string; level: 2 | 3 }
+
+const HEADING_OFFSET = 96;
 
 function decodeHash(value: string) {
   try {
@@ -10,6 +12,11 @@ function decodeHash(value: string) {
   } catch {
     return value;
   }
+}
+
+function scrollToHeading(el: HTMLElement, behavior: ScrollBehavior) {
+  const top = el.getBoundingClientRect().top + window.scrollY - HEADING_OFFSET;
+  window.scrollTo({ top: Math.max(0, top), behavior });
 }
 
 function extractHeadingsFromDOM(): Heading[] {
@@ -27,6 +34,21 @@ function extractHeadingsFromDOM(): Heading[] {
 export default function TableOfContents({ html }: { html: string }) {
   const [headings, setHeadings] = useState<Heading[]>([]);
   const [activeId, setActiveId] = useState("");
+  const scrollLockRef = useRef<number | null>(null);
+  const handledHashRef = useRef("");
+
+  const releaseScrollLock = useCallback(() => {
+    if (scrollLockRef.current) window.clearTimeout(scrollLockRef.current);
+    scrollLockRef.current = window.setTimeout(() => {
+      scrollLockRef.current = null;
+    }, 650);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (scrollLockRef.current) window.clearTimeout(scrollLockRef.current);
+    };
+  }, []);
 
   const updateActiveHeading = useCallback((items: Heading[]) => {
     if (!items.length) return;
@@ -45,6 +67,10 @@ export default function TableOfContents({ html }: { html: string }) {
 
     setActiveId(current);
   }, []);
+
+  useEffect(() => {
+    handledHashRef.current = "";
+  }, [html]);
 
   useEffect(() => {
     const postBody = document.querySelector(".post-body");
@@ -69,6 +95,11 @@ export default function TableOfContents({ html }: { html: string }) {
 
     let frame = 0;
     const scheduleUpdate = () => {
+      if (scrollLockRef.current) {
+        releaseScrollLock();
+        return;
+      }
+
       window.cancelAnimationFrame(frame);
       frame = window.requestAnimationFrame(() => updateActiveHeading(headings));
     };
@@ -82,17 +113,20 @@ export default function TableOfContents({ html }: { html: string }) {
       window.removeEventListener("scroll", scheduleUpdate);
       window.removeEventListener("resize", scheduleUpdate);
     };
-  }, [headings, updateActiveHeading]);
+  }, [headings, releaseScrollLock, updateActiveHeading]);
 
   useEffect(() => {
-    if (!headings.length || !window.location.hash) return;
+    const hash = window.location.hash;
+    if (!headings.length || !hash || handledHashRef.current === hash) return;
 
-    const targetId = decodeHash(window.location.hash.slice(1));
+    handledHashRef.current = hash;
+
+    const targetId = decodeHash(hash.slice(1));
     const target = document.getElementById(targetId);
     if (!target) return;
 
     const frame = window.requestAnimationFrame(() => {
-      target.scrollIntoView({ block: "start" });
+      scrollToHeading(target, "auto");
       setActiveId(targetId);
     });
 
@@ -124,9 +158,12 @@ export default function TableOfContents({ html }: { html: string }) {
                 e.preventDefault();
                 const el = document.getElementById(h.id);
                 if (el) {
+                  const hash = `#${encodeURIComponent(h.id)}`;
                   setActiveId(h.id);
-                  history.pushState(null, "", `#${encodeURIComponent(h.id)}`);
-                  el.scrollIntoView({ behavior: "smooth", block: "start" });
+                  handledHashRef.current = hash;
+                  releaseScrollLock();
+                  scrollToHeading(el, "smooth");
+                  history.pushState(null, "", hash);
                 }
               }}
             >
