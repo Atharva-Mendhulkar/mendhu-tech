@@ -43,6 +43,19 @@ export default function Home() {
     }
   }, [hasInitialGardenOpened]);
 
+  // Listen for custom garden open events (from GardenEntryClient)
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const { fileId } = (e as CustomEvent<{ fileId: string }>).detail;
+      if (fileId) {
+        setActiveGardenFileId(fileId);
+        setIsGardenOpen(true);
+      }
+    };
+    window.addEventListener("open-garden-file", handler);
+    return () => window.removeEventListener("open-garden-file", handler);
+  }, []);
+
   const handleMinimizeModal = (id: string, title: string, type: 'garden' | 'project') => {
     if (type === 'garden') setIsGardenOpen(false);
     else setActiveModalId(null);

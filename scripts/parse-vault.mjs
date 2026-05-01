@@ -62,7 +62,19 @@ const groupToColor = {
 files.forEach(filePath => {
   const fileContent = fs.readFileSync(filePath, 'utf-8');
   const { data, content } = matter(fileContent);
-  const id = path.basename(filePath, '.md').toLowerCase().replace(/\s+/g, '_');
+  
+  // URL-safe ID generation with frontmatter override
+  let id;
+  if (data.id && typeof data.id === "string") {
+    id = data.id.replace(/\s+/g, "_").replace(/[^a-zA-Z0-9_-]/g, "").toLowerCase();
+  } else {
+    id = path.relative(VAULT_PATH, filePath)
+      .replace(/\.md$/, "")
+      .replace(/[\\/]+/g, "_")
+      .replace(/\s+/g, "_")
+      .replace(/[^a-zA-Z0-9_-]/g, "")
+      .toLowerCase();
+  }
   
   let tags = data.tags || [];
   if (!Array.isArray(tags)) {

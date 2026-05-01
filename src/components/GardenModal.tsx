@@ -821,18 +821,25 @@ export default function GardenModal({ isOpen, onClose, onMinimize, onFileChange,
                 <div className="flex items-center gap-3 mb-8">
                   <span className="font-mono text-[9px] text-accent tracking-[0.25em] uppercase font-bold">{activeFile?.header}</span>
                   <div className="flex-1 h-px bg-accent/20"/>
-                  <button 
-                    onClick={() => {
-                      const url = window.location.origin + '/garden/' + activeFileId;
-                      navigator.clipboard.writeText(url);
-                      setShowCopyToast(true);
-                      setTimeout(() => setShowCopyToast(false), 2000);
-                    }}
-                    title="Copy share link"
-                    className="p-1 hover:text-accent transition-colors flex items-center justify-center relative"
-                  >
-                    <Share2 size={12} className="text-ink-faint hover:text-accent"/>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => {
+                        const url = `${window.location.origin}/garden/${activeFileId}`;
+                        navigator.clipboard.writeText(url).then(() => {
+                          setShowCopyToast(true);
+                          setTimeout(() => setShowCopyToast(false), 2500);
+                        });
+                        window.history.replaceState({}, "", `/garden/${activeFileId}`);
+                      }}
+                      title={`Copy link: mendhu.tech/garden/${activeFileId}`}
+                      className="group flex items-center gap-1.5 font-mono text-[9px] text-ink-faint hover:text-accent transition-colors px-2 py-1 border border-dashed border-transparent hover:border-accent rounded-[2px]"
+                    >
+                      <Share2 size={11} />
+                      <span className="hidden sm:inline opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                        {`/garden/${activeFileId}`}
+                      </span>
+                    </button>
+                  </div>
                 </div>
                 {renderedContent}
               </div>
@@ -890,7 +897,9 @@ export default function GardenModal({ isOpen, onClose, onMinimize, onFileChange,
         <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-[10000] animate-in fade-in slide-in-from-bottom-4 duration-300">
           <div className="px-6 py-2.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] flex items-center gap-2.5 overflow-hidden">
             <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-            <span className="font-mono text-[11px] tracking-wider text-ink font-medium uppercase">link copied to clipboard</span>
+            <span className="font-mono text-[11px] tracking-wider text-ink font-medium">
+              mendhu.tech/garden/{activeFileId}
+            </span>
           </div>
         </div>
       )}
