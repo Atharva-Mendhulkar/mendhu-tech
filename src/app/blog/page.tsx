@@ -80,10 +80,10 @@ export default async function BlogIndex({ searchParams }: PageProps) {
 
           {/* Header */}
           <h1 className="font-serif text-[42px] font-normal tracking-[-0.02em] leading-[1.1] mb-3 text-ink">
-            Blogs
+            Blogs by Atharva Mendhulkar
           </h1>
           <p className="font-mono text-[12px] text-ink-muted mb-10 max-w-[520px]">
-            Physics-informed ML · Linux kernel systems · AI agent security · SaaS engineering.
+            Exploring systems design, AI, engineering, and real-world builds.
             {" "}{posts.length} {activeTag === "all" ? "total" : activeTag} posts.
           </p>
 

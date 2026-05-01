@@ -73,6 +73,7 @@ export default function BlogSection() {
   return (
     <section className="py-10 border-b border-dashed border-border-strong relative z-10">
       <div className="section-tag">[02_INTELLECTUAL_LOG]</div>
+      <h2 className="sr-only">Latest Blogs by Atharva Mendhulkar</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-[10px]">
         {posts.map((post, i) => (
