@@ -267,14 +267,14 @@ const Toggle = ({ label, k, onToggle, settings, updateSetting }: ToggleProps) =>
   </label>
 );
 
-interface Props { isOpen:boolean; onClose:()=>void; onMinimize:(id:string,title:string)=>void; initialFileId?:string }
+interface Props { isOpen:boolean; onClose:()=>void; onMinimize:(id:string,title:string)=>void; onFileChange?:(id:string)=>void; initialFileId?:string }
 
-export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId }: Props) {
+export default function GardenModal({ isOpen, onClose, onMinimize, onFileChange, initialFileId }: Props) {
   const fileKeys = Object.keys(data.files);
   const [activeFileId, setActiveFileId] = useState(fileKeys[0]??'');
 
   useEffect(() => {
-    if (initialFileId && fileKeys.includes(initialFileId)) {
+    if (initialFileId && initialFileId !== activeFileId && fileKeys.includes(initialFileId)) {
       setActiveFileId(initialFileId);
     }
   }, [initialFileId, fileKeys]);
@@ -283,15 +283,16 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMounted, setIsMounted]       = useState(false);
 
-  // Sync active file with URL
+  // Sync active file with URL and parent
   useEffect(() => {
     if (isOpen && activeFileId) {
+      if (onFileChange) onFileChange(activeFileId);
       const newUrl = `/garden/${activeFileId}`;
       if (window.location.pathname !== newUrl) {
         window.history.replaceState({}, '', newUrl);
       }
     }
-  }, [activeFileId, isOpen]);
+  }, [activeFileId, isOpen, onFileChange]);
 
   // Return to home URL when closed
   useEffect(() => {

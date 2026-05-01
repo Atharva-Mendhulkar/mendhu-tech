@@ -230,8 +230,12 @@ export default function Home() {
       {/* MODALS */}
       <GardenModal 
         isOpen={isGardenOpen} 
-        onClose={() => setIsGardenOpen(false)} 
+        onClose={() => {
+          setIsGardenOpen(false);
+          setActiveGardenFileId(undefined); // Reset linked state on close
+        }} 
         onMinimize={(id, title) => handleMinimizeModal(id, title, 'garden')}
+        onFileChange={(id) => setActiveGardenFileId(id)}
         initialFileId={activeGardenFileId}
       />
       <ProjectModal 
