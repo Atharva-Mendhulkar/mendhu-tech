@@ -333,3 +333,16 @@ AVARA is correctly implemented when:
 ---
 
 > **AVARA does not make agents smarter. AVARA makes agents accountable.**
+
+tags:
+
+[[deterministic-control-plane]]
+[[intent-validation]]
+[[agent-systems]]
+[[audit-ledger]]
+[[agent-overreach]]
+[[api-gateway-pattern]]
+[[multi-agent-systems]]
+[[rag-systems]]
+[[rag-security]]
+[[tool-augmented-agents]]
