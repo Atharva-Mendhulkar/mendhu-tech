@@ -1,8 +1,16 @@
 // components/blog/TableOfContents.tsx
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface Heading { id: string; text: string; level: 2 | 3 }
+
+function decodeHash(value: string) {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
 
 function extractHeadingsFromDOM(): Heading[] {
   if (typeof document === "undefined") return [];
@@ -20,12 +28,32 @@ export default function TableOfContents({ html }: { html: string }) {
   const [headings, setHeadings] = useState<Heading[]>([]);
   const [activeId, setActiveId] = useState("");
 
+  const updateActiveHeading = useCallback((items: Heading[]) => {
+    if (!items.length) return;
+
+    const marker = window.scrollY + 112;
+    let current = items[0].id;
+
+    for (const heading of items) {
+      const el = document.getElementById(heading.id);
+      if (!el) continue;
+
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      if (top <= marker) current = heading.id;
+      else break;
+    }
+
+    setActiveId(current);
+  }, []);
+
   useEffect(() => {
     const postBody = document.querySelector(".post-body");
     if (!postBody) return;
 
     const extract = () => {
-      setHeadings(extractHeadingsFromDOM());
+      const nextHeadings = extractHeadingsFromDOM();
+      setHeadings(nextHeadings);
+      updateActiveHeading(nextHeadings);
     };
 
     extract();
@@ -34,27 +62,41 @@ export default function TableOfContents({ html }: { html: string }) {
     observer.observe(postBody, { childList: true, subtree: true });
 
     return () => observer.disconnect();
-  }, [html]);
+  }, [html, updateActiveHeading]);
 
   useEffect(() => {
     if (!headings.length) return;
 
-    const observer = new IntersectionObserver(
-      entries => {
-        const visibleEntries = entries
-          .filter(entry => entry.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+    let frame = 0;
+    const scheduleUpdate = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => updateActiveHeading(headings));
+    };
 
-        if (visibleEntries[0]?.target.id) setActiveId(visibleEntries[0].target.id);
-      },
-      { threshold: 0.1, rootMargin: "-96px 0px -55% 0px" }
-    );
+    scheduleUpdate();
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
 
-    headings.forEach(h => {
-      const el = document.getElementById(h.id);
-      if (el) observer.observe(el);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+    };
+  }, [headings, updateActiveHeading]);
+
+  useEffect(() => {
+    if (!headings.length || !window.location.hash) return;
+
+    const targetId = decodeHash(window.location.hash.slice(1));
+    const target = document.getElementById(targetId);
+    if (!target) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      target.scrollIntoView({ block: "start" });
+      setActiveId(targetId);
     });
-    return () => observer.disconnect();
+
+    return () => window.cancelAnimationFrame(frame);
   }, [headings]);
 
   if (!headings.length) return null;
