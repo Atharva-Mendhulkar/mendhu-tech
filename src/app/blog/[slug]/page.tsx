@@ -8,6 +8,7 @@ import PostBody          from "@/components/blog/PostBody";
 import TableOfContents   from "@/components/blog/TableOfContents";
 import SeriesNav         from "@/components/blog/SeriesNav";
 import CustomCursor     from "@/components/CustomCursor";
+import BlogShareButton from "@/components/blog/BlogShareButton";
 
 export const dynamic = "force-dynamic";
 
@@ -146,6 +147,8 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                 <span>{formatDate(post.publishedAt)}</span>
                 <span className="text-border-strong">·</span>
                 <span>{post.readTimeInMinutes} min read</span>
+                <span className="text-border-strong">·</span>
+                <BlogShareButton title={post.title} slug={post.slug} />
                 <span className="text-border-strong">·</span>
                 <span>Written by Atharva Mendhulkar</span>
               </div>
