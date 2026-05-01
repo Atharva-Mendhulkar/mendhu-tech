@@ -282,6 +282,26 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
   const [isMaxGraph, setIsMaxGraph]     = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMounted, setIsMounted]       = useState(false);
+
+  // Sync active file with URL
+  useEffect(() => {
+    if (isOpen && activeFileId) {
+      const newUrl = `/garden/${activeFileId}`;
+      if (window.location.pathname !== newUrl) {
+        window.history.replaceState({}, '', newUrl);
+      }
+    }
+  }, [activeFileId, isOpen]);
+
+  // Return to home URL when closed
+  useEffect(() => {
+    if (!isOpen && isMounted) {
+      if (window.location.pathname.startsWith('/garden/')) {
+        window.history.replaceState({}, '', '/');
+      }
+    }
+  }, [isOpen, isMounted]);
+
   const [settings, setSettings]         = useState<GraphSettings>({...DEFAULT});
   const [showCopyToast, setShowCopyToast] = useState(false);
   const settingsRef                     = useRef<GraphSettings>({...DEFAULT});

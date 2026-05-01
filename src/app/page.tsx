@@ -36,8 +36,8 @@ export default function Home() {
         setIsGardenOpen(true);
         setHasInitialGardenOpened(true);
         
-        // Clean up URL without refreshing
-        const newUrl = window.location.pathname;
+        // Clean up URL to show the clean /garden/id path instead of query params
+        const newUrl = `/garden/${gardenId}`;
         window.history.replaceState({}, '', newUrl);
       }
     }
