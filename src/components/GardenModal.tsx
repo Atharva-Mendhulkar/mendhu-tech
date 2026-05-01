@@ -109,7 +109,7 @@ function buildSimGraph(raw: ResearchData, groupByTags: boolean, W: number, H: nu
       id:n.id, label:n.name??n.label??n.id, color:n.color??'#888',
       group:n.group, tags:n.tags??[],
       x:cx+(Math.random()-.5)*300, y:cy+(Math.random()-.5)*300,
-      vx:0, vy:0, r:8, isTag:false, revealAt:now+i*100,
+      vx:0, vy:0, r:8, isTag:false, revealAt:0,
     };
   });
   const fileLinks: SimLink[] = raw.links.flatMap(l => {
@@ -126,7 +126,7 @@ function buildSimGraph(raw: ResearchData, groupByTags: boolean, W: number, H: nu
       id:`#${tag}`, label:`#${tag}`, color:tagColor(tag), group:'tag', tags:[],
       x:cx+Math.cos((i/allTags.size)*Math.PI*2)*160,
       y:cy+Math.sin((i/allTags.size)*Math.PI*2)*160,
-      vx:0, vy:0, r:14, isTag:true, revealAt:now,
+      vx:0, vy:0, r:14, isTag:true, revealAt:0,
     };
   });
   const tagLinks: SimLink[] = [];
@@ -219,7 +219,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
       setActiveFileId(initialFileId);
     }
   }, [initialFileId, fileKeys]);
-  const [showGraph, setShowGraph]       = useState(true);
+  const [showGraph, setShowGraph]       = useState(false);
   const [isMaxGraph, setIsMaxGraph]     = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMounted, setIsMounted]       = useState(false);
@@ -242,7 +242,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
   const simNodesRef  = useRef<SimNode[]>([]);
   const simLinksRef  = useRef<SimLink[]>([]);
   const dragNodeRef  = useRef<SimNode|null>(null);
-  const energyRef    = useRef<number>(1.0);
+  const energyRef    = useRef<number>(0.005);
   const transformRef = useRef({scale:1,x:0,y:0});
   const isPanRef     = useRef(false);
   const panStartRef  = useRef({x:0,y:0});
@@ -295,6 +295,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
     updateSetting('groupByTags',v);
   };
   const triggerAnimate = () => {
+    setIsSettingsOpen(false);
     const now = Date.now();
     simNodesRef.current.forEach((n, i) => {
       n.revealAt = now + (n.isTag ? 0 : i * 50);
@@ -661,12 +662,20 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
           </div>
           <div className="flex gap-2">
             <button 
-              onClick={() => setIsMaxGraph(!isMaxGraph)} 
-              className={`font-mono text-[9px] px-3 py-1 border border-dashed border-border-strong flex items-center gap-1.5 transition-all hover:border-accent hover:text-accent ${isMaxGraph ? 'bg-accent-light text-accent' : 'text-ink-muted'}`}
+              onClick={() => setShowGraph(!showGraph)} 
+              className={`font-mono text-[9px] px-3 py-1 border border-dashed border-border-strong flex items-center gap-1.5 transition-all hover:border-accent hover:text-accent ${showGraph ? 'bg-accent-light text-accent' : 'text-ink-muted'}`}
             >
-              {isMaxGraph ? <Minimize2 size={11}/> : <Maximize2 size={11}/>}
-              <span className="hidden sm:inline">{isMaxGraph ? 'restore' : 'max graph'}</span>
+              <span className="hidden sm:inline">{showGraph ? 'hide graph' : 'show graph'}</span>
             </button>
+            {showGraph && (
+              <button 
+                onClick={() => setIsMaxGraph(!isMaxGraph)} 
+                className={`font-mono text-[9px] px-3 py-1 border border-dashed border-border-strong flex items-center gap-1.5 transition-all hover:border-accent hover:text-accent ${isMaxGraph ? 'bg-accent-light text-accent' : 'text-ink-muted'}`}
+              >
+                {isMaxGraph ? <Minimize2 size={11}/> : <Maximize2 size={11}/>}
+                <span className="hidden sm:inline">{isMaxGraph ? 'restore' : 'max graph'}</span>
+              </button>
+            )}
             <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="lg:hidden font-mono text-[9px] px-3 py-1 border border-dashed border-border-strong text-ink-muted hover:text-accent">[menu]</button>
           </div>
         </div>
