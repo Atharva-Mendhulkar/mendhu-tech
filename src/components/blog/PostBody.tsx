@@ -33,33 +33,62 @@ export default function PostBody({ html }: Props) {
         <div
           className="post-body"
           dangerouslySetInnerHTML={{ 
-            __html: html.replace(/<h([23])([^>]*)>([\s\S]*?)<\/h\1>/gi, (match, level, attrs, text) => {
-              const cleanText = text.replace(/<[^>]*>/g, '').trim();
-              const id = cleanText.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-              return `<h${level} id="${id}"${attrs}>${text}</h${level}>`;
-            })
+            __html: (() => {
+              const counts: Record<string, number> = {};
+              return html.replace(/<h([23])([^>]*)>([\s\S]*?)<\/h\1>/gi, (match, level, attrs, text) => {
+                const cleanText = text.replace(/<[^>]*>/g, '').trim();
+                let id = cleanText.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+                if (!id) id = "heading";
+                if (counts[id]) {
+                  id = `${id}-${counts[id]}`;
+                  counts[id.replace(/-\d+$/, '')]++; // increment base count
+                } else {
+                  counts[id] = 1;
+                }
+                
+                // Remove any existing id attribute from attrs to avoid duplicates like <h2 id="new" id="old">
+                const cleanedAttrs = attrs.replace(/\s+id\s*=\s*["'][^"']*["']/i, '');
+                
+                return `<h${level} id="${id}"${cleanedAttrs}>${text}</h${level}>`;
+              });
+            })()
           }}
         />
       ) : (
         <div className="post-body">
-          <ReactMarkdown 
-            remarkPlugins={[remarkGfm]} 
-            rehypePlugins={[rehypeRaw]}
-            components={{
-              h2: ({ children }) => {
-                const text = Array.isArray(children) ? children.join("") : String(children);
-                const id = text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-                return <h2 id={id}>{children}</h2>;
-              },
-              h3: ({ children }) => {
-                const text = Array.isArray(children) ? children.join("") : String(children);
-                const id = text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-                return <h3 id={id}>{children}</h3>;
+          {(() => {
+            const counts: Record<string, number> = {};
+            const getSlug = (text: string) => {
+              let id = text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+              if (!id) id = "heading";
+              if (counts[id]) {
+                id = `${id}-${counts[id]}`;
+                counts[id.replace(/-\d+$/, '')]++;
+              } else {
+                counts[id] = 1;
               }
-            }}
-          >
-            {html}
-          </ReactMarkdown>
+              return id;
+            };
+
+            return (
+              <ReactMarkdown 
+                remarkPlugins={[remarkGfm]} 
+                rehypePlugins={[rehypeRaw]}
+                components={{
+                  h2: ({ children }) => {
+                    const text = Array.isArray(children) ? children.join("") : String(children);
+                    return <h2 id={getSlug(text)}>{children}</h2>;
+                  },
+                  h3: ({ children }) => {
+                    const text = Array.isArray(children) ? children.join("") : String(children);
+                    return <h3 id={getSlug(text)}>{children}</h3>;
+                  }
+                }}
+              >
+                {html}
+              </ReactMarkdown>
+            );
+          })()}
         </div>
       )}
     </>

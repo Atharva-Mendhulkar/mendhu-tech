@@ -4,34 +4,18 @@ import { useEffect, useState } from "react";
 
 interface Heading { id: string; text: string; level: 2 | 3 }
 
-function extractHeadings(content: string): Heading[] {
-  if (!content) return [];
+function extractHeadingsFromDOM(): Heading[] {
+  if (typeof document === "undefined") return [];
+  const headingElements = document.querySelectorAll(".post-body h2, .post-body h3");
   const headings: Heading[] = [];
   
-  // Try Markdown parsing
-  const mdLines = content.split("\n");
-  for (const line of mdLines) {
-    const trimmed = line.trim();
-    const match = trimmed.match(/^(#{2,3})\s+(.+)$/);
-    if (match) {
-      const level = match[1].length as 2 | 3;
-      const text = match[2].trim();
-      const id = text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-      headings.push({ id, text, level });
-    }
-  }
-
-  // Fallback to HTML parsing
-  if (headings.length === 0 && typeof window !== "undefined") {
-    const div = document.createElement("div");
-    div.innerHTML = content;
-    div.querySelectorAll("h2, h3").forEach(el => {
-      const text  = el.textContent ?? "";
-      const id    = el.id || text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-      const level = parseInt(el.tagName[1]) as 2 | 3;
-      headings.push({ id, text, level });
+  headingElements.forEach(el => {
+    headings.push({
+      id: el.id,
+      text: el.textContent || "",
+      level: parseInt(el.tagName[1]) as 2 | 3
     });
-  }
+  });
   
   return headings;
 }
@@ -41,17 +25,32 @@ export default function TableOfContents({ html }: { html: string }) {
   const [activeId, setActiveId]     = useState("");
 
   useEffect(() => {
-    setHeadings(extractHeadings(html));
+    // We need to wait for PostBody to render. A small timeout or just relying on
+    // React's rendering cycle is usually enough. Let's do it immediately, and 
+    // also set a small timeout as a fallback for complex markdown parsing.
+    const extract = () => setHeadings(extractHeadingsFromDOM());
+    extract(); // Initial extraction
+    const timer = setTimeout(extract, 100); // Fallback after render
+    return () => clearTimeout(timer);
   }, [html]);
 
   useEffect(() => {
     if (!headings.length) return;
     const observer = new IntersectionObserver(
       entries => {
-        entries.forEach(e => { if (e.isIntersecting) setActiveId(e.target.id); });
+        // Find the visible entry with the highest intersection ratio
+        const visibleEntries = entries.filter(e => e.isIntersecting);
+        if (visibleEntries.length > 0) {
+          // If multiple are visible, pick the first one from top (which is what we care about for TOC)
+          setActiveId(visibleEntries[0].target.id);
+        }
       },
-      { threshold: 0.5, rootMargin: "-80px 0px -40% 0px" }
+      { threshold: 0.1, rootMargin: "-80px 0px -40% 0px" }
     );
+    
+    // Disconnect old observer before observing new elements
+    observer.disconnect();
+    
     headings.forEach(h => {
       const el = document.getElementById(h.id);
       if (el) observer.observe(el);
