@@ -65,8 +65,10 @@ const POST_CARD_FIELDS = `
 
 // ── Queries ────────────────────────────────────────────────────────────────
 
+import { cache } from 'react';
+
 /** All posts — for index page + generateStaticParams */
-export async function getAllPosts(): Promise<Post[]> {
+export const getAllPosts = cache(async (): Promise<Post[]> => {
   let remotePosts: Post[] = [];
   try {
     const data = await gql<{
@@ -109,7 +111,7 @@ export async function getAllPosts(): Promise<Post[]> {
   }
 
   return combined;
-}
+});
 
 /** Single post by slug — for individual post pages */
 export async function getPost(slug: string): Promise<PostWithSeries | null> {

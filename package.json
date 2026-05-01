@@ -9,9 +9,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@react-three/drei": "^10.7.7",
-    "@react-three/fiber": "^9.6.0",
-    "@types/three": "^0.184.0",
     "gray-matter": "^4.0.3",
     "lucide-react": "^1.11.0",
     "mermaid": "^11.14.0",
@@ -20,8 +17,7 @@
     "react-dom": "19.2.4",
     "react-markdown": "^10.1.0",
     "rehype-raw": "^7.0.0",
-    "remark-gfm": "^4.0.1",
-    "three": "^0.184.0"
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

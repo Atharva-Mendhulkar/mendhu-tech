@@ -4,6 +4,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import { rehypeHeadingIds } from "@/lib/headingIds";
+import Image from "next/image";
 
 interface Props { html: string }
 
@@ -33,6 +34,16 @@ export default function PostBody({ html }: Props) {
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           rehypePlugins={[rehypeRaw, rehypeHeadingIds]}
+          components={{
+            img: ({ src, alt, ...props }) => {
+              if (!src) return null;
+              return (
+                <span className="block relative w-full" style={{ aspectRatio: '16/9' }}>
+                  <Image src={src} alt={alt || ''} fill sizes="(max-width: 768px) 100vw, 800px" className="object-cover" {...props as any} />
+                </span>
+              );
+            }
+          }}
         >
           {html}
         </ReactMarkdown>

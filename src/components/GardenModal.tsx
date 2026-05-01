@@ -4,42 +4,48 @@ import { useEffect, useState, useRef, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
-import mermaid from 'mermaid';
 import { ChevronRight, ChevronDown, FileText, Maximize2, Minimize2, Share2, Globe, Minus, X, Settings, Search } from 'lucide-react';
 import rawResearchData from '@/data/research.json';
 
 // ── Mermaid ────────────────────────────────────────────────────────────────
-if (typeof window !== 'undefined') {
-  mermaid.initialize({ 
-    startOnLoad: false, 
-    theme: 'base', 
-    themeVariables: {
-      primaryColor: '#F0EFE8',
-      primaryTextColor: '#1A1A1A',
-      primaryBorderColor: 'rgba(0,71,255,0.2)',
-      lineColor: '#555555',
-      secondaryColor: '#FFFFFF',
-      tertiaryColor: '#FDFDFB'
-    },
-    securityLevel: 'loose' 
-  });
-}
 
 const MermaidBlock = ({ chart }: { chart: string }) => {
   const [svg, setSvg] = useState('');
   useEffect(() => {
-    const uniqueId = `mmd-${Math.random().toString(36).slice(2)}-${Date.now().toString(36)}`;
-    mermaid.render(uniqueId, chart)
-      .then(r => setSvg(r.svg))
-      .catch((err) => {
-        console.error('Failed to render Mermaid chart:', err);
-        setSvg(`<div class="p-4 border border-dashed border-red-500/30 text-red-500 font-mono text-[10px] bg-red-500/5 my-4">
-          <strong>Mermaid Render Error:</strong>
-          <pre class="mt-2 text-[9px] text-ink-muted select-all overflow-x-auto whitespace-pre-wrap">${String(err)}</pre>
-          <pre class="mt-2 text-[9px] text-ink-muted border-t border-dashed border-red-500/20 pt-2 select-all overflow-x-auto whitespace-pre-wrap">${chart}</pre>
-        </div>`);
+    let isMounted = true;
+    import('mermaid').then((mermaidModule) => {
+      if (!isMounted) return;
+      const mermaid = mermaidModule.default;
+      mermaid.initialize({ 
+        startOnLoad: false, 
+        theme: 'base', 
+        themeVariables: {
+          primaryColor: '#F0EFE8',
+          primaryTextColor: '#1A1A1A',
+          primaryBorderColor: 'rgba(0,71,255,0.2)',
+          lineColor: '#555555',
+          secondaryColor: '#FFFFFF',
+          tertiaryColor: '#FDFDFB'
+        },
+        securityLevel: 'loose' 
       });
+      const uniqueId = `mmd-${Math.random().toString(36).slice(2)}-${Date.now().toString(36)}`;
+      mermaid.render(uniqueId, chart)
+        .then(r => { if (isMounted) setSvg(r.svg); })
+        .catch((err) => {
+          console.error('Failed to render Mermaid chart:', err);
+          if (isMounted) {
+            setSvg(`<div class="p-4 border border-dashed border-red-500/30 text-red-500 font-mono text-[10px] bg-red-500/5 my-4">
+              <strong>Mermaid Render Error:</strong>
+              <pre class="mt-2 text-[9px] text-ink-muted select-all overflow-x-auto whitespace-pre-wrap">${String(err)}</pre>
+              <pre class="mt-2 text-[9px] text-ink-muted border-t border-dashed border-red-500/20 pt-2 select-all overflow-x-auto whitespace-pre-wrap">${chart}</pre>
+            </div>`);
+          }
+        });
+    });
+    return () => { isMounted = false; };
   }, [chart]);
+
   return (
     <div className="my-8 p-6 border border-dashed border-accent/20 overflow-x-auto"
       dangerouslySetInnerHTML={{ __html: svg || '<span class="font-mono text-[10px] text-ink-faint">rendering…</span>' }} />

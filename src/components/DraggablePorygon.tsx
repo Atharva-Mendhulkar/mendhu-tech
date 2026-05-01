@@ -71,12 +71,10 @@ export default function DraggablePorygon() {
   const zoneLockRef    = useRef(false);
 
   // ── zone detection (pure rect check — no DOM stacking / z-index noise) ───
+  const zoneRectsRef = useRef<Record<string, DOMRect>>({});
 
   const detectZone = (clientX: number, clientY: number): string | null => {
-    for (const zone of ['name', 'logs', 'projects', 'garden']) {
-      const el = document.querySelector(`[data-${zone}-target]`);
-      if (!el) continue;
-      const r = el.getBoundingClientRect();
+    for (const [zone, r] of Object.entries(zoneRectsRef.current)) {
       if (clientX >= r.left && clientX <= r.right && clientY >= r.top && clientY <= r.bottom) {
         return zone;
       }
@@ -183,6 +181,14 @@ export default function DraggablePorygon() {
       document.body.classList.add('porygon-dragging');
 
       interactionRef.current += 1;
+
+      // Cache zone rects to prevent layout thrashing during drag
+      const rects: Record<string, DOMRect> = {};
+      for (const zone of ['name', 'logs', 'projects', 'garden']) {
+        const zoneEl = document.querySelector(`[data-${zone}-target]`);
+        if (zoneEl) rects[zone] = zoneEl.getBoundingClientRect();
+      }
+      zoneRectsRef.current = rects;
 
       if (!hasInteractedRef.current) {
         hasInteractedRef.current = true;

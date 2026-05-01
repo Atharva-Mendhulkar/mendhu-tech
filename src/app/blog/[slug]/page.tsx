@@ -3,6 +3,7 @@ import { getPost, getAllSlugs, getRelatedPosts, formatDate, TAG_COLORS, defaultT
 import { notFound }      from "next/navigation";
 import type { Metadata } from "next";
 import Link              from "next/link";
+import Image             from "next/image";
 import PostBody          from "@/components/blog/PostBody";
 import TableOfContents   from "@/components/blog/TableOfContents";
 import SeriesNav         from "@/components/blog/SeriesNav";
@@ -166,8 +167,8 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
               {/* Cover image */}
               {post.coverImage && (
-                <div className="mb-10 border border-dashed border-border-strong overflow-hidden" style={{ borderRadius: 2 }}>
-                  <img src={post.coverImage.url} alt={post.title} className="w-full object-cover" />
+                <div className="mb-10 border border-dashed border-border-strong overflow-hidden relative w-full aspect-video" style={{ borderRadius: 2 }}>
+                  <Image src={post.coverImage.url} alt={post.title} fill priority sizes="(max-width: 768px) 100vw, 800px" className="object-cover" />
                 </div>
               )}
 
