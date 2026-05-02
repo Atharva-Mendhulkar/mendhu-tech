@@ -7,6 +7,7 @@ export default function CustomCursor() {
   const [isHovering, setIsHovering] = useState(false);
   const [isHoveringTerminal, setIsHoveringTerminal] = useState(false);
   const [isGrabbing, setIsGrabbing] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
 
   useEffect(() => {
     const updatePosition = (e: MouseEvent | PointerEvent) => {
@@ -25,6 +26,9 @@ export default function CustomCursor() {
 
       const isTerminal = !!target.closest('.terminal-bg, .modal-window');
       setIsHoveringTerminal(isTerminal);
+
+      const isText = !!target.closest('.mac-text-cursor, input[type="text"], textarea');
+      setIsHidden(isText);
     };
 
     const handleMouseDown = () => setIsGrabbing(true);
@@ -48,7 +52,7 @@ export default function CustomCursor() {
   return (
     <div
       ref={cursorRef}
-      className={`cursor-ring ${isHovering ? "on-accent" : ""} ${isHoveringTerminal ? "on-terminal" : ""} ${isGrabbing ? "scale-75 bg-accent/20" : ""}`}
+      className={`cursor-ring ${isHovering ? "on-accent" : ""} ${isHoveringTerminal ? "on-terminal" : ""} ${isGrabbing ? "scale-75 bg-accent/20" : ""} ${isHidden ? "opacity-0" : "opacity-100"}`}
     />
   );
 }

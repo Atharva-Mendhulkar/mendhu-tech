@@ -31,14 +31,16 @@ export default async function BlogIndex({ searchParams }: PageProps) {
   const allPosts  = await getAllPosts();
 
   const FILTERS = [
-    { label: "all",             slug: "all"             },
-    { label: "build-log",       slug: "build-log"       },
-    { label: "deep-dive",       slug: "deep-dive"       },
-    { label: "research",        slug: "research"        },
-    { label: "paper-companion", slug: "paper-companion" },
-    { label: "notes",           slug: "notes"           },
-    { label: "explained",       slug: "explained"       },
+    { label: "all",             slug: "all",             desc: "All posts across topics, formats, and depth. Everything in one place." },
+    { label: "build-log",       slug: "build-log",       desc: "Step-by-step progress of projects, decisions, iterations, and lessons learned during development." },
+    { label: "deep-dive",       slug: "deep-dive",       desc: "In-depth breakdowns of complex systems, concepts, or architectures with detailed analysis." },
+    { label: "research",        slug: "research",        desc: "Explorations of ideas, experiments, and technical investigations with a focus on insights and findings." },
+    { label: "paper-companion", slug: "paper-companion", desc: "Simplified explanations and takeaways from research papers, focused on practical understanding." },
+    { label: "notes",           slug: "notes",           desc: "Concise, structured notes for quick revision and reference on key topics." },
+    { label: "explained",       slug: "explained",       desc: "Clear, beginner-friendly explanations of concepts, systems, or technologies." },
   ];
+
+  const activeFilter = FILTERS.find(f => f.slug === activeTag) || FILTERS[0];
 
   const posts     = activeTag === "all"
     ? allPosts
@@ -79,17 +81,16 @@ export default async function BlogIndex({ searchParams }: PageProps) {
           <div className="section-tag mb-8">[02_INTELLECTUAL_LOG]</div>
 
           {/* Header */}
-          <h1 className="font-serif text-[42px] font-normal tracking-[-0.02em] leading-[1.1] mb-3 text-ink">
+          <h1 className="font-serif text-[42px] font-normal tracking-[-0.02em] leading-[1.1] mb-5 text-ink">
             Blogs by Atharva Mendhulkar
           </h1>
-          <p className="font-mono text-[12px] text-ink-muted mb-10 max-w-[520px]">
-            Exploring systems design, AI, engineering, and real-world builds.
-            {" "}{posts.length} {activeTag === "all" ? "total" : activeTag} posts.
+          <p className="font-mono text-[12px] text-ink-muted leading-[1.6] mb-10 max-w-[560px]">
+            {activeFilter.desc}
           </p>
 
           {/* Tag filters */}
           <div className="flex gap-2 flex-wrap mb-12">
-            {FILTERS.map((f: { label: string; slug: string }) => {
+            {FILTERS.map((f) => {
               const isActive = f.slug === activeTag;
               const col = f.slug !== "all" ? (TAG_COLORS[f.slug] ?? defaultTagColor) : null;
               return (
@@ -106,6 +107,10 @@ export default async function BlogIndex({ searchParams }: PageProps) {
                 </Link>
               );
             })}
+          </div>
+
+          <div className="font-mono text-[9px] text-ink-faint uppercase tracking-[0.2em] font-bold mb-6">
+            {posts.length} {activeTag === "all" ? "total" : activeTag} articles
           </div>
 
           {/* Posts */}

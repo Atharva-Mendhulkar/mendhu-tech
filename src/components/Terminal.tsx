@@ -27,6 +27,7 @@ const COMMANDS = [
   { id: "projects", name: "type projects",  desc: "View modular technical research labs" },
   { id: "garden",   name: "type garden",    desc: "Access the research knowledge garden" },
   { id: "resume",   name: "open resume",    desc: "Download official credentials natively" },
+  { id: "blog",     name: "open blog",      desc: "Read technical articles & engineering logs" },
   { id: "linkedin", name: "goto linkedin",  desc: "Redirect to standard network links" },
   { id: "github",   name: "goto github",    desc: "Explore active version control hubs" },
   { id: "twitter",  name: "goto twitter",   desc: "Follow research updates online" },
@@ -154,6 +155,7 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const placeholders = useMemo(() => [
     "type 'projects' to view build logs",
+    "type 'blog' to read articles",
     "type 'garden' to access maps",
     "type 'open resume' to download",
     "search physics pipelines",
@@ -319,6 +321,9 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        close_();
+      } else if (r.item.id === "blog") {
+        window.location.href = "/blog";
         close_();
       } else if (r.item.id === "linkedin") {
         window.open("https://linkedin.com/in/mendhu36/", "_blank");

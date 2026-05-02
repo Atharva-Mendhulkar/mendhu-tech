@@ -22,11 +22,11 @@ export default function BlogShareButton({ title, slug }: BlogShareButtonProps) {
     <>
       <button 
         onClick={handleShare}
-        className="font-mono text-[10px] text-ink-faint hover:text-accent transition-colors flex items-center gap-1.5"
+        className="font-mono text-[12px] text-ink-muted hover:text-accent transition-all flex items-center gap-2 px-4 py-2 border border-dashed border-border-strong hover:border-accent rounded-[2px] bg-paper"
         title="Copy share link"
       >
-        <Share2 size={11} />
-        <span>Copy Link</span>
+        <Share2 size={18} />
+        <span className="uppercase tracking-widest font-bold">Share Post</span>
       </button>
 
       {/* Copy Toast */}

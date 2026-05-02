@@ -9,6 +9,7 @@ import TableOfContents   from "@/components/blog/TableOfContents";
 import SeriesNav         from "@/components/blog/SeriesNav";
 import CustomCursor     from "@/components/CustomCursor";
 import BlogShareButton from "@/components/blog/BlogShareButton";
+import ClapButton      from "@/components/blog/ClapButton";
 
 export const dynamic = "force-dynamic";
 
@@ -119,7 +120,12 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             <div className="hidden md:block md:w-16 lg:w-24 border-r border-dashed border-border-strong relative" aria-hidden />
 
             {/* article */}
-            <article className="flex-1 min-w-0 px-8 lg:pl-16 lg:pr-24 py-16">
+            <article className="flex-1 min-w-0 px-8 lg:pl-16 lg:pr-24 py-16 relative">
+              
+              {/* Top-right Actions */}
+              <div className="absolute top-16 right-8 lg:right-24 z-10 flex flex-col items-end gap-6">
+                <BlogShareButton title={post.title} slug={post.slug} />
+              </div>
 
               {/* Back */}
               <Link href="/blog" className="font-mono text-[10px] text-ink-faint hover:text-accent transition-colors mb-10 block w-fit"
@@ -147,8 +153,6 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                 <span>{formatDate(post.publishedAt)}</span>
                 <span className="text-border-strong">·</span>
                 <span>{post.readTimeInMinutes} min read</span>
-                <span className="text-border-strong">·</span>
-                <BlogShareButton title={post.title} slug={post.slug} />
                 <span className="text-border-strong">·</span>
                 <span>Written by Atharva Mendhulkar</span>
               </div>
@@ -180,6 +184,11 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
               {/* Content */}
               {post.content && <PostBody html={post.content.html} />}
+
+              {/* Claps */}
+              <div className="mt-16 flex flex-col items-center">
+                <ClapButton slug={post.slug} />
+              </div>
 
               {/* Bottom rule */}
               <div style={{ borderTop: "1px dashed var(--border-strong)", marginTop: 48, marginBottom: 40 }} />
