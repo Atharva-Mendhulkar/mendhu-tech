@@ -141,7 +141,7 @@ export default function TableOfContents({ html }: { html: string }) {
       </div>
       <nav 
         ref={navRef}
-        className="overflow-y-auto pr-2 custom-scrollbar scroll-smooth border-l border-dashed border-border-strong"
+        className="overflow-y-auto pl-1 pr-2 custom-scrollbar scroll-smooth"
         style={{ scrollbarWidth: 'none' }}
       >
         <style>{`
@@ -153,10 +153,11 @@ export default function TableOfContents({ html }: { html: string }) {
             <a
               key={h.id}
               href={`#${encodeURIComponent(h.id)}`}
-              className="block font-mono text-[10px] py-1 transition-all leading-[1.5] relative"
+              className="block font-mono text-[10px] py-1 transition-all leading-[1.5]"
               style={{
                 paddingLeft: h.level === 3 ? "24px" : "16px",
                 color: isActive ? "var(--accent)" : "var(--ink-faint)",
+                borderLeft: isActive ? "2px dashed var(--accent)" : "2px solid transparent",
               }}
               onClick={e => {
                 e.preventDefault();
@@ -171,12 +172,6 @@ export default function TableOfContents({ html }: { html: string }) {
                 }
               }}
             >
-              {isActive && (
-                <span 
-                  className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-3 bg-accent"
-                  style={{ marginLeft: "-1px" }}
-                />
-              )}
               {h.text.length > 36 ? h.text.slice(0, 33) + "…" : h.text}
             </a>
           );
