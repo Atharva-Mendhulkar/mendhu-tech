@@ -36,6 +36,7 @@ export default function TableOfContents({ html }: { html: string }) {
   const [activeId, setActiveId] = useState("");
   const scrollLockRef = useRef<number | null>(null);
   const handledHashRef = useRef("");
+  const navRef = useRef<HTMLDivElement>(null);
 
   const releaseScrollLock = useCallback(() => {
     if (scrollLockRef.current) window.clearTimeout(scrollLockRef.current);
@@ -50,28 +51,7 @@ export default function TableOfContents({ html }: { html: string }) {
     };
   }, []);
 
-  const updateActiveHeading = useCallback((items: Heading[]) => {
-    if (!items.length) return;
-
-    const marker = window.scrollY + 112;
-    let current = items[0].id;
-
-    for (const heading of items) {
-      const el = document.getElementById(heading.id);
-      if (!el) continue;
-
-      const top = el.getBoundingClientRect().top + window.scrollY;
-      if (top <= marker) current = heading.id;
-      else break;
-    }
-
-    setActiveId(current);
-  }, []);
-
-  useEffect(() => {
-    handledHashRef.current = "";
-  }, [html]);
-
+  // Update active heading based on viewport position
   useEffect(() => {
     const postBody = document.querySelector(".post-body");
     if (!postBody) return;
@@ -79,7 +59,6 @@ export default function TableOfContents({ html }: { html: string }) {
     const extract = () => {
       const nextHeadings = extractHeadingsFromDOM();
       setHeadings(nextHeadings);
-      updateActiveHeading(nextHeadings);
     };
 
     extract();
@@ -88,33 +67,44 @@ export default function TableOfContents({ html }: { html: string }) {
     observer.observe(postBody, { childList: true, subtree: true });
 
     return () => observer.disconnect();
-  }, [html, updateActiveHeading]);
+  }, [html]);
 
+  // Use IntersectionObserver for robust scroll tracking
   useEffect(() => {
     if (!headings.length) return;
 
-    let frame = 0;
-    const scheduleUpdate = () => {
-      if (scrollLockRef.current) {
-        releaseScrollLock();
-        return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (scrollLockRef.current) return;
+
+        // Find the "most relevant" visible heading
+        // Usually the one closest to the top of the viewport (with some offset)
+        const visibleEntries = entries
+          .filter(entry => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+
+        if (visibleEntries.length > 0) {
+          setActiveId(visibleEntries[0].target.id);
+        } else {
+          // If no headings are currently intersecting, we might be between headings
+          // We can fallback to checking window.scrollY if needed, or just stay on last one
+        }
+      },
+      { 
+        threshold: 1.0, 
+        rootMargin: "-96px 0px -70% 0px" // Only consider headings in the top 30% of view
       }
+    );
 
-      window.cancelAnimationFrame(frame);
-      frame = window.requestAnimationFrame(() => updateActiveHeading(headings));
-    };
+    headings.forEach(h => {
+      const el = document.getElementById(h.id);
+      if (el) observer.observe(el);
+    });
 
-    scheduleUpdate();
-    window.addEventListener("scroll", scheduleUpdate, { passive: true });
-    window.addEventListener("resize", scheduleUpdate);
+    return () => observer.disconnect();
+  }, [headings]);
 
-    return () => {
-      window.cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", scheduleUpdate);
-      window.removeEventListener("resize", scheduleUpdate);
-    };
-  }, [headings, releaseScrollLock, updateActiveHeading]);
-
+  // Handle initial hash navigation
   useEffect(() => {
     const hash = window.location.hash;
     if (!headings.length || !hash || handledHashRef.current === hash) return;
@@ -133,8 +123,7 @@ export default function TableOfContents({ html }: { html: string }) {
     return () => window.cancelAnimationFrame(frame);
   }, [headings]);
 
-  const navRef = useRef<HTMLDivElement>(null);
-
+  // Auto-scroll ToC to keep active item in view
   useEffect(() => {
     if (!activeId || !navRef.current) return;
     const activeLink = navRef.current.querySelector(`a[href$="${encodeURIComponent(activeId)}"]`);
