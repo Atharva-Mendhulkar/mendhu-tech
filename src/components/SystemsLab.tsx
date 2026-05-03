@@ -16,7 +16,7 @@ export default function SystemsLab({ onOpenModal }: SystemsLabProps) {
     : projects.filter(p => p.category === activeFilter);
 
   return (
-    <section className="py-10 border-b border-dashed border-border-strong relative z-10">
+    <section className="pt-8 pb-10 border-b border-dashed border-border-strong relative z-10">
       <div className="section-tag">[03_SYSTEMS_LAB]</div>
 
       {/* Filter Row */}

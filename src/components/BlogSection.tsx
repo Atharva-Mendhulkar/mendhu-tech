@@ -24,51 +24,69 @@ const HASHNODE_QUERY = `
   }
 `;
 
-interface Post {
-  title: string;
-  brief: string;
-  publishedAt: string;
-  tags: { name: string }[];
-  readTimeInMinutes: number;
-  slug: string;
+import { Post } from '@/lib/hashnode';
+
+interface BlogSectionProps {
+  initialPosts?: Post[];
 }
 
-export default function BlogSection() {
+export default function BlogSection({ initialPosts = [] }: BlogSectionProps) {
   const router = useRouter();
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [isNavigating, setIsNavigating] = useState(false);
   const [showCopyToast, setShowCopyToast] = useState(false);
 
   useEffect(() => {
-    async function fetchPosts() {
-      try {
-        const response = await fetch('https://gql.hashnode.com', {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': '0cb3d74f-1448-421d-b181-962fd449b69e'
-          },
-          body: JSON.stringify({ query: HASHNODE_QUERY }),
-        });
-        const json = await response.json();
-        const fetchedPosts = json.data?.publication?.posts?.edges?.map((e: any) => e.node) || [];
-        
-        // Filter for featured tags specifically
-        const featured = fetchedPosts.filter((p: any) => 
-          p.tags?.some((t: any) => t.name.toLowerCase() === 'featured')
-        );
+    // Only fetch if we don't have initial posts to speed up first load
+    if (posts.length === 0) {
+      async function fetchPosts() {
+        try {
+          const response = await fetch('https://gql.hashnode.com', {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': '0cb3d74f-1448-421d-b181-962fd449b69e'
+            },
+            body: JSON.stringify({ 
+              query: `
+                query {
+                  publication(host: "atharvarta.hashnode.dev") {
+                    posts(first: 2) {
+                      edges {
+                        node {
+                          title
+                          brief
+                          publishedAt
+                          tags { name }
+                          readTimeInMinutes
+                          slug
+                        }
+                      }
+                    }
+                  }
+                }
+              ` 
+            }),
+          });
+          const json = await response.json();
+          const fetchedPosts = json.data?.publication?.posts?.edges?.map((e: any) => e.node) || [];
+          
+          const featured = fetchedPosts.filter((p: any) => 
+            p.tags?.some((t: any) => t.name.toLowerCase() === 'featured')
+          );
 
-        if (featured.length > 0) {
-          setPosts(featured.slice(0, 2));
-        } else if (fetchedPosts.length > 0) {
-          setPosts(fetchedPosts.slice(0, 2)); // newest 2 additions
+          if (featured.length > 0) {
+            setPosts(featured.slice(0, 2));
+          } else {
+            setPosts(fetchedPosts.slice(0, 2));
+          }
+        } catch (err) {
+          console.error('Error fetching Hashnode posts:', err);
         }
-      } catch (err) {
-        console.error('Error fetching Hashnode posts:', err);
       }
+      fetchPosts();
     }
-    fetchPosts();
-  }, []);
+  }, [posts.length]);
 
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
@@ -76,7 +94,7 @@ export default function BlogSection() {
   };
 
   return (
-    <section className="py-10 border-b border-dashed border-border-strong relative z-10">
+    <section className="pt-8 pb-10 border-b border-dashed border-border-strong relative z-10">
       <div className="section-tag">[02_INTELLECTUAL_LOG]</div>
       <h2 className="sr-only">Latest Blogs by Atharva Mendhulkar</h2>
       
