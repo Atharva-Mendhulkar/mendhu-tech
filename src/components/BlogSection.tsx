@@ -33,7 +33,6 @@ interface BlogSectionProps {
 export default function BlogSection({ initialPosts = [] }: BlogSectionProps) {
   const router = useRouter();
   const [posts, setPosts] = useState<Post[]>(initialPosts);
-  const [isNavigating, setIsNavigating] = useState(false);
   const [showCopyToast, setShowCopyToast] = useState(false);
 
   useEffect(() => {
@@ -103,11 +102,6 @@ export default function BlogSection({ initialPosts = [] }: BlogSectionProps) {
           <Link 
             key={post.slug}
             href={`/blog/${post.slug}`}
-            onClick={(e) => {
-              e.preventDefault();
-              setIsNavigating(true);
-              setTimeout(() => router.push(`/blog/${post.slug}`), 500);
-            }}
             className="fade-in border border-dashed border-border-strong p-8 bg-[rgba(253,253,251,0.72)] hover:bg-[rgba(0,71,255,0.025)] hover:border-solid hover:border-accent transition-all duration-300 flex flex-col justify-between group cursor-pointer relative rounded-2xl overflow-hidden"
           >
             {/* Corner Marks */}
@@ -154,23 +148,7 @@ export default function BlogSection({ initialPosts = [] }: BlogSectionProps) {
         ))}
       </div>
 
-      {isNavigating && (
-        <div
-          className="fixed inset-0 z-[1000] flex items-center justify-center"
-          style={{
-            backgroundColor: "var(--paper)",
-            animation: "fadeInBlog 0.6s ease-in-out forwards",
-          }}
-        >
-          <div className="font-serif text-[24px] italic text-accent animate-pulse">Entering Intellectual Log...</div>
-          <style>{`
-            @keyframes fadeInBlog {
-              from { opacity: 0; }
-              to { opacity: 1; }
-            }
-          `}</style>
-        </div>
-      )}
+
 
       {/* Copy Toast */}
       {showCopyToast && (
