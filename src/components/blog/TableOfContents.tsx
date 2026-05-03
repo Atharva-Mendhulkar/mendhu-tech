@@ -133,26 +133,41 @@ export default function TableOfContents({ html }: { html: string }) {
     return () => window.cancelAnimationFrame(frame);
   }, [headings]);
 
+  const navRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!activeId || !navRef.current) return;
+    const activeLink = navRef.current.querySelector(`a[href$="${encodeURIComponent(activeId)}"]`);
+    if (activeLink) {
+      activeLink.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }, [activeId]);
+
   if (!headings.length) return null;
 
   return (
-    <div>
-      <div className="font-mono text-[9px] text-ink-faint tracking-widest uppercase mb-4">
+    <div className="flex flex-col max-h-[calc(100vh-120px)]">
+      <div className="font-mono text-[9px] text-ink-faint tracking-widest uppercase mb-4 shrink-0">
         Contents
       </div>
-      <nav>
+      <nav 
+        ref={navRef}
+        className="overflow-y-auto pr-2 custom-scrollbar scroll-smooth border-l border-dashed border-border-strong"
+        style={{ scrollbarWidth: 'none' }}
+      >
+        <style>{`
+          .custom-scrollbar::-webkit-scrollbar { display: none; }
+        `}</style>
         {headings.map(h => {
           const isActive = h.id === activeId;
           return (
             <a
               key={h.id}
               href={`#${encodeURIComponent(h.id)}`}
-              className="block font-mono text-[10px] py-1 transition-colors leading-[1.5]"
+              className="block font-mono text-[10px] py-1 transition-all leading-[1.5] relative"
               style={{
-                paddingLeft: h.level === 3 ? "16px" : "10px",
+                paddingLeft: h.level === 3 ? "24px" : "16px",
                 color: isActive ? "var(--accent)" : "var(--ink-faint)",
-                borderLeft: isActive ? "2px dashed var(--accent)" : "2px solid transparent",
-                marginLeft: "-2px",
               }}
               onClick={e => {
                 e.preventDefault();
@@ -167,6 +182,12 @@ export default function TableOfContents({ html }: { html: string }) {
                 }
               }}
             >
+              {isActive && (
+                <span 
+                  className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-3 bg-accent"
+                  style={{ marginLeft: "-1px" }}
+                />
+              )}
               {h.text.length > 36 ? h.text.slice(0, 33) + "…" : h.text}
             </a>
           );

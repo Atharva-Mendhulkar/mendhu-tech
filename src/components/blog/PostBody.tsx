@@ -38,8 +38,8 @@ export default function PostBody({ html }: Props) {
             img: ({ src, alt, ...props }) => {
               if (!src) return null;
               return (
-                <span className="block relative w-full" style={{ aspectRatio: '16/9' }}>
-                  <Image src={src} alt={alt || ''} fill sizes="(max-width: 768px) 100vw, 800px" className="object-cover" {...props as any} />
+                <span className="block my-8 border border-dashed border-border-strong overflow-hidden" style={{ borderRadius: 2, backgroundColor: "rgba(0,0,0,0.02)" }}>
+                  <img src={src} alt={alt || ''} className="w-full h-auto block" {...props as any} />
                 </span>
               );
             }

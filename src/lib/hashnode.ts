@@ -20,7 +20,11 @@ export interface Post {
   content?:          { html: string };
   tags:              { name: string; slug?: string }[];
   coverImage?:       { url: string };
-  series?:           { name: string; slug: string } | null;
+  series?:           { 
+    name: string; 
+    slug: string; 
+    posts: { edges: { node: { title: string; slug: string } }[] };
+  } | null;
   seo?:              { title?: string; description?: string };
 }
 
@@ -113,7 +117,18 @@ export async function getPost(slug: string): Promise<Post | null> {
           content { html }
           tags { name slug }
           coverImage { url }
-          series { name slug }
+          series { 
+            name 
+            slug 
+            posts(first: 20) {
+              edges {
+                node {
+                  title
+                  slug
+                }
+              }
+            }
+          }
           seo { title description }
         }
       }

@@ -174,8 +174,8 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
               {/* Cover image */}
               {post.coverImage && (
-                <div className="mb-10 border border-dashed border-border-strong overflow-hidden relative w-full aspect-video" style={{ borderRadius: 2 }}>
-                  <Image src={post.coverImage.url} alt={post.title} fill priority sizes="(max-width: 768px) 100vw, 800px" className="object-cover" />
+                <div className="mb-10 border border-dashed border-border-strong overflow-hidden relative w-full" style={{ borderRadius: 2, backgroundColor: "rgba(0,0,0,0.02)" }}>
+                  <img src={post.coverImage.url} alt={post.title} className="w-full h-auto block" />
                 </div>
               )}
 
