@@ -202,30 +202,35 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
               {/* Series nav */}
               {post.series && <SeriesNav series={post.series} currentSlug={post.slug} />}
 
-              {/* Related posts */}
+              {/* Related Posts */}
               {related.length > 0 && (
-                <div className="mt-12">
-                  <div className="section-tag mb-6">[related_posts]</div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {related.map(r => {
-                      const rSlug = r.tags[0] ? (r.tags[0].slug || r.tags[0].name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")) : "";
-                      const c = rSlug ? (TAG_COLORS[rSlug] ?? defaultTagColor) : defaultTagColor;
-                      return (
-                        <Link key={r.slug} href={`/blog/${r.slug}`}
-                          className="block p-4 border border-dashed border-border-strong hover:border-solid transition-all"
-                          style={{ borderRadius: 2 }}>
-                          <div className="font-mono text-[9px] text-ink-faint mb-2">{formatDate(r.publishedAt)}</div>
-                          <div className="font-serif text-[16px] text-ink leading-[1.3] mb-2">{r.title}</div>
-                          <span className="font-mono text-[9px] text-accent">Read →</span>
-                        </Link>
-                      );
-                    })}
+                <div className="mt-24 pt-16 border-t border-dashed border-border-strong">
+                  <div className="section-tag mb-8">[03_FURTHER_READING]</div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    {related.map(p => (
+                      <Link 
+                        key={p.slug} 
+                        href={`/blog/${p.slug}`}
+                        className="group block p-6 border border-dashed border-border-strong hover:border-solid hover:border-accent transition-all bg-[rgba(253,253,251,0.5)]"
+                        style={{ borderRadius: 2 }}
+                      >
+                        <div className="font-mono text-[9px] text-ink-faint mb-3 uppercase tracking-wider">
+                          {formatDate(p.publishedAt)}
+                        </div>
+                        <h3 className="font-serif text-[18px] text-ink mb-3 group-hover:text-accent transition-colors leading-tight">
+                          {p.title}
+                        </h3>
+                        <div className="font-mono text-[10px] text-accent opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+                          Read →
+                        </div>
+                      </Link>
+                    ))}
                   </div>
                 </div>
               )}
 
               {/* Footer */}
-              <footer className="mt-16 pt-6 border-t border-dashed border-border-strong">
+              <footer className="mt-24 pt-8 border-t border-dashed border-border-strong">
                 <div className="font-mono text-[10px] text-ink-faint flex items-center gap-3 flex-wrap">
                   <Link href="/blog" className="hover:text-accent transition-colors">← blog</Link>
                   <span>|</span>
