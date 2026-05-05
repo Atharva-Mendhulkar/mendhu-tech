@@ -139,17 +139,23 @@ export default function ScrollProgressButtons() {
         </button>
       </div>
 
-      {/* Floating Bottom-Right Search Icon (Mobile Only) */}
+      {/* Floating Bottom-Right Search Pill (Desktop & Mobile) */}
       <button 
         onClick={() => window.dispatchEvent(new Event('toggle-terminal'))}
-        className="md:hidden fixed bottom-6 right-6 w-12 h-12 rounded-full border border-dashed border-accent bg-paper/60 backdrop-blur-md shadow-lg flex items-center justify-center hover:bg-paper/80 z-[220] transition-all duration-300"
+        className="fixed bottom-6 right-6 z-[220] transition-all duration-500 border border-dashed border-accent/40 bg-paper/70 backdrop-blur-xl shadow-2xl rounded-full flex items-center group overflow-hidden h-[48px] w-[48px] hover:w-[155px] hover:bg-paper/90 hover:border-accent hover:border-solid px-[14px] hover:px-5"
         style={{
           opacity: scrollProgress,
-          transform: `scale(${0.7 + scrollProgress * 0.3})`,
-          pointerEvents: scrollProgress < 0.2 ? 'none' : 'auto'
+          transform: `translateY(${(1 - scrollProgress) * 40}px) scale(${0.8 + scrollProgress * 0.2})`,
+          pointerEvents: scrollProgress < 0.3 ? 'none' : 'auto',
+          boxShadow: scrollProgress > 0.3 ? '0 10px 30px -10px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.02)' : 'none'
         }}
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-accent"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <div className="flex items-center gap-3">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-accent shrink-0 group-hover:scale-110 transition-transform"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <span className="font-mono text-[11px] text-accent whitespace-nowrap font-bold opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
+            [CTRL + `]
+          </span>
+        </div>
       </button>
     </>
   );
