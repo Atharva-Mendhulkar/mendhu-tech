@@ -1,4 +1,5 @@
 import { EB_Garamond, JetBrains_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import LogBar from "@/components/LogBar";
 import "./globals.css";
 
@@ -67,6 +68,7 @@ export default function RootLayout({
       <body>
         <LogBar />
         {children}
+        <Analytics />
       </body>
     </html>
   );
