@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import GardenEntryClient from "@/components/GardenEntryClient";
+import { getLatestPosts } from "@/lib/hashnode";
 import researchData from "@/data/research.json";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -55,36 +56,38 @@ export async function generateMetadata({
     plainText ??
     "Research note from Atharva Mendhulkar's knowledge garden.";
 
-  const url = `https://mendhu.tech/garden/${id}`;
+  const url = `https://www.mendhu.tech/garden/${id}`;
   const tags = node?.tags?.join(", ") ?? "";
 
   return {
     title: `${file.title} — Knowledge Garden · Atharva Mendhulkar`,
     description,
     keywords: tags,
-    authors: [{ name: "Atharva Mendhulkar", url: "https://mendhu.tech" }],
+    authors: [{ name: "Atharva Mendhulkar", url: "https://www.mendhu.tech" }],
     openGraph: {
       title: file.title,
       description,
       url,
       type: "article",
       siteName: "mendhu.tech",
-      images: [{ url: "https://mendhu.tech/og-garden.png", width: 1200, height: 630 }],
+      images: [{ url: "https://www.mendhu.tech/og-garden.png", width: 1200, height: 630 }],
     },
     twitter: {
       card: "summary_large_image",
       title: file.title,
       description,
-      images: ["https://mendhu.tech/og-garden.png"],
+      images: ["https://www.mendhu.tech/og-garden.png"],
     },
     alternates: { canonical: url },
   };
 }
 
+
 // ── Page ───────────────────────────────────────────────────────────────────
 export default async function GardenFilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const file = data.files[id];
+  const initialPosts = await getLatestPosts();
 
   const jsonLd = file
     ? {
@@ -94,16 +97,16 @@ export default async function GardenFilePage({ params }: { params: Promise<{ id:
         author: {
           "@type": "Person",
           name: "Atharva Mendhulkar",
-          url: "https://mendhu.tech",
+          url: "https://www.mendhu.tech",
         },
         mainEntityOfPage: {
           "@type": "WebPage",
-          "@id": `https://mendhu.tech/garden/${id}`,
+          "@id": `https://www.mendhu.tech/garden/${id}`,
         },
         publisher: {
           "@type": "Person",
           name: "Atharva Mendhulkar",
-          url: "https://mendhu.tech",
+          url: "https://www.mendhu.tech",
         },
       }
     : null;
@@ -116,7 +119,7 @@ export default async function GardenFilePage({ params }: { params: Promise<{ id:
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       )}
-      <GardenEntryClient initialFileId={id} />
+      <GardenEntryClient initialFileId={id} initialPosts={initialPosts} />
     </>
   );
 }

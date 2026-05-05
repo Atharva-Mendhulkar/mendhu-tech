@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect } from "react";
-import Home from "@/app/page";
+import HomeClient from "@/components/HomeClient";
+import { Post } from "@/lib/hashnode";
 
 interface Props {
   initialFileId: string;
+  initialPosts: Post[];
 }
 
-export default function GardenEntryClient({ initialFileId }: Props) {
+export default function GardenEntryClient({ initialFileId, initialPosts }: Props) {
   // Signal to the Home component to open the garden on mount
   useEffect(() => {
     // Small delay so the Home component has time to mount
@@ -19,5 +21,5 @@ export default function GardenEntryClient({ initialFileId }: Props) {
     return () => clearTimeout(timer);
   }, [initialFileId]);
 
-  return <Home />;
+  return <HomeClient initialPosts={initialPosts} />;
 }

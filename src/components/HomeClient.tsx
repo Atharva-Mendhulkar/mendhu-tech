@@ -115,7 +115,7 @@ export default function HomeClient({ initialPosts }: { initialPosts: Post[] }) {
                 "@context": "https://schema.org",
                 "@type": "Person",
                 name: "Atharva Mendhulkar",
-                url: "https://mendhu.tech",
+                url: "https://www.mendhu.tech",
                 jobTitle: "Systems Engineer & AI Researcher",
                 sameAs: [
                   "https://github.com/Atharva-Mendhulkar",

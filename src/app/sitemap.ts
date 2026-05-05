@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { getAllPosts } from '@/lib/hashnode';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://mendhu.tech';
+  const baseUrl = 'https://www.mendhu.tech';
 
   // Fetch blogs dynamically for robust automated search indexing
   const posts = await getAllPosts().catch(() => []);
