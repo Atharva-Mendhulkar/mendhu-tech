@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
     },
-    sitemap: 'https://mendhu.tech/sitemap.xml',
+    sitemap: 'https://www.mendhu.tech/sitemap.xml',
   };
 }

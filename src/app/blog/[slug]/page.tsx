@@ -81,7 +81,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     author: {
       "@type": "Person",
       name: "Atharva Mendhulkar",
-      url:  "https://mendhu.tech",
+      url:  "https://www.mendhu.tech",
       sameAs: [
         "https://github.com/Atharva-Mendhulkar",
         "https://x.com/atharvanta",

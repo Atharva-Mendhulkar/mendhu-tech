@@ -1,5 +1,6 @@
 import { EB_Garamond, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+
 import LogBar from "@/components/LogBar";
 import "./globals.css";
 
@@ -34,7 +35,7 @@ export const metadata = {
   openGraph: {
     title: "Atharva Mendhulkar | Systems Engineer & AI Researcher",
     description: "Exploring the intersection of physics-informed machine learning and kernel-level infrastructure.",
-    url: "https://mendhu.tech",
+    url: "https://www.mendhu.tech",
     siteName: "Atharva Mendhulkar Portfolio",
     locale: "en_US",
     type: "website",

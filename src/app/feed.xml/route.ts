@@ -3,7 +3,7 @@ import { getAllPosts } from "@/lib/hashnode";
 export async function GET() {
   const posts = await getAllPosts();
 
-  const site_url = "https://mendhu.tech";
+  const site_url = "https://www.mendhu.tech";
 
   const feedItems = posts.map((post) => {
     return `
