@@ -234,7 +234,7 @@ export default function HomeClient({ initialPosts }: { initialPosts: Post[] }) {
               <span>© Atharva Mendhulkar {new Date().getFullYear()}</span>
             </div>
             <div className="font-mono text-[10px] text-ink-faint uppercase tracking-widest">
-              mendhu.tech
+              www.mendhu.tech
             </div>
           </footer>
 

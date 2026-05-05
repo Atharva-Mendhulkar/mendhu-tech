@@ -22,7 +22,7 @@ export const metadata = {
     canonical: '/',
   },
   keywords: ["Atharva Mendhulkar", "Systems Engineer", "AI Researcher", "PINNs", "Machine Learning", "Kernel Development", "Agentic Systems", "Digital Garden", "Agentic AI", "LLMs", "Assitive Devices", "AI", "Systems", "Embedded Systems", "Systems Programming", "Full Stack Developer", "Machine Learning Engineer"],
-  metadataBase: new URL("https://mendhu.tech"),
+  metadataBase: new URL("https://www.mendhu.tech"),
   authors: [{ name: "Atharva Mendhulkar" }],
   creator: "Atharva Mendhulkar",
   icons: {

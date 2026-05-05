@@ -11,7 +11,7 @@ import CustomCursor     from "@/components/CustomCursor";
 import BlogShareButton from "@/components/blog/BlogShareButton";
 import ClapButton      from "@/components/blog/ClapButton";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
 
 // ── SSG ────────────────────────────────────────────────────────────────────
 export async function generateStaticParams() {
@@ -35,13 +35,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const seoTitle = post.seo?.title ?? `${post.title} — Atharva Mendhulkar`;
   const seoDesc  = post.seo?.description ?? post.brief;
-  const url      = `https://mendhu.tech/blog/${resolvedParams.slug}`;
+  const url      = `https://www.mendhu.tech/blog/${resolvedParams.slug}`;
 
   return {
-    title:       `${post.title} | Atharva Mendhulkar Blogs`,
+    title:       `${post.title} | Atharva Mendhulkar`,
     description: seoDesc,
     keywords:    [...post.tags.map(t => t.name), "Atharva Mendhulkar", "Atharva blogs", "Atharva Mendhulkar blogs", "mendhu blogs", "engineering blog"],
-    authors:     [{ name: "Atharva Mendhulkar", url: "https://mendhu.tech" }],
+    authors:     [{ name: "Atharva Mendhulkar", url: "https://www.mendhu.tech" }],
     alternates:  { canonical: url },
     robots:      { index: true, follow: true },
     openGraph: {
@@ -53,13 +53,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       modifiedTime:  post.updatedAt,
       authors:       ["Atharva Mendhulkar"],
       tags:          post.tags.map(t => t.name),
-      images:        post.coverImage ? [{ url: post.coverImage.url }] : [{ url: "/og-default.png" }],
+      images:        post.coverImage ? [{ url: post.coverImage.url }] : [{ url: "https://www.mendhu.tech/og-default.png" }],
     },
     twitter: {
       card:        "summary_large_image",
       title:       post.title,
       description: seoDesc,
-      images:      post.coverImage ? [post.coverImage.url] : ["/og-default.png"],
+      images:      post.coverImage ? [post.coverImage.url] : ["https://www.mendhu.tech/og-default.png"],
     },
   };
 }
@@ -89,13 +89,13 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     },
     datePublished:      post.publishedAt,
     dateModified:       post.updatedAt,
-    mainEntityOfPage: { "@type": "WebPage", "@id": `https://mendhu.tech/blog/${post.slug}` },
+    mainEntityOfPage: { "@type": "WebPage", "@id": `https://www.mendhu.tech/blog/${post.slug}` },
     keywords: post.tags.map(t => t.name).join(", "),
     ...(post.coverImage && { image: post.coverImage.url }),
     publisher: {
       "@type": "Person",
       name: "Atharva Mendhulkar",
-      url:  "https://mendhu.tech",
+      url:  "https://www.mendhu.tech",
     },
   };
 
@@ -174,8 +174,14 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
               {/* Cover image */}
               {post.coverImage && (
-                <div className="mb-10 border border-dashed border-border-strong overflow-hidden relative w-full" style={{ borderRadius: 2, backgroundColor: "rgba(0,0,0,0.02)" }}>
-                  <img src={post.coverImage.url} alt={post.title} className="w-full h-auto block" />
+                <div className="mb-10 border border-dashed border-border-strong overflow-hidden relative w-full aspect-video" style={{ borderRadius: 2, backgroundColor: "rgba(0,0,0,0.02)" }}>
+                  <Image 
+                    src={post.coverImage.url} 
+                    alt={post.title} 
+                    fill 
+                    className="object-contain" 
+                    priority
+                  />
                 </div>
               )}
 
@@ -223,9 +229,9 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                 <div className="font-mono text-[10px] text-ink-faint flex items-center gap-3 flex-wrap">
                   <Link href="/blog" className="hover:text-accent transition-colors">← blog</Link>
                   <span>|</span>
-                  <Link href="/" className="hover:text-accent transition-colors">mendhu.tech</Link>
+                  <Link href="/" className="hover:text-accent transition-colors">www.mendhu.tech</Link>
                   <span>|</span>
-                  <a href={`https://x.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(`https://mendhu.tech/blog/${post.slug}`)}`}
+                  <a href={`https://x.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(`https://www.mendhu.tech/blog/${post.slug}`)}`}
                     target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors">
                     share on X ↗
                   </a>

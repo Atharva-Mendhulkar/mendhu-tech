@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Atharva Mendhulkar Blogs | Technical Essays & ML Research",
     description: "Official blogs of Atharva Mendhulkar. Covering AI, ML, and systems engineering.",
-    url: "https://mendhu.tech/blog",
+    url: "https://www.mendhu.tech/blog",
   },
 };
 
@@ -181,7 +181,7 @@ export default async function BlogIndex({ searchParams }: PageProps) {
             <div className="font-mono text-[10px] text-ink-faint flex items-center gap-3">
               <Link href="/" className="hover:text-accent transition-colors">← portfolio</Link>
               <span>|</span>
-              <span>mendhu.tech/blog</span>
+              <span>www.mendhu.tech/blog</span>
               <span>|</span>
               <a href="https://atharvarta.hashnode.dev/" className="hover:text-accent transition-colors" target="_blank" rel="noopener noreferrer">hashnode ↗</a>
             </div>

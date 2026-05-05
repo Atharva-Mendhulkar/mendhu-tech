@@ -110,7 +110,7 @@ export default function BlogSection({ initialPosts = [] }: BlogSectionProps) {
             
             <div className="relative z-10">
               <div className="font-mono text-[9.5px] text-ink-faint mb-2 tracking-wider uppercase flex justify-between items-center w-full">
-                <span>latest draft · mendhu.tech/blog</span>
+                <span>latest draft · www.mendhu.tech/blog</span>
                 <button 
                   onClick={(e) => {
                     e.preventDefault();
@@ -147,8 +147,14 @@ export default function BlogSection({ initialPosts = [] }: BlogSectionProps) {
           </Link>
         ))}
       </div>
-
-
+      <div className="mt-8 flex justify-center">
+        <Link 
+          href="/blog" 
+          className="font-mono text-[11px] text-ink-muted hover:text-accent transition-colors border-b border-dashed border-border-strong hover:border-accent"
+        >
+          view all logs →
+        </Link>
+      </div>
 
       {/* Copy Toast */}
       {showCopyToast && (
