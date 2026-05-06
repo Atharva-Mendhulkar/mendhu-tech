@@ -1,0 +1,10 @@
+{
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "mendhu.tech" }],
+      "destination": "https://www.mendhu.tech/:path*",
+      "permanent": true
+    }
+  ]
+}
