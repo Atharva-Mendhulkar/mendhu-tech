@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "AVARA.md",
-                "mode": "source",
+                "file": "multi-agent-systems.md",
+                "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "AVARA"
+              "title": "multi-agent-systems"
             }
           }
         ]
@@ -78,8 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "right": {
     "id": "2a9a4a3f31ff0c15",
@@ -180,7 +179,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -196,31 +196,32 @@
   },
   "active": "6670a3f10407938e",
   "lastOpenFiles": [
-    "deterministic-control-plane.md",
+    "lstm-autoencoder.md",
+    "llm-as-untrusted-component.md",
+    "intent-validation.md",
+    "backpressure.md",
     "AVARA.md",
-    "tool-augmented-agents.md",
+    "approval-workflows.md",
     "api-gateway-pattern.md",
+    "anomaly-detection-security.md",
+    "agent-systems.md",
+    "agent-runtime-authority.md",
     "agent-overreach.md",
+    "agent-identity-iam.md",
+    "deterministic-control-plane.md",
+    "tool-augmented-agents.md",
     "control-plane-vs-data-plane.md",
     "distributed-systems.md",
     "reasoning-vs-execution.md",
     "multi-agent-systems.md",
     "policy-engine.md",
     "failure-cascades.md",
-    "agent-identity-iam.md",
-    "agent-systems.md",
     "atharva.md",
     "autonomous-agents.md",
-    "approval-workflows.md",
     "behavioral-biometrics.md",
-    "agent-runtime-authority.md",
     "prompt-injection.md",
     "rag-systems.md",
-    "llm-as-untrusted-component.md",
     "badmosi.md",
-    "CAPS.md",
-    "Floework.md",
-    "K-PHD.md",
     "Untitled.canvas",
     "Untitled.base",
     "Untitled 1.base",
