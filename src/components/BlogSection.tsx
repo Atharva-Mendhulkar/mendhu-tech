@@ -39,11 +39,10 @@ export default function BlogSection({ initialPosts = [] }: BlogSectionProps) {
     if (posts.length === 0) {
       async function fetchPosts() {
         try {
-          const response = await fetch('https://gql.hashnode.com', {
+          const response = await fetch('/api/hashnode', {
             method: 'POST',
             headers: { 
-              'Content-Type': 'application/json',
-              'Authorization': '0cb3d74f-1448-421d-b181-962fd449b69e'
+              'Content-Type': 'application/json'
             },
             body: JSON.stringify({ 
               query: `
