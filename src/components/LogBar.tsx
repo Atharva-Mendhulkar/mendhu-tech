@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { usePathname } from 'next/navigation';
-import { projects } from '@/data/projects';
+import { formatDate, MediumPost } from '@/lib/medium';
 
 interface LogItem {
   name: string;
@@ -11,72 +11,25 @@ interface LogItem {
   href: string;
 }
 
-interface HashnodePostEdge {
-  node: {
-    title: string;
-    publishedAt: string;
-    slug: string;
-  };
+interface LogBarProps {
+  initialBlogPosts?: MediumPost[];
 }
 
-const PROJECT_ITEMS: LogItem[] = projects.map(p => ({
-  name: p.title,
-  subtitle: p.subtitle,
-  date: p.statusLabel,
-  href: p.links.github || `/#projects`
-}));
-
-export default function LogBar() {
+export default function LogBar({ initialBlogPosts = [] }: LogBarProps) {
   const pathname = usePathname();
-  const [blogItems, setBlogItems] = useState<LogItem[]>([]);
 
-  useEffect(() => {
-    async function fetchLatestBlogs() {
-      try {
-        const query = `
-          query {
-            publication(host: "atharvarta.hashnode.dev") {
-              posts(first: 3) {
-                edges {
-                  node {
-                    title
-                    publishedAt
-                    slug
-                  }
-                }
-              }
-            }
-          }
-        `;
-        const res = await fetch('/api/hashnode', {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ query }),
-        });
-        const json = await res.json();
-        const edges = json.data?.publication?.posts?.edges || [];
-        if (edges.length > 0) {
-          const parsed = edges.map((e: HashnodePostEdge) => ({
-            name: e.node.title,
-            subtitle: "",
-            date: new Date(e.node.publishedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-            href: `/blog/${e.node.slug}`
-          }));
-          setBlogItems(parsed.slice(0, 3));
-        }
-      } catch (err) {
-        console.error('Error fetching Hashnode posts for LogBar:', err);
-      }
-    }
-    fetchLatestBlogs();
-  }, []);
+  const BLOG_ITEMS: LogItem[] = initialBlogPosts.slice(0, 3).map((post) => ({
+    name: post.title,
+    subtitle: "Latest Log",
+    date: formatDate(post.pubDate),
+    href: `/blog/${post.slug}`,
+  }));
 
-  const items = (pathname === '/' || !pathname.startsWith('/blog')) ? PROJECT_ITEMS : blogItems;
+  const items = BLOG_ITEMS;
 
   // Triple items for continuous seamless marquee loop
   const displayItems = items.length > 0 ? [...items, ...items, ...items] : [];
+
 
   return (
     <div className="log-bar sticky top-0 z-[100] border-b border-dashed border-[rgba(0,71,255,0.3)] bg-[rgba(253,253,251,0.92)] backdrop-blur-[4px] overflow-hidden">

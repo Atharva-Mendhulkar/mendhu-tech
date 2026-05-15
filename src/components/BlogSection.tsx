@@ -1,89 +1,19 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Share2 } from 'lucide-react';
 
-const HASHNODE_QUERY = `
-  query {
-    publication(host: "atharvarta.hashnode.dev") {
-      posts(first: 2) {
-        edges {
-          node {
-            title
-            brief
-            publishedAt
-            tags { name }
-            readTimeInMinutes
-            slug
-          }
-        }
-      }
-    }
-  }
-`;
-
-import { Post } from '@/lib/hashnode';
+import { MediumPost } from '@/lib/medium';
 
 interface BlogSectionProps {
-  initialPosts?: Post[];
+  initialPosts?: MediumPost[];
 }
 
 export default function BlogSection({ initialPosts = [] }: BlogSectionProps) {
   const router = useRouter();
-  const [posts, setPosts] = useState<Post[]>(initialPosts);
-
-  useEffect(() => {
-    // Only fetch if we don't have initial posts to speed up first load
-    if (posts.length === 0) {
-      async function fetchPosts() {
-        try {
-          const response = await fetch('/api/hashnode', {
-            method: 'POST',
-            headers: { 
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ 
-              query: `
-                query {
-                  publication(host: "atharvarta.hashnode.dev") {
-                    posts(first: 2) {
-                      edges {
-                        node {
-                          title
-                          brief
-                          publishedAt
-                          tags { name }
-                          readTimeInMinutes
-                          slug
-                        }
-                      }
-                    }
-                  }
-                }
-              ` 
-            }),
-          });
-          const json = await response.json();
-          const fetchedPosts = json.data?.publication?.posts?.edges?.map((e: any) => e.node) || [];
-          
-          const featured = fetchedPosts.filter((p: any) => 
-            p.tags?.some((t: any) => t.name.toLowerCase() === 'featured')
-          );
-
-          if (featured.length > 0) {
-            setPosts(featured.slice(0, 2));
-          } else {
-            setPosts(fetchedPosts.slice(0, 2));
-          }
-        } catch (err) {
-          console.error('Error fetching Hashnode posts:', err);
-        }
-      }
-      fetchPosts();
-    }
-  }, [posts.length]);
+  const posts = initialPosts;
 
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
@@ -96,9 +26,15 @@ export default function BlogSection({ initialPosts = [] }: BlogSectionProps) {
       <h2 className="sr-only">Latest Blogs by Atharva Mendhulkar</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-[10px]">
+        {posts.length === 0 && (
+          <div className="col-span-full border border-dashed border-border-strong p-8 bg-[rgba(253,253,251,0.72)] rounded-2xl text-center">
+            <div className="font-mono text-[11px] text-ink-faint uppercase tracking-wider">No posts yet</div>
+          </div>
+        )}
+
         {posts.map((post) => (
           <Link 
-            key={post.slug}
+            key={post.guid}
             href={`/blog/${post.slug}`}
             className="fade-in border border-dashed border-border-strong p-8 bg-[rgba(253,253,251,0.72)] hover:bg-[rgba(0,71,255,0.025)] hover:border-solid hover:border-accent transition-all duration-300 flex flex-col justify-between group cursor-pointer relative rounded-2xl overflow-hidden"
           >
@@ -108,12 +44,12 @@ export default function BlogSection({ initialPosts = [] }: BlogSectionProps) {
             
             <div className="relative z-10">
               <div className="font-mono text-[9.5px] text-ink-faint mb-2 tracking-wider uppercase flex justify-between items-center w-full">
-                <span>latest draft · www.mendhu.tech/blog</span>
+                <span>latest draft · mendhu.tech</span>
                 <button 
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    const url = window.location.origin + '/blog/' + post.slug;
+                    const url = `${window.location.origin}/blog/${post.slug}`;
                     navigator.clipboard.writeText(url);
                     window.dispatchEvent(new CustomEvent("show-toast", { detail: { message: "link copied to clipboard" } }));
                   }}
@@ -130,12 +66,12 @@ export default function BlogSection({ initialPosts = [] }: BlogSectionProps) {
 
             <div className="flex justify-between items-end mt-auto">
               <div className="font-mono text-[9.5px] text-ink-muted flex flex-wrap items-center gap-2">
-                {formatDate(post.publishedAt)} 
-                <span className="text-border-strong">·</span> 
-                {post.tags.slice(0, 2).map(t => t.name).join(', ')} 
-                <span className="text-border-strong">·</span> 
-                ~{post.readTimeInMinutes} min
+                <span>{formatDate(post.pubDate)}</span>
+                <span className="text-border-strong">·</span>
+                <span>~{post.readingTime} min read</span>
               </div>
+
+
               
               <div className="font-mono text-[10px] text-accent opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
                 Read →
@@ -143,6 +79,7 @@ export default function BlogSection({ initialPosts = [] }: BlogSectionProps) {
             </div>
           </Link>
         ))}
+
       </div>
       <div className="mt-8 flex justify-center">
         <Link 
@@ -156,3 +93,5 @@ export default function BlogSection({ initialPosts = [] }: BlogSectionProps) {
     </section>
   );
 }
+
+

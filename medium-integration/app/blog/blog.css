@@ -1,0 +1,292 @@
+/* app/blog/blog.css
+   Import this in app/blog/layout.tsx (or add to your globals.css).
+   Matches mendhu.tech: EB Garamond body, JetBrains Mono for meta/tags,
+   dark research palette, minimal editorial layout.
+*/
+
+/* ── Variables ──────────────────────────────────────────────────────────── */
+:root {
+  --blog-bg:          #0a0a0a;
+  --blog-surface:     #111111;
+  --blog-border:      rgba(255, 255, 255, 0.07);
+  --blog-border-hover:rgba(255, 255, 255, 0.18);
+  --blog-text:        #e8e3d8;          /* warm off-white, like old paper */
+  --blog-text-muted:  #7a7469;
+  --blog-accent:      #c8a96e;          /* warm amber — research journal feel */
+  --blog-accent-dim:  rgba(200, 169, 110, 0.15);
+  --blog-font-serif:  "EB Garamond", "Georgia", serif;
+  --blog-font-mono:   "JetBrains Mono", "Fira Code", monospace;
+  --blog-radius:      4px;
+  --blog-transition:  200ms ease;
+}
+
+/* ── Page ────────────────────────────────────────────────────────────────── */
+.blog-page {
+  min-height: 100vh;
+  padding: 5rem 1.5rem 8rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+.blog-header {
+  margin-bottom: 4rem;
+}
+
+.blog-header__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.blog-header__line {
+  display: block;
+  width: 2.5rem;
+  height: 1px;
+  background: var(--blog-accent);
+}
+
+.blog-header__label {
+  font-family: var(--blog-font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--blog-accent);
+}
+
+.blog-header__title {
+  font-family: var(--blog-font-serif);
+  font-size: clamp(2.8rem, 6vw, 4.5rem);
+  font-weight: 400;
+  line-height: 1.1;
+  color: var(--blog-text);
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.01em;
+}
+
+.blog-header__sub {
+  font-family: var(--blog-font-serif);
+  font-size: 1.05rem;
+  color: var(--blog-text-muted);
+  line-height: 1.6;
+  max-width: 52ch;
+}
+
+.blog-header__medium-link {
+  color: var(--blog-accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--blog-transition);
+}
+.blog-header__medium-link:hover {
+  border-color: var(--blog-accent);
+}
+
+/* ── Tag filter bar ──────────────────────────────────────────────────────── */
+.blog-tags-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.blog-tag-pill {
+  font-family: var(--blog-font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--blog-text-muted);
+  background: transparent;
+  border: 1px solid var(--blog-border);
+  border-radius: var(--blog-radius);
+  padding: 0.3rem 0.75rem;
+  cursor: pointer;
+  transition: color var(--blog-transition),
+              border-color var(--blog-transition),
+              background var(--blog-transition);
+}
+.blog-tag-pill:hover {
+  color: var(--blog-text);
+  border-color: var(--blog-border-hover);
+}
+.blog-tag-pill--active {
+  color: var(--blog-accent);
+  border-color: var(--blog-accent);
+  background: var(--blog-accent-dim);
+}
+
+/* ── Grid ────────────────────────────────────────────────────────────────── */
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+/* ── Card ────────────────────────────────────────────────────────────────── */
+@keyframes blogCardIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.blog-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--blog-surface);
+  border: 1px solid var(--blog-border);
+  border-radius: var(--blog-radius);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color var(--blog-transition), transform var(--blog-transition);
+  animation: blogCardIn 0.4s ease both;
+}
+.blog-card:hover {
+  border-color: var(--blog-border-hover);
+  transform: translateY(-3px);
+}
+
+/* Thumbnail */
+.blog-card__thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #1a1a1a;
+}
+.blog-card__img {
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+.blog-card:hover .blog-card__img {
+  transform: scale(1.04);
+}
+.blog-card__thumb-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 40%, rgba(10,10,10,0.6));
+}
+
+/* Body */
+.blog-card__body {
+  padding: 1.25rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  flex: 1;
+}
+
+/* Inline tags */
+.blog-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.blog-card__tag {
+  font-family: var(--blog-font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--blog-accent);
+  background: var(--blog-accent-dim);
+  border-radius: 2px;
+  padding: 0.2rem 0.55rem;
+}
+
+/* Title */
+.blog-card__title {
+  font-family: var(--blog-font-serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--blog-text);
+  margin: 0;
+  transition: color var(--blog-transition);
+}
+.blog-card:hover .blog-card__title {
+  color: #fff;
+}
+
+/* Excerpt */
+.blog-card__excerpt {
+  font-family: var(--blog-font-serif);
+  font-size: 0.93rem;
+  line-height: 1.65;
+  color: var(--blog-text-muted);
+  margin: 0;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+/* Meta row */
+.blog-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--blog-border);
+}
+.blog-card__date,
+.blog-card__reading-time {
+  font-family: var(--blog-font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
+  color: var(--blog-text-muted);
+}
+.blog-card__dot {
+  color: var(--blog-border-hover);
+  font-size: 0.75rem;
+}
+.blog-card__arrow {
+  margin-left: auto;
+  font-size: 0.9rem;
+  color: var(--blog-text-muted);
+  transition: color var(--blog-transition), transform var(--blog-transition);
+}
+.blog-card:hover .blog-card__arrow {
+  color: var(--blog-accent);
+  transform: translate(2px, -2px);
+}
+
+/* ── Error / Empty states ────────────────────────────────────────────────── */
+.blog-error {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  background: rgba(200, 80, 80, 0.08);
+  border: 1px solid rgba(200, 80, 80, 0.2);
+  border-radius: var(--blog-radius);
+  font-family: var(--blog-font-mono);
+  font-size: 0.8rem;
+  color: #e07070;
+}
+.blog-error__icon {
+  font-size: 1rem;
+}
+
+.blog-empty-state,
+.blog-empty {
+  font-family: var(--blog-font-serif);
+  font-size: 1rem;
+  color: var(--blog-text-muted);
+  padding: 3rem 0;
+  text-align: center;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .blog-page {
+    padding: 3.5rem 1rem 5rem;
+  }
+  .blog-grid {
+    grid-template-columns: 1fr;
+  }
+  .blog-header__title {
+    font-size: 2.4rem;
+  }
+}

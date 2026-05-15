@@ -1,8 +1,12 @@
-// components/blog/TableOfContents.tsx
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
 
-interface Heading { id: string; text: string; level: 2 | 3 }
+import React, { useCallback, useEffect, useRef, useState } from "react";
+
+interface Heading {
+  id: string;
+  text: string;
+  level: number;
+}
 
 const HEADING_OFFSET = 96;
 
@@ -14,6 +18,26 @@ function decodeHash(value: string) {
   }
 }
 
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&#8217;/g, "’")
+    .replace(/&#8216;/g, "‘")
+    .replace(/&#8220;/g, "“")
+    .replace(/&#8221;/g, "”")
+    .replace(/&#8211;/g, "–")
+    .replace(/&#8212;/g, "—")
+    .replace(/&#[0-9]+;/g, (match) => {
+      const code = parseInt(match.slice(2, -1), 10);
+      return !isNaN(code) ? String.fromCharCode(code) : match;
+    });
+}
+
 function scrollToHeading(el: HTMLElement, behavior: ScrollBehavior) {
   const top = el.getBoundingClientRect().top + window.scrollY - HEADING_OFFSET;
   window.scrollTo({ top: Math.max(0, top), behavior });
@@ -22,17 +46,31 @@ function scrollToHeading(el: HTMLElement, behavior: ScrollBehavior) {
 function extractHeadingsFromDOM(): Heading[] {
   if (typeof document === "undefined") return [];
 
-  return Array.from(document.querySelectorAll<HTMLHeadingElement>(".post-body h2[id], .post-body h3[id]"))
-    .map(el => ({
-      id: el.id,
-      text: el.textContent?.trim() || "",
-      level: Number(el.tagName.slice(1)) as 2 | 3,
-    }))
-    .filter(heading => heading.id && heading.text);
+  const selectors = [
+    ".post-body h1[id]",
+    ".post-body h2[id]",
+    ".post-body h3[id]",
+    ".post-body h4[id]",
+    ".post-body h5[id]",
+    ".post-body h6[id]",
+  ].join(", ");
+
+  return Array.from(document.querySelectorAll<HTMLHeadingElement>(selectors))
+    .map((el) => {
+      let rawText = el.textContent?.trim() || "";
+      rawText = decodeHtmlEntities(rawText);
+      const level = parseInt(el.tagName[1], 10) || 2;
+      return {
+        id: el.id,
+        text: rawText,
+        level,
+      };
+    })
+    .filter((heading) => heading.id && heading.text);
 }
 
-export default function TableOfContents({ html }: { html: string }) {
-  const [headings, setHeadings] = useState<Heading[]>([]);
+export default function TableOfContents({ headings: initialHeadings, html }: { headings?: Heading[]; html?: string }) {
+  const [headings, setHeadings] = useState<Heading[]>(initialHeadings || []);
   const [activeId, setActiveId] = useState("");
   const scrollLockRef = useRef<number | null>(null);
   const handledHashRef = useRef("");
@@ -51,8 +89,13 @@ export default function TableOfContents({ html }: { html: string }) {
     };
   }, []);
 
-  // Update active heading based on viewport position
+  // Extract active headings from DOM when content changes
   useEffect(() => {
+    if (initialHeadings && initialHeadings.length > 0) {
+      setHeadings(initialHeadings);
+      return;
+    }
+
     const postBody = document.querySelector(".post-body");
     if (!postBody) return;
 
@@ -67,7 +110,7 @@ export default function TableOfContents({ html }: { html: string }) {
     observer.observe(postBody, { childList: true, subtree: true });
 
     return () => observer.disconnect();
-  }, [html]);
+  }, [html, initialHeadings]);
 
   // Use IntersectionObserver for robust scroll tracking
   useEffect(() => {
@@ -77,26 +120,21 @@ export default function TableOfContents({ html }: { html: string }) {
       (entries) => {
         if (scrollLockRef.current) return;
 
-        // Find the "most relevant" visible heading
-        // Usually the one closest to the top of the viewport (with some offset)
         const visibleEntries = entries
-          .filter(entry => entry.isIntersecting)
+          .filter((entry) => entry.isIntersecting)
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
 
         if (visibleEntries.length > 0) {
           setActiveId(visibleEntries[0].target.id);
-        } else {
-          // If no headings are currently intersecting, we might be between headings
-          // We can fallback to checking window.scrollY if needed, or just stay on last one
         }
       },
-      { 
-        threshold: 1.0, 
-        rootMargin: "-96px 0px -70% 0px" // Only consider headings in the top 30% of view
+      {
+        threshold: 1.0,
+        rootMargin: "-96px 0px -55% 0px",
       }
     );
 
-    headings.forEach(h => {
+    headings.forEach((h) => {
       const el = document.getElementById(h.id);
       if (el) observer.observe(el);
     });
@@ -135,19 +173,12 @@ export default function TableOfContents({ html }: { html: string }) {
   if (!headings.length) return null;
 
   return (
-    <div className="flex flex-col max-h-[calc(100vh-120px)]">
-      <div className="font-mono text-[9px] text-ink-faint tracking-widest uppercase mb-4 shrink-0">
-        Contents
+    <div className="flex flex-col select-none">
+      <div className="font-mono text-[9px] text-ink-faint tracking-widest uppercase mb-6 pb-2 border-b border-dashed border-border-strong font-bold">
+        [TABLE OF CONTENTS]
       </div>
-      <nav 
-        ref={navRef}
-        className="overflow-y-auto pl-1 pr-2 custom-scrollbar scroll-smooth"
-        style={{ scrollbarWidth: 'none' }}
-      >
-        <style>{`
-          .custom-scrollbar::-webkit-scrollbar { display: none; }
-        `}</style>
-        {headings.map(h => {
+      <nav ref={navRef} className="flex flex-col gap-1 pr-2 max-h-[calc(100vh-200px)] overflow-y-auto scroll-smooth" style={{ scrollbarWidth: "none" }}>
+        {headings.map((h) => {
           const isActive = h.id === activeId;
           return (
             <a
@@ -159,7 +190,8 @@ export default function TableOfContents({ html }: { html: string }) {
                 color: isActive ? "var(--accent)" : "var(--ink-faint)",
                 borderLeft: isActive ? "2px dashed var(--accent)" : "2px solid transparent",
               }}
-              onClick={e => {
+
+              onClick={(e) => {
                 e.preventDefault();
                 const el = document.getElementById(h.id);
                 if (el) {
@@ -171,12 +203,14 @@ export default function TableOfContents({ html }: { html: string }) {
                   history.pushState(null, "", hash);
                 }
               }}
+              title={h.text}
             >
-              {h.text.length > 36 ? h.text.slice(0, 33) + "…" : h.text}
+              {h.text}
             </a>
           );
         })}
       </nav>
+
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { EB_Garamond, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 
-import LogBar from "@/components/LogBar";
+import LogBarServer from "@/components/LogBarServer";
 import ToastProvider from "@/components/ToastProvider";
 import "./globals.css";
 
@@ -68,7 +68,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${ebGaramond.variable} ${jetbrainsMono.variable}`}>
       <body>
-        <LogBar />
+        <LogBarServer />
         <ToastProvider />
         {children}
         <Analytics />

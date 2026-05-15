@@ -1,7 +1,7 @@
-import { getAllPosts } from "@/lib/hashnode";
+import { getMediumPosts, getExcerpt } from "@/lib/medium";
 
 export async function GET() {
-  const posts = await getAllPosts();
+  const { posts } = await getMediumPosts().catch(() => ({ posts: [] }));
 
   const site_url = "https://www.mendhu.tech";
 
@@ -9,11 +9,11 @@ export async function GET() {
     return `
     <item>
       <title><![CDATA[${post.title}]]></title>
-      <link>${site_url}/blog/${post.slug}</link>
-      <guid>${site_url}/blog/${post.slug}</guid>
-      <pubDate>${new Date(post.publishedAt).toUTCString()}</pubDate>
-      <description><![CDATA[${post.brief}]]></description>
-      <author>Atharva Mendhulkar</author>
+      <link>${post.link}</link>
+      <guid>${post.guid}</guid>
+      <pubDate>${new Date(post.pubDate).toUTCString()}</pubDate>
+      <description><![CDATA[${getExcerpt(post.description)}]]></description>
+      <author>${post.author}</author>
     </item>`;
   }).join('');
 

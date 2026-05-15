@@ -1,6 +1,6 @@
 // app/blog/page.tsx
-import { getAllPosts, formatDate, TAG_COLORS, defaultTagColor } from "@/lib/hashnode";
-import type { Metadata } from "next";
+import { Metadata } from "next";
+import { MediumPost, getMediumPosts, formatDate, getExcerpt, TAG_COLORS, defaultTagColor } from "@/lib/medium";
 import Link from "next/link";
 import CustomCursor from "@/components/CustomCursor";
 
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   keywords: ["Atharva Mendhulkar", "Atharva blogs", "Atharva Mendhulkar blogs", "mendhu blogs", "engineering", "ML Research", "AI Security"],
   robots: {
     index: true,
-    follow: true
+    follow: true,
   },
   openGraph: {
     title: "Atharva Mendhulkar Blogs | Technical Essays & ML Research",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = 3600;
+export const revalidate = 60;
 
 interface PageProps {
   searchParams: Promise<{ tag?: string }> | { tag?: string };
@@ -28,52 +28,78 @@ interface PageProps {
 export default async function BlogIndex({ searchParams }: PageProps) {
   const resolvedSearchParams = await searchParams;
   const activeTag = resolvedSearchParams.tag ?? "all";
-  const allPosts  = await getAllPosts();
+
+  let allPosts: MediumPost[] = [];
+  try {
+    const { posts } = await getMediumPosts();
+    allPosts = posts;
+  } catch (err) {
+    console.error("Failed to fetch Medium posts:", err);
+  }
 
   const FILTERS = [
-    { label: "all",             slug: "all",             desc: "All posts across topics, formats, and depth. Everything in one place." },
-    { label: "build-log",       slug: "build-log",       desc: "Step-by-step progress of projects, decisions, iterations, and lessons learned during development." },
-    { label: "deep-dive",       slug: "deep-dive",       desc: "In-depth breakdowns of complex systems, concepts, or architectures with detailed analysis." },
-    { label: "research",        slug: "research",        desc: "Explorations of ideas, experiments, and technical investigations with a focus on insights and findings." },
+    { label: "all", slug: "all", desc: "All posts across topics, formats, and depth. Everything in one place." },
+    { label: "build-log", slug: "build-log", desc: "Step-by-step progress of projects, decisions, iterations, and lessons learned during development." },
+    { label: "deep-dive", slug: "deep-dive", desc: "In-depth breakdowns of complex systems, concepts, or architectures with detailed analysis." },
+    { label: "research", slug: "research", desc: "Explorations of ideas, experiments, and technical investigations with a focus on insights and findings." },
     { label: "paper-companion", slug: "paper-companion", desc: "Simplified explanations and takeaways from research papers, focused on practical understanding." },
-    { label: "notes",           slug: "notes",           desc: "Concise, structured notes for quick revision and reference on key topics." },
-    { label: "explained",       slug: "explained",       desc: "Clear, beginner-friendly explanations of concepts, systems, or technologies." },
+    { label: "notes", slug: "notes", desc: "Concise, structured notes for quick revision and reference on key topics." },
+    { label: "explained", slug: "explained", desc: "Clear, beginner-friendly explanations of concepts, systems, or technologies." },
   ];
 
-  const activeFilter = FILTERS.find(f => f.slug === activeTag) || FILTERS[0];
+  const activeFilter = FILTERS.find((f) => f.slug === activeTag) || FILTERS[0];
 
-  const posts     = activeTag === "all"
-    ? allPosts
-    : allPosts.filter(p => p.tags.some(t => {
-        const tSlug = t.slug || t.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-        return tSlug === activeTag;
-      }));
+  const posts = activeTag === "all" ? allPosts : allPosts.filter((p) => p.categories.includes(activeTag));
 
   return (
-    <main className="relative">
+    <main className="relative selection:bg-accent/10 selection:text-accent">
       <CustomCursor />
       {/* Outer shell — same as portfolio, body dot grid shows on margins */}
       <div className="max-w-[960px] mx-auto border-x border-dashed border-border-strong min-h-screen relative">
-
         {/* Inner paper + diagonal hatch */}
         <div
           aria-hidden
           style={{
-            position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0,
+            position: "absolute",
+            inset: 0,
+            pointerEvents: "none",
+            zIndex: 0,
             backgroundColor: "var(--paper)",
-            backgroundImage: `repeating-linear-gradient(-45deg,rgba(0,0,0,0.055) 0px,rgba(0,0,0,0.055) 1px,transparent 1px,transparent 9px)`,
+            backgroundImage: `repeating-linear-gradient(-45deg, rgba(0,0,0,0.055) 0px, rgba(0,0,0,0.055) 1px, transparent 1px, transparent 9px)`,
           }}
         />
 
         {/* Corner marks */}
-        {[{t:2,l:4},{t:2,r:4},{b:2,l:4},{b:2,r:4}].map((pos,i) => (
-          <span key={i} aria-hidden style={{ position:"absolute", ...pos as any, zIndex:2, fontFamily:"var(--font-mono)", fontSize:9, color:"var(--ink-faint)", userSelect:"none" }}>+</span>
+        {[
+          { t: 2, l: 4 },
+          { t: 2, r: 4 },
+          { b: 2, l: 4 },
+          { b: 2, r: 4 },
+        ].map((pos, i) => (
+          <span
+            key={i}
+            aria-hidden
+            style={{
+              position: "absolute",
+              ...(pos as any),
+              zIndex: 2,
+              fontFamily: "var(--font-mono)",
+              fontSize: 9,
+              color: "var(--ink-faint)",
+              userSelect: "none",
+            }}
+          >
+            +
+          </span>
         ))}
 
         <div className="relative px-8 lg:px-12 py-16" style={{ zIndex: 1 }}>
-
           {/* Back link */}
-          <Link href="/" className="font-mono text-[10px] text-ink-faint hover:text-accent transition-colors mb-12 block w-fit" style={{ borderBottom: "1px dashed transparent" }}>
+          <Link
+            href="/"
+            className="font-mono text-[10px] text-ink-faint hover:text-accent transition-colors mb-12 block w-fit"
+            style={{ borderBottom: "1px dashed transparent" }}
+          >
             ← mendhu.tech
           </Link>
 
@@ -92,17 +118,19 @@ export default async function BlogIndex({ searchParams }: PageProps) {
           <div className="flex gap-2 flex-wrap mb-12">
             {FILTERS.map((f) => {
               const isActive = f.slug === activeTag;
-              const col = f.slug !== "all" ? (TAG_COLORS[f.slug] ?? defaultTagColor) : null;
+              const col = f.slug !== "all" ? TAG_COLORS[f.slug] ?? defaultTagColor : null;
               return (
-                <Link key={f.slug} href={f.slug === "all" ? "/blog" : `/blog?tag=${f.slug}`}
-                  className="font-mono text-[10px] px-3 py-1.5 transition-all"
+                <Link
+                  key={f.slug}
+                  href={f.slug === "all" ? "/blog" : `/blog?tag=${f.slug}`}
+                  className="font-mono text-[10px] px-3 py-1.5 transition-all rounded hover:border-solid"
                   style={{
                     border: `1px ${isActive ? "solid" : "dashed"} ${isActive && col ? col.border : "var(--border-strong)"}`,
                     background: isActive && col ? col.bg : "transparent",
                     color: isActive && col ? col.text : isActive ? "var(--accent)" : "var(--ink-muted)",
-                    borderRadius: 2,
-                    borderColor: isActive ? (col?.border ?? "var(--accent)") : "var(--border-strong)",
-                  }}>
+                    borderColor: isActive ? col?.border ?? "var(--accent)" : "var(--border-strong)",
+                  }}
+                >
                   {f.label}
                 </Link>
               );
@@ -115,28 +143,27 @@ export default async function BlogIndex({ searchParams }: PageProps) {
 
           {/* Posts */}
           {posts.length === 0 ? (
-            <div className="font-mono text-[11px] text-ink-faint py-16 text-center border border-dashed border-border-strong" style={{ borderRadius: 2 }}>
+            <div
+              className="font-mono text-[11px] text-ink-faint py-16 text-center border border-dashed border-border-strong rounded"
+            >
               No posts yet in this category. Check back soon.
             </div>
           ) : (
             <div>
               {posts.map((post) => {
                 return (
-                  <article key={post.slug}>
-                    <Link href={`/blog/${post.slug}`} className="group block py-8 border-b border-dashed border-border-strong hover:border-solid transition-all">
+                  <article key={post.guid}>
+                    <Link
+                      href={`/blog/${post.slug}`}
+                      className="group block py-8 border-b border-dashed border-border-strong hover:border-solid transition-all"
+                    >
                       <div className="flex items-start justify-between gap-6">
                         <div className="flex-1 min-w-0">
                           {/* Meta */}
                           <div className="flex items-center gap-3 mb-3 font-mono text-[9.5px] text-ink-faint">
-                            <span>{formatDate(post.publishedAt)}</span>
+                            <span>{formatDate(post.pubDate)}</span>
                             <span>·</span>
-                            <span>{post.readTimeInMinutes} min read</span>
-                            {post.series && (
-                              <>
-                                <span>·</span>
-                                <span style={{ color: "var(--accent)" }}>Series: {post.series.name}</span>
-                              </>
-                            )}
+                            <span>{post.readingTime} min read</span>
                           </div>
 
                           {/* Title */}
@@ -145,19 +172,25 @@ export default async function BlogIndex({ searchParams }: PageProps) {
                           </h2>
 
                           {/* Brief */}
-                          <p className="font-mono text-[11px] text-ink-muted leading-[1.7] mb-4 line-clamp-2">
-                            {post.brief}
+                          <p className="font-mono text-[11.5px] text-ink-muted leading-[1.7] mb-4 line-clamp-2">
+                            {getExcerpt(post.content || post.description, 180)}
                           </p>
 
                           {/* Tags */}
                           <div className="flex gap-2 flex-wrap">
-                            {post.tags.map(tag => {
-                              const tSlug = tag.slug || tag.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-                              const c = TAG_COLORS[tSlug] ?? defaultTagColor;
+                            {post.categories.map((cat) => {
+                              const c = TAG_COLORS[cat] ?? defaultTagColor;
                               return (
-                                <span key={tSlug} className="font-mono text-[9px] px-2 py-0.5"
-                                  style={{ background: c.bg, border: `1px dashed ${c.border}`, color: c.text, borderRadius: 2 }}>
-                                  {tag.name}
+                                <span
+                                  key={cat}
+                                  className="font-mono text-[9px] px-2 py-0.5 rounded"
+                                  style={{
+                                    background: c.bg,
+                                    border: `1px dashed ${c.border}`,
+                                    color: c.text,
+                                  }}
+                                >
+                                  {cat}
                                 </span>
                               );
                             })}
@@ -176,6 +209,7 @@ export default async function BlogIndex({ searchParams }: PageProps) {
             </div>
           )}
 
+
           {/* Footer */}
           <footer className="pt-16 pb-8 border-t border-dashed border-border-strong mt-4">
             <div className="font-mono text-[10px] text-ink-faint flex items-center gap-3">
@@ -183,7 +217,7 @@ export default async function BlogIndex({ searchParams }: PageProps) {
               <span>|</span>
               <span>www.mendhu.tech/blog</span>
               <span>|</span>
-              <a href="https://atharvarta.hashnode.dev/" className="hover:text-accent transition-colors" target="_blank" rel="noopener noreferrer">hashnode ↗</a>
+              <a href={`https://medium.com/@${allPosts[0]?.author ?? 'mendhu'}`} className="hover:text-accent transition-colors" target="_blank" rel="noopener noreferrer">medium ↗</a>
             </div>
           </footer>
 

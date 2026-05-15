@@ -11,13 +11,13 @@ import dynamic from 'next/dynamic';
 import MinimizedPill from "@/components/MinimizedPill";
 import DraggablePorygon from '@/components/DraggablePorygon';
 import ScrollProgressButtons from "@/components/ScrollProgressButtons";
-import { Post } from "@/lib/hashnode";
+import { MediumPost } from "@/lib/medium";
 
 const GardenModal = dynamic(() => import('@/components/GardenModal'), { ssr: false });
 const ProjectModal = dynamic(() => import('@/components/ProjectModal'), { ssr: false });
 const Terminal = dynamic(() => import('@/components/Terminal'), { ssr: false });
 
-export default function HomeClient({ initialPosts }: { initialPosts: Post[] }) {
+export default function HomeClient({ initialPosts }: { initialPosts: MediumPost[] }) {
   const router = useRouter();
   const [activeModalId, setActiveModalId] = useState<string | null>(null);
   const [isGardenOpen, setIsGardenOpen] = useState(false);

@@ -2,11 +2,11 @@
 
 import { useEffect } from "react";
 import HomeClient from "@/components/HomeClient";
-import { Post } from "@/lib/hashnode";
+import { MediumPost } from "@/lib/medium";
 
 interface Props {
   initialFileId: string;
-  initialPosts: Post[];
+  initialPosts: MediumPost[];
 }
 
 export default function GardenEntryClient({ initialFileId, initialPosts }: Props) {

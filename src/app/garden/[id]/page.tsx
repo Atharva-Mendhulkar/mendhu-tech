@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import GardenEntryClient from "@/components/GardenEntryClient";
-import { getLatestPosts } from "@/lib/hashnode";
+import { getMediumPosts } from "@/lib/medium";
 import researchData from "@/data/research.json";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -87,7 +87,8 @@ export async function generateMetadata({
 export default async function GardenFilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const file = data.files[id];
-  const initialPosts = await getLatestPosts();
+  const { posts: allPosts } = await getMediumPosts();
+  const initialPosts = allPosts.slice(0, 2);
 
   const jsonLd = file
     ? {

@@ -1,257 +1,312 @@
-// app/blog/[slug]/page.tsx
-import { getPost, getAllSlugs, getRelatedPosts, formatDate, TAG_COLORS, defaultTagColor } from "@/lib/hashnode";
-import { notFound }      from "next/navigation";
-import type { Metadata } from "next";
-import Link              from "next/link";
-import Image             from "next/image";
-import PostBody          from "@/components/blog/PostBody";
-import TableOfContents   from "@/components/blog/TableOfContents";
-import SeriesNav         from "@/components/blog/SeriesNav";
-import CustomCursor     from "@/components/CustomCursor";
-import BlogShareButton from "@/components/blog/BlogShareButton";
-import ClapButton      from "@/components/blog/ClapButton";
+import "./article.css";
+import React from "react";
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import {
+  getMediumPostBySlug,
+  getMediumPosts,
+  formatDate,
+  getExcerpt,
+  addHeadingIds,
+  TAG_COLORS,
+  defaultTagColor,
+} from "@/lib/medium";
+import CustomCursor from "@/components/CustomCursor";
+import TableOfContents from "@/components/blog/TableOfContents";
+import ShareButton from "./ShareButton";
 
-export const dynamic = "force-static";
+export const revalidate = 60;
 
-// ── SSG ────────────────────────────────────────────────────────────────────
+interface PageProps {
+  params: Promise<{ slug: string }>;
+}
+
 export async function generateStaticParams() {
   try {
-    const slugs = await getAllSlugs();
-    return slugs.map(slug => ({ slug }));
-  } catch (err) {
-    console.error("generateStaticParams failed:", err);
+    const { posts } = await getMediumPosts();
+    return posts.map((p) => ({ slug: p.slug }));
+  } catch {
     return [];
   }
 }
 
-// Rebuild stale posts hourly (ISR)
-export const revalidate = 3600;
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await getMediumPostBySlug(slug);
 
-// ── Metadata ────────────────────────────────────────────────────────────────
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> | { slug: string } }): Promise<Metadata> {
-  const resolvedParams = await params;
-  const post = await getPost(resolvedParams.slug);
-  if (!post) return { title: "Post not found" };
+  if (!post) {
+    return {
+      title: "Blog Post Not Found | mendhu.tech",
+      description: "The requested log could not be located.",
+    };
+  }
 
-  const seoTitle = post.seo?.title ?? `${post.title} — Atharva Mendhulkar`;
-  const seoDesc  = post.seo?.description ?? post.brief;
-  const url      = `https://www.mendhu.tech/blog/${resolvedParams.slug}`;
+  const desc = getExcerpt(post.content || post.description, 160);
+  const url = `https://www.mendhu.tech/blog/${post.slug}`;
 
   return {
-    title:       `${post.title} | Atharva Mendhulkar`,
-    description: seoDesc,
-    keywords:    [...post.tags.map(t => t.name), "Atharva Mendhulkar", "Atharva blogs", "Atharva Mendhulkar blogs", "mendhu blogs", "engineering blog"],
-    authors:     [{ name: "Atharva Mendhulkar", url: "https://www.mendhu.tech" }],
-    alternates:  { canonical: url },
-    robots:      { index: true, follow: true },
+    title: `${post.title} — Technical Essays | mendhu.tech`,
+    description: desc,
+    authors: [{ name: post.author, url: "https://www.mendhu.tech" }],
     openGraph: {
-      title:         post.title,
-      description:   seoDesc,
+      title: post.title,
+      description: desc,
       url,
-      type:          "article",
-      publishedTime: post.publishedAt,
-      modifiedTime:  post.updatedAt,
-      authors:       ["Atharva Mendhulkar"],
-      tags:          post.tags.map(t => t.name),
-      images:        post.coverImage ? [{ url: post.coverImage.url }] : [{ url: "https://www.mendhu.tech/og-default.png" }],
+      type: "article",
+      siteName: "mendhu.tech",
+      publishedTime: post.pubDate,
+      images: post.thumbnail ? [{ url: post.thumbnail }] : [],
     },
     twitter: {
-      card:        "summary_large_image",
-      title:       post.title,
-      description: seoDesc,
-      images:      post.coverImage ? [post.coverImage.url] : ["https://www.mendhu.tech/og-default.png"],
+      card: "summary_large_image",
+      title: post.title,
+      description: desc,
+      images: post.thumbnail ? [post.thumbnail] : [],
     },
+    alternates: { canonical: url },
   };
 }
 
-// ── Page ────────────────────────────────────────────────────────────────────
-export default async function PostPage({ params }: { params: Promise<{ slug: string }> | { slug: string } }) {
-  const resolvedParams = await params;
-  const post = await getPost(resolvedParams.slug);
-  if (!post) notFound();
+export default async function BlogPostPage({ params }: PageProps) {
+  const { slug } = await params;
+  const { posts } = await getMediumPosts();
+  const post = posts.find((p) => p.slug === slug || p.link.includes(slug));
+  const otherPosts = posts.filter((p) => p.slug !== slug).slice(0, 2);
 
-  const related = await getRelatedPosts(resolvedParams.slug, post.tags, 2);
 
-  // JSON-LD structured data
+  if (!post) {
+    notFound();
+  }
+
+  const { htmlWithIds, headings } = addHeadingIds(post.content || post.description);
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    headline:    post.title,
-    description: post.brief,
+    headline: post.title,
+    description: getExcerpt(post.content || post.description, 160),
+    datePublished: post.pubDate,
+    dateModified: post.pubDate,
     author: {
       "@type": "Person",
-      name: "Atharva Mendhulkar",
-      url:  "https://www.mendhu.tech",
-      sameAs: [
-        "https://github.com/Atharva-Mendhulkar",
-        "https://x.com/atharvanta",
-      ],
+      name: post.author,
+      url: "https://www.mendhu.tech",
     },
-    datePublished:      post.publishedAt,
-    dateModified:       post.updatedAt,
-    mainEntityOfPage: { "@type": "WebPage", "@id": `https://www.mendhu.tech/blog/${post.slug}` },
-    keywords: post.tags.map(t => t.name).join(", "),
-    ...(post.coverImage && { image: post.coverImage.url }),
     publisher: {
-      "@type": "Person",
-      name: "Atharva Mendhulkar",
-      url:  "https://www.mendhu.tech",
+      "@type": "Organization",
+      name: "mendhu.tech",
+      url: "https://www.mendhu.tech",
     },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `https://www.mendhu.tech/blog/${post.slug}`,
+    },
+    image: post.thumbnail ? [post.thumbnail] : undefined,
   };
 
   return (
-    <main className="relative">
+    <main className="relative selection:bg-accent/10 selection:text-accent">
       <CustomCursor />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
 
       {/* Outer shell */}
-      <div className="w-full min-h-screen relative" style={{ backgroundColor: "var(--paper)" }}>
+      <div className="max-w-[1200px] mx-auto border-x border-dashed border-border-strong min-h-screen relative">
+        {/* Inner paper + diagonal hatch */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            inset: 0,
+            pointerEvents: "none",
+            zIndex: 0,
+            backgroundColor: "var(--paper)",
+            backgroundImage: `repeating-linear-gradient(-45deg, rgba(0,0,0,0.055) 0px, rgba(0,0,0,0.055) 1px, transparent 1px, transparent 9px)`,
+          }}
+        />
 
         {/* Corner marks */}
-        {[{t:2,l:4},{t:2,r:4},{b:2,l:4},{b:2,r:4}].map((pos,i) => (
-          <span key={i} aria-hidden style={{ position:"absolute",...pos as any,zIndex:2,fontFamily:"var(--font-mono)",fontSize:9,color:"var(--ink-faint)",userSelect:"none" }}>+</span>
+        {[
+          { t: 2, l: 4 },
+          { t: 2, r: 4 },
+          { b: 2, l: 4 },
+          { b: 2, r: 4 },
+        ].map((pos, i) => (
+          <span
+            key={i}
+            aria-hidden
+            style={{
+              position: "absolute",
+              ...(pos as any),
+              zIndex: 2,
+              fontFamily: "var(--font-mono)",
+              fontSize: 9,
+              color: "var(--ink-faint)",
+              userSelect: "none",
+            }}
+          >
+            +
+          </span>
         ))}
 
-        <div className="relative" style={{ zIndex: 1 }}>
+        <div className="relative flex flex-col lg:flex-row gap-0" style={{ zIndex: 1 }}>
+          {/* Main Article Prose */}
+          <div className="flex-1 min-w-0 px-8 lg:pl-16 lg:pr-16 py-16 relative">
+            {/* Top navigation / Share header */}
+            <ShareButton slug={post.slug} title={post.title} />
 
-          {/* Two-column layout with left gutter: spacer + prose + sticky ToC */}
-          <div className="flex gap-0">
-            {/* Left Gutter spacer */}
-            <div className="hidden md:block md:w-16 lg:w-24 border-r border-dashed border-border-strong relative" aria-hidden />
+            {/* Article Header */}
+            <header className="mb-16">
+              <div className="section-tag mb-6">[02_INTELLECTUAL_LOG / ESSAY]</div>
 
-            {/* article */}
-            <article className="flex-1 min-w-0 px-8 lg:pl-16 lg:pr-24 py-16 relative">
-              
-              {/* Top-right Actions */}
-              <div className="absolute top-16 right-8 lg:right-24 z-10 flex flex-col items-end gap-6">
-                <BlogShareButton title={post.title} slug={post.slug} />
-              </div>
-
-              {/* Back */}
-              <Link href="/blog" className="font-mono text-[10px] text-ink-faint hover:text-accent transition-colors mb-10 block w-fit"
-                style={{ borderBottom: "1px dashed transparent" }}>
-                ← all posts
-              </Link>
-
-              {/* Series breadcrumb */}
-              {post.series && (
-                <div className="font-mono text-[9.5px] text-ink-faint mb-4 flex items-center gap-2">
-                  <span>Series:</span>
-                  <span style={{ color: "var(--accent)", borderBottom: "1px dashed var(--accent)" }}>
-                    {post.series.name}
-                  </span>
-                </div>
-              )}
-
-              {/* Title */}
-              <h1 className="font-serif text-[clamp(28px,4vw,40px)] font-normal leading-[1.15] tracking-[-0.01em] text-ink mb-5">
+              <h1 className="font-serif text-[36px] md:text-[48px] font-normal tracking-[-0.02em] leading-[1.1] mb-8 text-ink">
                 {post.title}
               </h1>
 
-              {/* Meta bar */}
-              <div className="flex items-center gap-3 font-mono text-[10px] text-ink-faint mb-6 flex-wrap">
-                <span>{formatDate(post.publishedAt)}</span>
+              <div className="flex flex-wrap items-center gap-4 py-4 border-y border-dashed border-border-strong font-mono text-[11.5px] text-ink-muted">
+                <div>
+                  <span className="text-ink-faint uppercase mr-1.5">Date:</span>
+                  {formatDate(post.pubDate)}
+                </div>
                 <span className="text-border-strong">·</span>
-                <span>{post.readTimeInMinutes} min read</span>
+                <div>
+                  <span className="text-ink-faint uppercase mr-1.5">Reading time:</span>~
+                  {post.readingTime} min
+                </div>
                 <span className="text-border-strong">·</span>
-                <span>Written by Atharva Mendhulkar</span>
+                <div>
+                  <span className="text-ink-faint uppercase mr-1.5">Author:</span>
+                  {post.author}
+                </div>
               </div>
 
-              {/* Tags */}
-              <div className="flex gap-2 flex-wrap mb-8">
-                {post.tags.map(tag => {
-                  const tSlug = tag.slug || tag.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-                  const c = TAG_COLORS[tSlug] ?? defaultTagColor;
-                  return (
-                    <Link key={tSlug} href={`/blog?tag=${tSlug}`}
-                      className="font-mono text-[9px] px-2 py-0.5 hover:border-solid transition-all"
-                      style={{ background: c.bg, border: `1px dashed ${c.border}`, color: c.text, borderRadius: 2 }}>
-                      {tag.name}
-                    </Link>
-                  );
-                })}
-              </div>
-
-              {/* Cover image */}
-              {post.coverImage && (
-                <div className="mb-10 border border-dashed border-border-strong overflow-hidden relative w-full aspect-video" style={{ borderRadius: 2, backgroundColor: "rgba(0,0,0,0.02)" }}>
-                  <Image 
-                    src={post.coverImage.url} 
-                    alt={post.title} 
-                    fill 
-                    className="object-contain" 
-                    priority
-                  />
+              {/* Categories / Tags */}
+              {post.categories.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-6">
+                  {post.categories.map((cat) => {
+                    const c = TAG_COLORS[cat] ?? defaultTagColor;
+                    return (
+                      <Link
+                        key={cat}
+                        href={`/blog?tag=${encodeURIComponent(cat)}`}
+                        className="font-mono text-[10px] px-2.5 py-1 transition-all rounded hover:border-solid"
+                        style={{
+                          background: c.bg,
+                          border: `1px dashed ${c.border}`,
+                          color: c.text,
+                        }}
+                      >
+                        #{cat}
+                      </Link>
+                    );
+                  })}
                 </div>
               )}
+            </header>
 
-              {/* Dashed rule */}
-              <div style={{ borderTop: "1px dashed var(--border-strong)", marginBottom: 40 }} />
-
-              {/* Content */}
-              {post.content && <PostBody html={post.content.html} />}
-
-              {/* Claps */}
-              <div className="mt-16 flex flex-col items-center">
-                <ClapButton slug={post.slug} />
+            {/* Article Thumbnail if available */}
+            {post.thumbnail && (
+              <div className="mb-16 rounded-xl overflow-hidden border border-dashed border-border-strong shadow-sm">
+                <img
+                  src={post.thumbnail}
+                  alt={post.title}
+                  className="w-full max-h-[500px] object-cover"
+                />
               </div>
+            )}
 
-              {/* Bottom rule */}
-              <div style={{ borderTop: "1px dashed var(--border-strong)", marginTop: 48, marginBottom: 40 }} />
+            {/* Article Content */}
+            <article
+              className="blog-prose post-body pb-16 border-b border-dashed border-border-strong"
+              dangerouslySetInnerHTML={{ __html: htmlWithIds }}
+              suppressHydrationWarning
+            />
 
-              {/* Series nav */}
-              {post.series && <SeriesNav series={post.series} currentSlug={post.slug} />}
-
-              {/* Related Posts */}
-              {related.length > 0 && (
-                <div className="mt-24 pt-16 border-t border-dashed border-border-strong">
-                  <div className="section-tag mb-8">[03_FURTHER_READING]</div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {related.map(p => (
-                      <Link 
-                        key={p.slug} 
-                        href={`/blog/${p.slug}`}
-                        className="group block p-6 border border-dashed border-border-strong hover:border-solid hover:border-accent transition-all bg-[rgba(253,253,251,0.5)]"
-                        style={{ borderRadius: 2 }}
-                      >
-                        <div className="font-mono text-[9px] text-ink-faint mb-3 uppercase tracking-wider">
-                          {formatDate(p.publishedAt)}
+            {/* Further Reading / Related Posts */}
+            {otherPosts.length > 0 && (
+              <section className="mt-16 pt-12 border-t border-dashed border-border-strong">
+                <div className="font-mono text-[10px] text-ink-faint tracking-widest uppercase mb-6 font-bold">
+                  [FURTHER_READING]
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {otherPosts.map((p) => (
+                    <Link
+                      key={p.slug}
+                      href={`/blog/${p.slug}`}
+                      className="p-6 border border-dashed border-border-strong hover:border-solid hover:border-accent bg-[rgba(253,253,251,0.5)] transition-all flex flex-col justify-between group rounded-xl"
+                    >
+                      <div>
+                        <div className="font-mono text-[9px] text-ink-faint mb-2">
+                          {formatDate(p.pubDate)} · ~{p.readingTime} min
                         </div>
-                        <h3 className="font-serif text-[18px] text-ink mb-3 group-hover:text-accent transition-colors leading-tight">
+                        <h3 className="font-serif text-[17px] text-ink group-hover:text-accent transition-colors leading-snug">
                           {p.title}
                         </h3>
-                        <div className="font-mono text-[10px] text-accent opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
-                          Read →
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
+                      </div>
+                      <div className="font-mono text-[10px] text-accent mt-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+                        Read →
+                      </div>
+                    </Link>
+                  ))}
                 </div>
-              )}
+              </section>
+            )}
 
-              {/* Footer */}
-              <footer className="mt-24 pt-8 border-t border-dashed border-border-strong">
-                <div className="font-mono text-[10px] text-ink-faint flex items-center gap-3 flex-wrap">
-                  <Link href="/blog" className="hover:text-accent transition-colors">← blog</Link>
-                  <span>|</span>
-                  <Link href="/" className="hover:text-accent transition-colors">www.mendhu.tech</Link>
-                  <span>|</span>
-                  <a href={`https://x.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(`https://www.mendhu.tech/blog/${post.slug}`)}`}
-                    target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors">
-                    share on X ↗
-                  </a>
-                </div>
-              </footer>
-            </article>
 
-            {/* RIGHT — sticky Table of Contents */}
-            <aside className="hidden lg:block w-[220px] shrink-0 border-l border-dashed border-border-strong">
-              <div className="sticky top-6 pt-16 px-5">
-                <TableOfContents html={post.content?.html ?? ""} />
+
+            {/* Article Footer */}
+            <footer className="pt-12 pb-8 flex flex-col sm:flex-row items-center justify-between gap-6 font-mono text-[11px] text-ink-muted">
+              <Link
+                href="/blog"
+                className="px-4 py-2 border border-dashed border-border-strong hover:border-solid hover:border-accent hover:text-accent rounded-lg transition-all bg-[rgba(253,253,251,0.5)] flex items-center gap-2 group"
+              >
+                <span>← Return to all logs</span>
+              </Link>
+
+              <div className="flex items-center gap-4 text-ink-faint">
+                <a
+                  href={post.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-accent transition-colors underline decoration-dashed"
+                >
+                  View on Medium ↗
+                </a>
+                <span>·</span>
+                <a
+                  href={`https://x.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(`https://www.mendhu.tech/blog/${post.slug}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-accent transition-colors flex items-center gap-1 group font-mono text-[11px]"
+                >
+                  <span className="underline decoration-dashed">Post on</span>
+                  <svg className="w-2.5 h-2.5 fill-current group-hover:fill-accent transition-colors ml-0.5" viewBox="0 0 24 24">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 24.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                  </svg>
+                  <span>↗</span>
+                </a>
+
+
               </div>
-            </aside>
 
+
+            </footer>
           </div>
+
+          {/* Sticky Table of Contents Sidebar (Right) */}
+          <aside className="hidden lg:block w-[240px] shrink-0 border-l border-dashed border-border-strong">
+            <div className="sticky top-10 pt-8 px-6 pb-8 max-h-[calc(100vh-2.5rem)] overflow-hidden">
+              <TableOfContents headings={headings} />
+            </div>
+          </aside>
+
+
+
         </div>
       </div>
     </main>
