@@ -154,6 +154,9 @@ export default function DraggablePorygon() {
     setTimeout(() => setPhase('idle'), 520);
   }, []);
 
+  const initialScrollRef = useRef({ x: 0, y: 0 });
+  const lastPointerRef   = useRef<{ clientX: number; clientY: number } | null>(null);
+
   // ── single-mount pointer effect ───────────────────────────────────────────
   // All mutable logic goes through refs — effect runs exactly once.
 
@@ -161,49 +164,12 @@ export default function DraggablePorygon() {
     const el = iconRef.current;
     if (!el) return;
 
-    const onDown = (e: PointerEvent) => {
-      if (e.button !== 0) return;
+    const updateCoords = (clientX: number, clientY: number) => {
+      const scrollDiffX = window.scrollX - initialScrollRef.current.x;
+      const scrollDiffY = window.scrollY - initialScrollRef.current.y;
 
-      // Picking up while snapped cancels the auto-reset
-      if (snapTimerRef.current) { clearTimeout(snapTimerRef.current); snapTimerRef.current = null; }
-
-      e.preventDefault();
-      e.stopPropagation();
-
-      const rect = el.getBoundingClientRect();
-      // Cursor offset within the element — preserved throughout the drag
-      dragAnchorRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-      // Natural (untranslated) viewport position — fixed for this drag session
-      naturalPosRef.current = { x: rect.left - posRef.current.x, y: rect.top - posRef.current.y };
-
-      draggingRef.current = true;
-      setPhase('dragging');
-      document.body.classList.add('porygon-dragging');
-
-      interactionRef.current += 1;
-
-      // Cache zone rects to prevent layout thrashing during drag
-      const rects: Record<string, DOMRect> = {};
-      for (const zone of ['name', 'logs', 'projects', 'garden']) {
-        const zoneEl = document.querySelector(`[data-${zone}-target]`);
-        if (zoneEl) rects[zone] = zoneEl.getBoundingClientRect();
-      }
-      zoneRectsRef.current = rects;
-
-      if (!hasInteractedRef.current) {
-        hasInteractedRef.current = true;
-        triggerDialogue('first');              // highest priority
-      } else if (interactionRef.current % 3 === 0) {
-        triggerDialogue('drag');               // every 3rd pick-up only
-      }
-    };
-
-    const onMove = (e: PointerEvent) => {
-      if (!draggingRef.current) return;
-
-      // Pixel-accurate position: element top-left placed so cursor stays at dragAnchor
-      const newX = e.clientX - dragAnchorRef.current.x - naturalPosRef.current.x;
-      const newY = e.clientY - dragAnchorRef.current.y - naturalPosRef.current.y;
+      const newX = clientX - dragAnchorRef.current.x - naturalPosRef.current.x + scrollDiffX;
+      const newY = clientY - dragAnchorRef.current.y - naturalPosRef.current.y + scrollDiffY;
       const dist = Math.sqrt(newX * newX + newY * newY);
 
       if (dist > 80) hasLeftThresholdRef.current = true;
@@ -218,7 +184,7 @@ export default function DraggablePorygon() {
       setPosition({ x: newX, y: newY });
 
       // Zone detection — 100 ms dwell before triggering to prevent flicker
-      const zone = detectZone(e.clientX, e.clientY);
+      const zone = detectZone(clientX, clientY);
       if (zone !== pendingZoneRef.current) {
         pendingZoneRef.current = zone;
         if (zoneTimerRef.current) clearTimeout(zoneTimerRef.current);
@@ -228,16 +194,60 @@ export default function DraggablePorygon() {
             if (pendingZoneRef.current === zone) {
               lastZoneRef.current = zone;
               triggerDialogue('zone', zone as keyof typeof DIALOGUE.zones);
-              // Brief lock so boundary jitter can't re-fire
               zoneLockRef.current = true;
               setTimeout(() => { zoneLockRef.current = false; }, 500);
             }
           }, 100);
         } else if (!zone) {
-          // Exited all zones — allow same zone to trigger again next entry
           lastZoneRef.current = null;
         }
       }
+    };
+
+    const onDown = (e: PointerEvent) => {
+      if (e.button !== 0) return;
+
+      if (snapTimerRef.current) { clearTimeout(snapTimerRef.current); snapTimerRef.current = null; }
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      const rect = el.getBoundingClientRect();
+      dragAnchorRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+      naturalPosRef.current = { x: rect.left - posRef.current.x, y: rect.top - posRef.current.y };
+      initialScrollRef.current = { x: window.scrollX, y: window.scrollY };
+      lastPointerRef.current   = { clientX: e.clientX, clientY: e.clientY };
+
+      draggingRef.current = true;
+      setPhase('dragging');
+      document.body.classList.add('porygon-dragging');
+
+      interactionRef.current += 1;
+
+      const rects: Record<string, DOMRect> = {};
+      for (const zone of ['name', 'logs', 'projects', 'garden']) {
+        const zoneEl = document.querySelector(`[data-${zone}-target]`);
+        if (zoneEl) rects[zone] = zoneEl.getBoundingClientRect();
+      }
+      zoneRectsRef.current = rects;
+
+      if (!hasInteractedRef.current) {
+        hasInteractedRef.current = true;
+        triggerDialogue('first');
+      } else if (interactionRef.current % 3 === 0) {
+        triggerDialogue('drag');
+      }
+    };
+
+    const onMove = (e: PointerEvent) => {
+      if (!draggingRef.current) return;
+      lastPointerRef.current = { clientX: e.clientX, clientY: e.clientY };
+      updateCoords(e.clientX, e.clientY);
+    };
+
+    const onScroll = () => {
+      if (!draggingRef.current || !lastPointerRef.current) return;
+      updateCoords(lastPointerRef.current.clientX, lastPointerRef.current.clientY);
     };
 
     const onUp = (e: PointerEvent) => {
@@ -258,16 +268,15 @@ export default function DraggablePorygon() {
 
     el.addEventListener('pointerdown', onDown);
     window.addEventListener('pointermove', onMove);
+    window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('pointerup', onUp);
 
     return () => {
       el.removeEventListener('pointerdown', onDown);
       window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('scroll', onScroll);
       window.removeEventListener('pointerup', onUp);
       document.body.classList.remove('porygon-dragging');
-      // ⚠️ intentionally NOT clearing snapTimerRef here —
-      //    the cleanup runs on unmount only (single-mount effect),
-      //    and doReset() already owns the timer lifecycle.
     };
   }, [doReset]); // doReset is stable via useCallback; effect mounts once.
 
