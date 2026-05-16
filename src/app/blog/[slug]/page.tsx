@@ -12,7 +12,6 @@ import {
   TAG_COLORS,
   defaultTagColor,
 } from "@/lib/medium";
-import CustomCursor from "@/components/CustomCursor";
 import TableOfContents from "@/components/blog/TableOfContents";
 import ShareButton from "./ShareButton";
 
@@ -106,8 +105,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   };
 
   return (
-    <main className="relative selection:bg-accent/10 selection:text-accent">
-      <CustomCursor />
+    <main className="relative selection:bg-accent/10 selection:text-accent animate-page-enter">
       {jsonLd && (
         <script
           type="application/ld+json"
@@ -153,8 +151,7 @@ export default async function BlogPostPage({ params }: PageProps) {
             +
           </span>
         ))}
-
-        <div className="relative flex flex-col lg:flex-row gap-0" style={{ zIndex: 1 }}>
+        <div className="relative flex flex-col lg:flex-row gap-0 z-20 pointer-events-auto">
           {/* Main Article Prose */}
           <div className="flex-1 min-w-0 px-8 lg:pl-16 lg:pr-16 py-16 relative">
             {/* Top navigation / Share header */}

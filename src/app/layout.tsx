@@ -3,6 +3,7 @@ import { Analytics } from "@vercel/analytics/next";
 
 import LogBarServer from "@/components/LogBarServer";
 import ToastProvider from "@/components/ToastProvider";
+import CustomCursor from "@/components/CustomCursor";
 import "./globals.css";
 
 const ebGaramond = EB_Garamond({
@@ -68,6 +69,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${ebGaramond.variable} ${jetbrainsMono.variable}`}>
       <body>
+        <CustomCursor />
         <LogBarServer />
         <ToastProvider />
         {children}

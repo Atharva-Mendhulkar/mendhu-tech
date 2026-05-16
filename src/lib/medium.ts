@@ -212,58 +212,90 @@ let fallbackCache: MediumFeedResult | null = null;
  */
 export const getMediumPosts = cache(async (username = MEDIUM_USERNAME): Promise<MediumFeedResult> => {
   try {
-    const rollingCacheBuster = Math.floor(Date.now() / 30000);
-    const rssUrl = `https://medium.com/feed/@${username}?nocache=${rollingCacheBuster}`;
-    const apiUrl = `${RSS2JSON_API}?rss_url=${encodeURIComponent(rssUrl)}`;
+    const rollingCacheBuster = Math.floor(Date.now() / 10000);
+    const rssUrl = `https://medium.com/feed/@${username}?cb=${rollingCacheBuster}`;
 
-    const res = await fetch(apiUrl, {
+    const res = await fetch(rssUrl, {
       cache: "no-store",
     });
 
-
     if (!res.ok) {
-      throw new Error(`Medium RSS fetch failed: ${res.status} ${res.statusText}`);
+      throw new Error(`Medium raw RSS fetch failed: ${res.status} ${res.statusText}`);
     }
 
-    const data = await res.json();
+    const xml = await res.text();
 
-    if (data.status !== "ok") {
-      throw new Error(`rss2json error: ${data.message ?? "unknown"}`);
-    }
+    // Extract channel title
+    const channelTitleMatch = xml.match(/<channel>[\s\S]*?<title><\!\[CDATA\[([\s\S]*?)\]\]><\/title>/);
+    const feedTitle = channelTitleMatch ? channelTitleMatch[1] : `${username} on Medium`;
 
-    const posts: MediumPost[] = (data.items ?? []).map((item: any) => {
-      const cleanSlug = extractSlug(item.link);
-      const rawCats = Array.isArray(item.categories) ? item.categories : [];
+    // Split items
+    const itemMatches = Array.from(xml.matchAll(/<item>([\s\S]*?)<\/item>/g));
 
-      const cleanThumb = item.thumbnail && !item.thumbnail.includes("medium.com/_/stat") ? item.thumbnail : null;
+    const posts: MediumPost[] = itemMatches.map((match) => {
+      const itemXml = match[1];
+
+      // Extract title
+      const titleMatch = itemXml.match(/<title><\!\[CDATA\[([\s\S]*?)\]\]><\/title>/) || itemXml.match(/<title>([\s\S]*?)<\/title>/);
+      const title = titleMatch ? titleMatch[1].trim() : "Untitled";
+
+      // Extract link
+      const linkMatch = itemXml.match(/<link>([\s\S]*?)<\/link>/);
+      const link = linkMatch ? linkMatch[1].trim() : "";
+
+      // Extract guid
+      const guidMatch = itemXml.match(/<guid[^>]*>([\s\S]*?)<\/guid>/);
+      const guid = guidMatch ? guidMatch[1].trim() : link;
+
+      // Extract pubDate
+      const pubDateMatch = itemXml.match(/<pubDate>([\s\S]*?)<\/pubDate>/);
+      const pubDate = pubDateMatch ? pubDateMatch[1].trim() : "";
+
+      // Extract creator / author
+      const authorMatch = itemXml.match(/<dc:creator><\!\[CDATA\[([\s\S]*?)\]\]><\/dc:creator>/) || itemXml.match(/<dc:creator>([\s\S]*?)<\/dc:creator>/);
+      const author = authorMatch ? authorMatch[1].trim() : username;
+
+      // Extract content
+      const contentMatch = itemXml.match(/<content:encoded><\!\[CDATA\[([\s\S]*?)\]\]><\/content:encoded>/) || itemXml.match(/<description><\!\[CDATA\[([\s\S]*?)\]\]><\/description>/);
+      const content = contentMatch ? contentMatch[1].trim() : "";
+
+      // Extract categories
+      const categoryMatches = Array.from(itemXml.matchAll(/<category><\!\[CDATA\[([\s\S]*?)\]\]><\/category>/g));
+      const categories = categoryMatches.map((c) => c[1].trim());
+
+      // Extract thumbnail
+      const cleanThumb = extractFirstImage(content);
+
+      // Create description preview
+      const description = getExcerpt(content, 200);
 
       return {
-        guid:        item.guid ?? item.link,
-        slug:        cleanSlug || "untitled",
-        title:       item.title ?? "Untitled",
-        link:        item.link,
-        pubDate:     item.pubDate,
-        author:      item.author ?? username,
-        thumbnail:   cleanThumb || extractFirstImage(item.content ?? item.description ?? "") || null,
-        description: item.description ?? "",
-        content:     item.content ?? item.description ?? "",
-        categories:  rawCats,
-        readingTime: estimateReadingTime(item.content ?? item.description ?? ""),
+        guid,
+        slug: extractSlug(link) || "untitled",
+        title,
+        link,
+        pubDate,
+        author,
+        thumbnail: cleanThumb,
+        description,
+        content,
+        categories,
+        readingTime: estimateReadingTime(content),
       };
     });
 
     const meta: MediumFeedMeta = {
-      title:       data.feed?.title ?? `${username} on Medium`,
-      description: data.feed?.description ?? "",
-      image:       data.feed?.image ?? "",
-      link:        data.feed?.link ?? `https://medium.com/@${username}`,
+      title: feedTitle,
+      description: "",
+      image: "",
+      link: `https://medium.com/@${username}`,
     };
 
     const result = { meta, posts };
     fallbackCache = result;
     return result;
   } catch (err) {
-    console.error("Failed to fetch Medium posts:", err);
+    console.error("Failed to fetch Medium posts directly:", err);
     if (fallbackCache) {
       return fallbackCache;
     }
@@ -273,6 +305,7 @@ export const getMediumPosts = cache(async (username = MEDIUM_USERNAME): Promise<
     };
   }
 });
+
 
 
 /**

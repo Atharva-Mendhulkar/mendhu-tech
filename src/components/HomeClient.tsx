@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import CustomCursor from "@/components/CustomCursor";
 import BlogSection from "@/components/BlogSection";
 import SystemsLab from "@/components/SystemsLab";
 import KnowledgeArchive from "@/components/KnowledgeArchive";
@@ -95,7 +94,6 @@ export default function HomeClient({ initialPosts }: { initialPosts: MediumPost[
 
   return (
     <main className="min-h-screen relative">
-      <CustomCursor />
 
       {/* OUTER CONTAINER */}
       <div className="max-w-[1000px] mx-auto border-x border-dashed border-border-strong min-h-[85vh] relative shadow-sm">

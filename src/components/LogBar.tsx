@@ -27,8 +27,8 @@ export default function LogBar({ initialBlogPosts = [] }: LogBarProps) {
 
   const items = BLOG_ITEMS;
 
-  // Triple items for continuous seamless marquee loop
-  const displayItems = items.length > 0 ? [...items, ...items, ...items] : [];
+  // Quadruple items for exact 50% continuous seamless marquee loop math
+  const displayItems = items.length > 0 ? [...items, ...items, ...items, ...items] : [];
 
 
   return (

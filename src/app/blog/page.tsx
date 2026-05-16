@@ -2,7 +2,6 @@
 import { Metadata } from "next";
 import { MediumPost, getMediumPosts, formatDate, getExcerpt, TAG_COLORS, defaultTagColor } from "@/lib/medium";
 import Link from "next/link";
-import CustomCursor from "@/components/CustomCursor";
 
 export const metadata: Metadata = {
   title: "Atharva Mendhulkar Blogs | Technical Essays & ML Research",
@@ -52,8 +51,7 @@ export default async function BlogIndex({ searchParams }: PageProps) {
   const posts = activeTag === "all" ? allPosts : allPosts.filter((p) => p.categories.includes(activeTag));
 
   return (
-    <main className="relative selection:bg-accent/10 selection:text-accent">
-      <CustomCursor />
+    <main className="relative selection:bg-accent/10 selection:text-accent animate-page-enter">
       {/* Outer shell — same as portfolio, body dot grid shows on margins */}
       <div className="max-w-[960px] mx-auto border-x border-dashed border-border-strong min-h-screen relative">
         {/* Inner paper + diagonal hatch */}
@@ -92,8 +90,7 @@ export default async function BlogIndex({ searchParams }: PageProps) {
             +
           </span>
         ))}
-
-        <div className="relative px-8 lg:px-12 py-16" style={{ zIndex: 1 }}>
+        <div className="relative px-8 lg:px-12 py-16 z-20 pointer-events-auto">
           {/* Back link */}
           <Link
             href="/"
@@ -149,7 +146,7 @@ export default async function BlogIndex({ searchParams }: PageProps) {
               No posts yet in this category. Check back soon.
             </div>
           ) : (
-            <div>
+            <div key={activeTag} className="animate-tag-switch">
               {posts.map((post) => {
                 return (
                   <article key={post.guid}>
