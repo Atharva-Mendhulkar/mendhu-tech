@@ -212,12 +212,14 @@ let fallbackCache: MediumFeedResult | null = null;
  */
 export const getMediumPosts = cache(async (username = MEDIUM_USERNAME): Promise<MediumFeedResult> => {
   try {
-    const rssUrl = `https://medium.com/feed/@${username}`;
-    const apiUrl = `${RSS2JSON_API}?rss_url=${encodeURIComponent(rssUrl)}&_ts=${Math.floor(Date.now() / 60000)}`;
+    const rollingCacheBuster = Math.floor(Date.now() / 30000);
+    const rssUrl = `https://medium.com/feed/@${username}?nocache=${rollingCacheBuster}`;
+    const apiUrl = `${RSS2JSON_API}?rss_url=${encodeURIComponent(rssUrl)}`;
 
     const res = await fetch(apiUrl, {
-      next: { revalidate: CACHE_REVALIDATE },
+      cache: "no-store",
     });
+
 
     if (!res.ok) {
       throw new Error(`Medium RSS fetch failed: ${res.status} ${res.statusText}`);
