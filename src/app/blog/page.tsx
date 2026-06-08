@@ -51,7 +51,7 @@ export default async function BlogIndex({ searchParams }: PageProps) {
   const posts = activeTag === "all" ? allPosts : allPosts.filter((p) => p.categories.includes(activeTag));
 
   return (
-    <main className="relative selection:bg-accent/10 selection:text-accent animate-page-enter">
+    <main className="relative selection:bg-accent/10 selection:text-accent">
       {/* Outer shell — same as portfolio, body dot grid shows on margins */}
       <div className="max-w-[960px] mx-auto border-x border-dashed border-border-strong min-h-screen relative">
         {/* Inner paper + diagonal hatch */}

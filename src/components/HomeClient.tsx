@@ -23,7 +23,6 @@ export default function HomeClient({ initialPosts }: { initialPosts: MediumPost[
   const [activeGardenFileId, setActiveGardenFileId] = useState<string | undefined>(undefined);
   const [minimizedItems, setMinimizedItems] = useState<{ id: string, title: string, type: 'garden' | 'project' }[]>([]);
   const [restoredId, setRestoredId] = useState<string | null>(null);
-  const [isNavigatingToBlog, setIsNavigatingToBlog] = useState(false);
   const [hasInitialGardenOpened, setHasInitialGardenOpened] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
 
@@ -138,7 +137,7 @@ export default function HomeClient({ initialPosts }: { initialPosts: MediumPost[
           <ScrollProgressButtons />
           
           {/* Introduction Section with Header and Meta Links */}
-          <section className="fade-in flex flex-col md:flex-row justify-between items-center gap-8 md:gap-12 pb-10 border-b border-dashed border-border-strong relative z-[200]">
+          <section className="fade-in flex flex-col md:flex-row justify-between items-center gap-8 md:gap-12 pb-10 relative z-[200]">
             <div className="flex-1">
               <div className="section-tag">[01_ABOUT_ME]</div>
               <div className="flex items-center gap-6 mb-6">
@@ -192,10 +191,7 @@ export default function HomeClient({ initialPosts }: { initialPosts: MediumPost[
                   <span>email ↗</span>
                 </a>
                 <button 
-                  onClick={() => {
-                    setIsNavigatingToBlog(true);
-                    setTimeout(() => router.push("/blog"), 500);
-                  }}
+                  onClick={() => router.push("/blog")}
                   className="group flex items-center gap-2 font-mono text-[11px] text-accent border border-dashed border-accent px-4 py-2 hover:bg-accent-light hover:border-solid transition-all cursor-pointer"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5z"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path><path d="M6.5 18H20"></path></svg>
@@ -314,25 +310,6 @@ export default function HomeClient({ initialPosts }: { initialPosts: MediumPost[
           setActiveGardenFileId(fileId);
         }}
       />
-
-      {isNavigatingToBlog && (
-        <div 
-          className="fixed inset-0 z-[1000] flex items-center justify-center"
-          style={{
-            backgroundColor: "var(--paper)",
-            animation: "fadeInBlog 0.6s ease-in-out forwards",
-          }}
-        >
-          <div className="font-serif text-[24px] italic text-accent animate-pulse">Entering Intellectual Log...</div>
-          <style>{`
-            @keyframes fadeInBlog {
-              from { opacity: 0; }
-              to { opacity: 1; }
-            }
-          `}</style>
-        </div>
-      )}
-
     </main>
   );
 }

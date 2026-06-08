@@ -105,7 +105,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   };
 
   return (
-    <main className="relative selection:bg-accent/10 selection:text-accent animate-page-enter">
+    <main className="relative selection:bg-accent/10 selection:text-accent">
       {jsonLd && (
         <script
           type="application/ld+json"
@@ -265,30 +265,27 @@ export default async function BlogPostPage({ params }: PageProps) {
                 <span>← Return to all logs</span>
               </Link>
 
-              <div className="flex items-center gap-4 text-ink-faint">
+              <div className="flex items-center gap-3">
                 <a
                   href={post.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-accent transition-colors underline decoration-dashed"
+                  className="px-4 py-2 border border-dashed border-border-strong hover:border-solid hover:border-accent hover:text-accent rounded-lg transition-all bg-[rgba(253,253,251,0.5)] flex items-center gap-2 group"
                 >
-                  View on Medium ↗
+                  <span>View on Medium ↗</span>
                 </a>
-                <span>·</span>
                 <a
                   href={`https://x.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(`https://www.mendhu.tech/blog/${post.slug}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-accent transition-colors flex items-center gap-1 group font-mono text-[11px]"
+                  className="px-4 py-2 border border-dashed border-border-strong hover:border-solid hover:border-accent hover:text-accent rounded-lg transition-all bg-[rgba(253,253,251,0.5)] flex items-center gap-2 group font-mono text-[11px]"
                 >
-                  <span className="underline decoration-dashed">Post on</span>
-                  <svg className="w-2.5 h-2.5 fill-current group-hover:fill-accent transition-colors ml-0.5" viewBox="0 0 24 24">
+                  <span>Post on</span>
+                  <svg className="w-2.5 h-2.5 fill-current group-hover:fill-accent transition-colors" viewBox="0 0 24 24">
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 24.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                   </svg>
                   <span>↗</span>
                 </a>
-
-
               </div>
 
 

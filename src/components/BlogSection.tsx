@@ -21,7 +21,7 @@ export default function BlogSection({ initialPosts = [] }: BlogSectionProps) {
   };
 
   return (
-    <section className="pt-8 pb-10 border-b border-dashed border-border-strong relative z-10">
+    <section className="pt-8 pb-10 relative z-10">
       <div className="section-tag">[02_INTELLECTUAL_LOG]</div>
       <h2 className="sr-only">Latest Blogs by Atharva Mendhulkar</h2>
       
@@ -89,7 +89,6 @@ export default function BlogSection({ initialPosts = [] }: BlogSectionProps) {
           view all logs →
         </Link>
       </div>
-
     </section>
   );
 }

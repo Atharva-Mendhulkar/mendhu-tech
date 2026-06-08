@@ -2,7 +2,10 @@
 
 /* REFINED VERSION - NO ANALYSIS BUTTON ON TILES */
 import React, { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { projects, categories } from '@/data/projects';
+
+const GithubGraph = dynamic(() => import('@/components/GithubGraph'), { ssr: false });
 
 interface SystemsLabProps {
   onOpenModal: (id: string) => void;
@@ -16,8 +19,11 @@ export default function SystemsLab({ onOpenModal }: SystemsLabProps) {
     : projects.filter(p => p.category === activeFilter);
 
   return (
-    <section className="pt-8 pb-10 border-b border-dashed border-border-strong relative z-10">
-      <div className="section-tag">[03_SYSTEMS_LAB]</div>
+    <section className="pt-8 pb-10 relative z-10">
+      <div className="section-tag mb-8">[03_SYSTEMS_LAB]</div>
+
+      {/* Github Graph */}
+      <GithubGraph />
 
       {/* Filter Row */}
       <div className="flex gap-2 mb-8 flex-wrap">

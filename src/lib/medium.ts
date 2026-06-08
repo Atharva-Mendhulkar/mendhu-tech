@@ -216,7 +216,7 @@ export const getMediumPosts = cache(async (username = MEDIUM_USERNAME): Promise<
     const rssUrl = `https://medium.com/feed/@${username}?cb=${rollingCacheBuster}`;
 
     const res = await fetch(rssUrl, {
-      cache: "no-store",
+      next: { revalidate: 60 },
     });
 
     if (!res.ok) {
