@@ -43,7 +43,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "Atharva Mendhulkar — Systems Engineer & AI Researcher",
@@ -55,7 +55,7 @@ export const metadata = {
     title: "Atharva Mendhulkar | Systems Engineer & AI Researcher",
     description: "Exploring the intersection of physics-informed machine learning and kernel-level infrastructure.",
     creator: "@atharvarta",
-    images: ["/og-image.jpg"],
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
