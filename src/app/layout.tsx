@@ -41,12 +41,21 @@ export const metadata = {
     siteName: "Atharva Mendhulkar Portfolio",
     locale: "en_US",
     type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Atharva Mendhulkar — Systems Engineer & AI Researcher",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Atharva Mendhulkar | Systems Engineer & AI Researcher",
     description: "Exploring the intersection of physics-informed machine learning and kernel-level infrastructure.",
     creator: "@atharvarta",
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
