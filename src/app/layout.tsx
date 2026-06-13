@@ -21,7 +21,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata = {
   title: "Atharva Mendhulkar | Systems Engineer & AI Researcher",
-  description: "Portfolio of Atharva Mendhulkar, a Systems Engineer and AI Researcher specializing in physics-informed machine learning, kernel-level infrastructure, and autonomous agentic systems.",
+  description: "Atharva Mendhulkar — Systems Engineer & AI Researcher specializing in physics-informed ML, kernel infrastructure, and agentic systems.",
   alternates: {
     canonical: '/',
   },
@@ -43,7 +43,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-image.png",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Atharva Mendhulkar — Systems Engineer & AI Researcher",
@@ -55,7 +55,7 @@ export const metadata = {
     title: "Atharva Mendhulkar | Systems Engineer & AI Researcher",
     description: "Exploring the intersection of physics-informed machine learning and kernel-level infrastructure.",
     creator: "@atharvarta",
-    images: ["/og-image.png"],
+    images: ["/og-image.jpg"],
   },
   robots: {
     index: true,
