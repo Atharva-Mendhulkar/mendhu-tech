@@ -27,7 +27,7 @@ export default function BlogSection({ initialPosts = [] }: BlogSectionProps) {
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-[10px]">
         {posts.length === 0 && (
-          <div className="col-span-full border border-dashed border-border-strong p-8 bg-[rgba(253,253,251,0.72)] rounded-2xl text-center">
+          <div className="col-span-full border border-dashed border-border-strong p-8 bg-card rounded-2xl text-center">
             <div className="font-mono text-[11px] text-ink-faint uppercase tracking-wider">No posts yet</div>
           </div>
         )}
@@ -36,7 +36,7 @@ export default function BlogSection({ initialPosts = [] }: BlogSectionProps) {
           <Link 
             key={post.guid}
             href={`/blog/${post.slug}`}
-            className="fade-in border border-dashed border-border-strong p-8 bg-[rgba(253,253,251,0.72)] hover:bg-[rgba(0,71,255,0.025)] hover:border-solid hover:border-accent transition-all duration-300 flex flex-col justify-between group cursor-pointer relative rounded-2xl overflow-hidden"
+            className="fade-in border border-dashed border-border-strong p-8 bg-card hover:bg-card-hover hover:border-solid hover:border-accent transition-all duration-300 flex flex-col justify-between group cursor-pointer relative rounded-2xl overflow-hidden"
           >
             {/* Corner Marks */}
             <span className="absolute top-1 left-1 font-mono text-[8px] text-ink-faint opacity-30">+</span>

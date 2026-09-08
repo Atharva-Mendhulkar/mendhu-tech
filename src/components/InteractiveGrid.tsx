@@ -63,6 +63,10 @@ export default function InteractiveGrid() {
     const animate = () => {
       ctx.clearRect(0, 0, width, height);
 
+      // Dark-aware dot color — follows the themed ink token (shadcn-style swap).
+      const inkColor =
+        getComputedStyle(document.documentElement).getPropertyValue("--ink").trim() || "#1A1A1A";
+
       dots.forEach(dot => {
         const dx = mouseX - dot.baseX;
         const dy = mouseY - dot.baseY;
@@ -88,9 +92,12 @@ export default function InteractiveGrid() {
 
         ctx.beginPath();
         ctx.arc(dot.x, dot.y, size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(0, 0, 0, ${opacity})`;
+        ctx.globalAlpha = opacity;
+        ctx.fillStyle = inkColor;
         ctx.fill();
       });
+
+      ctx.globalAlpha = 1;
 
       animationId = requestAnimationFrame(animate);
     };

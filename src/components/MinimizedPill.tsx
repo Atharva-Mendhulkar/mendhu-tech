@@ -27,7 +27,7 @@ export default function MinimizedPill({ item, onRestore, onClose }: MinimizedPil
       <div className="flex items-center gap-2 pl-3 border-l border-dashed border-accent/20">
         <button 
           onClick={(e) => { e.stopPropagation(); onClose(); }}
-          className="p-1.5 hover:bg-red-50 rounded-full text-ink-faint hover:text-red-500 transition-all group/close"
+          className="p-1.5 hover:bg-red-500/10 rounded-full text-ink-faint hover:text-red-500 transition-all group/close"
           title="Dismiss"
         >
           <X size={12} className="group-hover/close:rotate-90 transition-transform" />

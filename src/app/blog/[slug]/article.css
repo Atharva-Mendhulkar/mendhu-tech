@@ -58,7 +58,7 @@
 }
 
 .blog-prose a:hover {
-  background-color: rgba(0, 71, 255, 0.08);
+  background-color: var(--blue-glow);
   border-bottom-style: solid;
 }
 
@@ -68,7 +68,7 @@
   margin: 1.4em 0;
   font-style: italic;
   color: var(--ink-muted);
-  background-color: rgba(0, 71, 255, 0.02);
+  background-color: var(--blue-glow);
   border-radius: 0 8px 8px 0;
 }
 
@@ -96,6 +96,10 @@
   background: rgba(0, 0, 0, 0.05);
   padding: 0.2em 0.4em;
   border-radius: 4px;
+}
+
+html.dark .blog-prose code {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .blog-prose pre code {

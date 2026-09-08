@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Class-based dark mode — the `dark:` variant follows the `.dark` class on
+   <html> (swapped by ThemeToggle), not the OS preference. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --paper: #FDFDFB;
   --paper-dark: #f3f1f1;
@@ -13,10 +17,34 @@
   --terminal-dim: #888;
   --border: rgba(26,26,26,0.12);
   --border-strong: rgba(26,26,26,0.25);
+  --bg-dot: rgba(0, 0, 0, 0.25);
+  /* Extended surfaces (light) */
+  --bg-card: rgba(253, 253, 251, 0.72);
+  --bg-card-hover: #F5F4F1;
+  --bg-control: #F3F1F1;
+  --bg-input: #FAFAF8;
+  /* Extended accent (light — same blue identity) */
+  --blue: #0047FF;
+  --blue-hover: #0038CC;
+  --blue-bright: #3B6BFF;
+  --blue-dark: #A8BDFF;
+  --blue-glow: rgba(0, 71, 255, 0.08);
+  /* Extended borders (light) */
+  --border-faint: rgba(26, 26, 26, 0.07);
+  --border-blue: rgba(0, 71, 255, 0.45);
+  /* Patterns (light) */
+  --hatch: rgba(0, 0, 0, 0.05);
+  /* Heatmap (light) */
+  --heat-0: #EDF1F7;
+  --heat-1: #B3C7FF;
+  --heat-2: #6690FF;
+  --heat-3: #1A59FF;
+  --heat-4: #0047FF;
 }
   
 @theme inline {
   --color-paper: var(--paper);
+  --color-paper-dark: var(--paper-dark);
   --color-ink: var(--ink);
   --color-ink-muted: var(--ink-muted);
   --color-ink-faint: var(--ink-faint);
@@ -27,6 +55,18 @@
   --color-terminal-dim: var(--terminal-dim);
   --color-border-subtle: var(--border);
   --color-border-strong: var(--border-strong);
+  /* Extended surfaces */
+  --color-card: var(--bg-card);
+  --color-card-hover: var(--bg-card-hover);
+  --color-control: var(--bg-control);
+  --color-input-bg: var(--bg-input);
+  /* Extended accent */
+  --color-accent-hover: var(--blue-hover);
+  --color-accent-bright: var(--blue-bright);
+  --color-accent-dark: var(--blue-dark);
+  /* Extended borders */
+  --color-border-faint: var(--border-faint);
+  --color-border-blue: var(--border-blue);
   
   --font-serif: var(--font-eb-garamond), Georgia, serif;
   --font-mono: var(--font-jetbrains-mono), "Courier New", monospace;
@@ -53,7 +93,7 @@
 
 body {
   background-color: var(--paper-dark);
-  background-image: radial-gradient(rgba(0, 0, 0, 0.25) 1px, transparent 1px);
+  background-image: radial-gradient(var(--bg-dot) 1px, transparent 1px);
   background-size: 16px 16px;
   color: var(--ink);
   font-family: var(--font-serif);
@@ -198,5 +238,170 @@ body::before {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 0;
+}
+/* ── Dark theme palette ────────────────────────────────────────────────────── */
+/* shadcn/ui-style: semantic tokens swapped via the `.dark` class on <html>.   */
+/* Mapping: --paper ≈ background · --ink ≈ foreground · --accent ≈ primary     */
+/*          --accent-light ≈ primary surface · --border ≈ border/input/ring    */
+html.dark {
+  color-scheme: dark;
+  /* ── Graphite palette ──────────────────────────────────────────────────
+     Hierarchy: 70% graphite/grey · 20% darker surfaces/patterns · 10% blue
+     OUTER #0B0D0F ↓ PAGE #171A1D ↓ CARDS #1B1F23 ↓ HOVER #20252A        */
+  /* Surfaces */
+  --paper: #171A1D;                       /* main page surface (graphite) */
+  --paper-dark: #0B0D0F;                  /* outer dotted background      */
+  --bg-card: #1B1F23;                     /* article cards, panels        */
+  --bg-card-hover: #20252A;               /* card hover                   */
+  --bg-control: #15181B;                  /* buttons, shortcuts           */
+  --bg-input: #111417;                    /* search/input areas           */
+  /* Typography */
+  --ink: #E6E8E6;                         /* main headings                */
+  --ink-muted: #A5ABB0;                   /* bio/body                     */
+  --ink-faint: #555C63;                   /* section labels, metadata     */
+  /* Accent — one blue family, same identity as light mode */
+  --accent: #4D7CFF;                      /* primary accent               */
+  --accent-light: rgba(77, 124, 255, 0.14); /* subtle primary surface     */
+  --blue: #4D7CFF;
+  --blue-hover: #6B94FF;
+  --blue-bright: #82A4FF;
+  --blue-dark: #294A9E;
+  --blue-glow: rgba(77, 124, 255, 0.12);
+  /* Terminal (stays dark in both themes) */
+  --terminal-bg: #111417;
+  --terminal-green: #00FF88;
+  --terminal-dim: #888;
+  /* Borders — never bright grey */
+  --border: #292E33;
+  --border-strong: #343A40;
+  --border-faint: #23282D;
+  --border-blue: #3159B8;
+  /* Patterns */
+  --bg-dot: #252A2F;
+  --hatch: rgba(255, 255, 255, 0.025);
+  /* Heatmap — blue intensity increasing with activity */
+  --heat-0: #252A30;
+  --heat-1: #283653;
+  --heat-2: #3155A0;
+  --heat-3: #3E68CC;
+  --heat-4: #4D7CFF;
+}
+
+/* Custom cursor: multiply blend turns invisible over dark backgrounds */
+html.dark .cursor-ring {
+  mix-blend-mode: screen;
+}
+
+/* ── Theme toggle ──────────────────────────────────────────────────────────── */
+/* Resting (light): graphite control. Active (dark): subtle blue, never loud.  */
+html.dark [data-theme-toggle] {
+  background: #182448;
+  border-color: var(--accent);
+  color: var(--blue-hover);
+}
+html.dark [data-theme-toggle]:hover {
+  border-color: var(--blue-hover);
+  color: var(--blue-bright);
+}
+
+/* ── Intellectual Log (LogBar) ─────────────────────────────────────────────── */
+/* The sticky LogBar's backdrop-blur breaks the circular theme-ripple snapshot */
+/* (fixed/backdrop-filter layers don't animate correctly in View Transitions). */
+/* Disable it only while the ripple runs so the effect stays clean.            */
+html[data-theme-transition] .log-bar {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+html[data-theme-transition] .log-bar::before {
+  display: none;
+}
+
+/* ── Circular theme-transition ripple ─────────────────────────────────────── */
+
+/* Circular ripple animation origin variables */
+:root {
+  --transition-speed: 1s;
+  --transition-blur: 0px;
+  --x: 50%;
+  --y: 50%;
+}
+
+/* Base View Transition Configuration */
+::view-transition-group(root) {
+  animation: none;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+::view-transition-image-pair(root) {
+  isolation: isolate;
+  overflow: hidden;
+}
+
+/* Apply blur if specified */
+::view-transition-old(root),
+::view-transition-new(root) {
+  filter: blur(var(--transition-blur));
+  overflow: hidden;
+  backface-visibility: hidden;
+  contain: paint;
+}
+
+/* Light → Dark: Dark theme expands from click position */
+[data-theme-transition="to-dark"]::view-transition-old(root) {
+  animation: none;
+  z-index: -1;
+  mix-blend-mode: normal;
+}
+
+[data-theme-transition="to-dark"]::view-transition-new(root) {
+  animation: circle var(--transition-speed) ease-in-out;
+  will-change: clip-path;
+  mix-blend-mode: normal;
+  z-index: 1;
+  transform: translateZ(0);
+}
+
+/* Dark → Light: Dark shrinks away, revealing light underneath */
+[data-theme-transition="to-light"]::view-transition-old(root) {
+  animation: circle-reverse var(--transition-speed) ease-in-out;
+  will-change: clip-path;
+  z-index: 1;
+  transform: translateZ(0);
+}
+
+[data-theme-transition="to-light"]::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+  z-index: -1;
+}
+
+/* Circle expand animation */
+@keyframes circle {
+  from {
+    clip-path: circle(0% at var(--x) var(--y));
+  }
+  to {
+    clip-path: circle(150% at var(--x) var(--y));
+  }
+}
+
+/* Circle shrink animation */
+@keyframes circle-reverse {
+  from {
+    clip-path: circle(150% at var(--x) var(--y));
+  }
+  to {
+    clip-path: circle(0% at var(--x) var(--y));
+  }
+}
+
+/* Disable animations for reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
 }
 

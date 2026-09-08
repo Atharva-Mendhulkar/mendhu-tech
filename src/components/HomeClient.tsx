@@ -97,13 +97,13 @@ export default function HomeClient({ initialPosts }: { initialPosts: MediumPost[
       {/* OUTER CONTAINER */}
       <div className="max-w-[1000px] mx-auto border-x border-dashed border-border-strong min-h-[85vh] relative shadow-sm">
         
-        {/* PAPER TEXTURE & HATCH */}
+        {/* PAPER TEXTURE & HATCH — barely visible graphite pattern in dark */}
         <div 
           aria-hidden 
           className="absolute inset-0 z-0"
           style={{
             backgroundColor: "var(--paper)",
-            backgroundImage: `repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.05) 0px, rgba(0, 0, 0, 0.05) 1px, transparent 1px, transparent 9px)`
+            backgroundImage: `repeating-linear-gradient(-45deg, var(--hatch) 0px, var(--hatch) 1px, transparent 1px, transparent 9px)`
           }}
         />
 
@@ -137,7 +137,11 @@ export default function HomeClient({ initialPosts }: { initialPosts: MediumPost[
           <ScrollProgressButtons />
           
           {/* Introduction Section with Header and Meta Links */}
-          <section className="fade-in flex flex-col md:flex-row justify-between items-center gap-8 md:gap-12 pb-10 relative z-[200]">
+          {/* NOTE: no z-index / fade-in here — both would create a stacking
+              context that traps the draggable Porygon below the spotlight
+              utilities (z-[210]). The Porygon wrapper's z-[500] must compete
+              directly within the content container's context. */}
+          <section className="flex flex-col md:flex-row justify-between items-center gap-8 md:gap-12 pb-10 relative">
             <div className="flex-1">
               <div className="section-tag">[01_ABOUT_ME]</div>
               <div className="flex items-center gap-6 mb-6">

@@ -312,6 +312,7 @@ export default function DraggablePorygon() {
       {/* Porygon */}
       <div
         ref={iconRef}
+        data-porygon-anchor=""
         style={{ transform: `translate(${position.x}px, ${position.y}px)`, transition, touchAction: 'none' }}
         className={[
           'w-24 h-24 relative select-none flex items-center justify-center pointer-events-auto',

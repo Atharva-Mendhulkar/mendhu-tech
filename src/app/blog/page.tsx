@@ -2,6 +2,7 @@
 import { Metadata } from "next";
 import { MediumPost, getMediumPosts, formatDate, getExcerpt, TAG_COLORS, defaultTagColor } from "@/lib/medium";
 import Link from "next/link";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export const metadata: Metadata = {
   title: "Atharva Mendhulkar Blogs | Technical Essays & ML Research",
@@ -103,10 +104,13 @@ export default async function BlogIndex({ searchParams }: PageProps) {
           {/* Section tag */}
           <div className="section-tag mb-8">[02_INTELLECTUAL_LOG]</div>
 
-          {/* Header */}
-          <h1 className="font-serif text-[42px] font-normal tracking-[-0.02em] leading-[1.1] mb-5 text-ink">
-            Blogs by Atharva Mendhulkar
-          </h1>
+          {/* Header — theme toggle sits next to the name, top right */}
+          <div className="flex items-center justify-between gap-6 flex-wrap mb-5">
+            <h1 className="font-serif text-[42px] font-normal tracking-[-0.02em] leading-[1.1] text-ink">
+              Blogs by Atharva Mendhulkar
+            </h1>
+            <ThemeToggle />
+          </div>
           <p className="font-mono text-[12px] text-ink-muted leading-[1.6] mb-10 max-w-[560px]">
             {activeFilter.desc}
           </p>

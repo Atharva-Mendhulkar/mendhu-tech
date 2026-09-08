@@ -20,10 +20,19 @@ const MermaidBlock = ({ chart }: { chart: string }) => {
     import('mermaid').then((mermaidModule) => {
       if (!isMounted) return;
       const mermaid = mermaidModule.default;
+      // shadcn-style theme swap — read the active token set from <html>.
+      const isDark = document.documentElement.classList.contains('dark');
       mermaid.initialize({ 
         startOnLoad: false, 
         theme: 'base', 
-        themeVariables: {
+        themeVariables: isDark ? {
+          primaryColor: '#182448',
+          primaryTextColor: '#E6E8E6',
+          primaryBorderColor: 'rgba(77,124,255,0.30)',
+          lineColor: '#343A40',
+          secondaryColor: '#15181B',
+          tertiaryColor: '#171A1D'
+        } : {
           primaryColor: '#F0EFE8',
           primaryTextColor: '#1A1A1A',
           primaryBorderColor: 'rgba(0,71,255,0.2)',
@@ -594,6 +603,10 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
     canvas.addEventListener('touchmove',onTouchMove,{passive:false});
     canvas.addEventListener('touchend',onTouchEnd);
 
+    // Re-paint the canvas when the theme class changes on <html>.
+    const themeObs = new MutationObserver(() => { dirtyRef.current = true; sleepRef.current = false; });
+    themeObs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
     const tick=()=>{
       tickRef.current = tick;
       const s=settingsRef.current;
@@ -638,6 +651,13 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
       const activeId = activeIdRef.current;
       const q = s.searchQuery.toLowerCase();
 
+      // Theme-aware canvas colors — read the live CSS tokens so the graph
+      // re-paints correctly when the theme toggles (see MutationObserver below).
+      const cs = getComputedStyle(document.documentElement);
+      const inkC = cs.getPropertyValue('--ink').trim() || '#1A1A1A';
+      const inkMutedC = cs.getPropertyValue('--ink-muted').trim() || '#555555';
+      const accentC = cs.getPropertyValue('--accent').trim() || '#0047FF';
+
       // Draw edges
       links.forEach(l => {
         if (now < l.source.revealAt || now < l.target.revealAt) return;
@@ -655,10 +675,10 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
         ctx.setLineDash(active ? [] : [3, 5]);
         ctx.lineWidth = (active ? 2.2 : 1.0) * s.linkThickness;
         
-        if (active) ctx.strokeStyle = 'rgba(0,71,255,0.85)';
+        if (active) ctx.strokeStyle = cachedAlpha(accentC, 'D9');
         else if (l.isTag) {
           ctx.strokeStyle = cachedAlpha(l.target.color, '44');
-        } else ctx.strokeStyle = 'rgba(26,26,26,0.3)';
+        } else ctx.strokeStyle = cachedAlpha(inkC, '4D');
 
         ctx.beginPath();
         ctx.moveTo(l.source.x, l.source.y);
@@ -686,7 +706,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
         // Glow
         if (isActive || isConn || node.isTag) {
           ctx.shadowBlur = isActive ? 30 : node.isTag ? 18 : 10;
-          ctx.shadowColor = node.isTag ? cachedAlpha(node.color, 'BB') : isActive ? 'rgba(0,71,255,0.5)' : cachedAlpha(node.color, '55');
+          ctx.shadowColor = node.isTag ? cachedAlpha(node.color, 'BB') : isActive ? cachedAlpha(accentC, '80') : cachedAlpha(node.color, '55');
         } else ctx.shadowBlur = 0;
 
         // Outer ring (wireframe)
@@ -699,18 +719,18 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
         ctx.stroke();
         ctx.setLineDash([]);
 
-        // Fill
+        // Fill — soft light-blue bodies so nodes read on both themes
         ctx.beginPath();
         if (isActive) ctx.fillStyle = node.color;
         else if (node.isTag) ctx.fillStyle = node.color;
         else {
           const g = ctx.createRadialGradient(node.x - 1, node.y - 1, 0, node.x, node.y, nr);
-          g.addColorStop(0, '#FFFFFF');
-          g.addColorStop(1, isConn ? cachedAlpha(node.color, '44') : '#F0EFE8');
+          g.addColorStop(0, '#E9EFFF');
+          g.addColorStop(1, isConn ? cachedAlpha(node.color, '44') : '#B9CBFF');
           ctx.fillStyle = g;
         }
         
-        ctx.strokeStyle = node.isTag ? 'rgba(255,255,255,0.25)' : isActive ? node.color : (isConn ? node.color : 'rgba(26,26,26,0.35)');
+        ctx.strokeStyle = node.isTag ? 'rgba(255,255,255,0.25)' : isActive ? node.color : (isConn ? node.color : cachedAlpha(accentC, '73'));
         ctx.lineWidth = isActive || node.isTag ? 2.5 : 1.5;
         ctx.arc(node.x, node.y, nr, 0, Math.PI * 2);
         ctx.fill();
@@ -724,13 +744,13 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
         
         if (isActive) {
           const tw = ctx.measureText(node.label).width;
-          ctx.fillStyle = 'rgba(0,71,255,0.08)';
+          ctx.fillStyle = cachedAlpha(accentC, '2E');
           ctx.beginPath();
           ctx.roundRect(node.x - tw / 2 - 6, node.y + nr + 8, tw + 12, 18, 3);
           ctx.fill();
         }
         
-        ctx.fillStyle = node.isTag ? node.color : isActive ? 'rgba(0,71,255,1.0)' : (isConn ? '#1A1A1A' : '#555');
+        ctx.fillStyle = node.isTag ? node.color : isActive ? accentC : (isConn ? inkC : inkMutedC);
         ctx.fillText(node.label, node.x, node.y + nr + 22);
         ctx.globalAlpha = 1;
       });
@@ -744,6 +764,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
     return ()=>{
       if(rafRef.current) cancelAnimationFrame(rafRef.current);
       ro.disconnect();
+      themeObs.disconnect();
       canvas.removeEventListener('mousedown',onDown);
       window.removeEventListener('mousemove',onMove);
       window.removeEventListener('mouseup',onUp);
@@ -795,7 +816,11 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
 
   return (
     <div className={`fixed inset-0 z-[9999] flex items-center justify-center p-2 md:p-6 transition-opacity duration-300 ${isMounted?'opacity-100':'opacity-0'}`}>
-      <div className="absolute inset-0 bg-[rgba(253,253,251,0.97)] backdrop-blur-[12px]" onClick={onClose}/>
+      {/* Outer backdrop — dark graphite in dark mode, paper-dark in light */}
+      <div
+        className="absolute inset-0 bg-paper-dark/95 backdrop-blur-[12px]"
+        onClick={onClose}
+      />
       <div className="relative bg-paper border border-dashed border-border-strong flex flex-col w-full md:w-[98vw] h-[98vh] md:h-[95vh] rounded-[2px] overflow-hidden shadow-[0_40px_100px_-20px_rgba(0,0,0,0.18)]">
 
         {/* Chrome */}
@@ -869,8 +894,8 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
                     {isExpanded&&(
                       <div className="ml-4 pl-3 border-l border-dashed border-border-strong/50 space-y-0.5 mt-1">
                         {filtered.map(id=>{const f=data.files[id];if(!f)return null;return(
-                          <button key={id} onClick={()=>{setActiveFileId(id);setIsSidebarOpen(false);}} className={`w-full text-left flex items-center gap-2 px-2 py-1.5 font-mono text-[10px] rounded-[2px] transition-all truncate ${activeFileId===id?'bg-accent text-white':'text-ink-muted hover:text-accent hover:bg-accent-light'}`}>
-                            <FileText size={9} className={activeFileId===id?'text-white shrink-0':'shrink-0 opacity-40'}/><span className="truncate">{f.title}</span>
+                          <button key={id} onClick={()=>{setActiveFileId(id);setIsSidebarOpen(false);}} className={`w-full text-left flex items-center gap-2 px-2 py-1.5 font-mono text-[10px] rounded-[2px] transition-all truncate ${activeFileId===id?'bg-accent text-paper':'text-ink-muted hover:text-accent hover:bg-accent-light'}`}>
+                            <FileText size={9} className={activeFileId===id?'text-paper shrink-0':'shrink-0 opacity-40'}/><span className="truncate">{f.title}</span>
                           </button>
                         );})}
                       </div>
@@ -922,7 +947,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
               {isMaxGraph && (
                 <button 
                   onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-                  className={`absolute top-3 right-3 z-30 p-2 border border-dashed border-border-strong bg-[rgba(253,253,251,0.95)] hover:border-accent hover:text-accent transition-all ${isSettingsOpen ? 'text-accent border-accent' : 'text-ink-muted'}`}
+                  className={`absolute top-3 right-3 z-30 p-2 border border-dashed border-border-strong bg-paper/95 hover:border-accent hover:text-accent transition-all ${isSettingsOpen ? 'text-accent border-accent' : 'text-ink-muted'}`}
                 >
                   <Settings size={14} />
                 </button>

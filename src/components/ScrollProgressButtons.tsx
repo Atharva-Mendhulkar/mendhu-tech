@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function ScrollProgressButtons() {
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -63,7 +64,8 @@ export default function ScrollProgressButtons() {
 
   return (
     <>
-      {/* Spotlight Quick-Trigger (Top Pill) */}
+      {/* Spotlight Quick-Trigger (Top Pill) — hero utilities: search + theme,
+          side by side on the same plane, theme toggle on the RIGHT */}
       <div 
         className="md:absolute md:top-1 md:right-8 lg:right-14 z-[210] flex flex-col items-center md:items-end gap-1 mb-8 md:mb-0 w-full md:w-auto transition-all duration-300"
         style={{
@@ -126,17 +128,20 @@ export default function ScrollProgressButtons() {
           />
         </svg>
 
-        {/* Pill Button */}
-        <button 
-          onClick={() => window.dispatchEvent(new Event('toggle-terminal'))}
-          className="px-5 py-2 border border-dashed border-border-strong bg-paper/60 backdrop-blur-md rounded-full shadow-sm hover:text-accent hover:border-accent flex items-center justify-center cursor-pointer font-mono select-none min-w-[130px]"
-        >
-          <span className="text-[12px] font-normal text-ink text-center flex items-center justify-center">
-            <span className="hidden md:inline">{displayText}</span>
-            <span className="inline md:hidden">Search.</span>
-            <span className="animate-pulse text-accent ml-0.5 font-bold hidden md:inline">|</span>
-          </span>
-        </button>
+        {/* Hero utilities row: search button + theme toggle side by side */}
+        <div className="flex items-center gap-2.5">
+          <button 
+            onClick={() => window.dispatchEvent(new Event('toggle-terminal'))}
+            className="h-12 px-7 border border-dashed border-border-strong bg-paper rounded-[18px] shadow-sm hover:text-accent hover:border-accent flex items-center justify-center cursor-pointer font-mono text-[12px] select-none min-w-[130px] transition-[border-color,color,background] duration-200"
+          >
+            <span className="text-[12px] font-normal text-ink text-center flex items-center justify-center transition-colors duration-200">
+              <span className="hidden md:inline">{displayText}</span>
+              <span className="inline md:hidden">Search.</span>
+              <span className="animate-pulse text-accent ml-0.5 font-bold hidden md:inline">|</span>
+            </span>
+          </button>
+          <ThemeToggle />
+        </div>
       </div>
 
     </>

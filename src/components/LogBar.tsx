@@ -32,12 +32,12 @@ export default function LogBar({ initialBlogPosts = [] }: LogBarProps) {
 
 
   return (
-    <div className="log-bar sticky top-0 z-[100] border-b border-dashed border-[rgba(0,71,255,0.3)] bg-[rgba(253,253,251,0.92)] backdrop-blur-[4px] overflow-hidden">
-      {/* Subtle diagonal hatch overlay */}
+    <div className="log-bar sticky top-0 z-[100] border-b border-dashed border-border-blue bg-paper/95 backdrop-blur-[4px] overflow-hidden">
+      {/* Subtle diagonal hatch overlay — barely visible in both themes */}
       <div 
-        className="absolute inset-0 pointer-events-none opacity-[0.04]" 
+        className="absolute inset-0 pointer-events-none" 
         style={{
-          backgroundImage: `repeating-linear-gradient(-45deg, var(--ink) 0, var(--ink) 1px, transparent 1px, transparent 8px)`
+          backgroundImage: `repeating-linear-gradient(-45deg, var(--hatch) 0, var(--hatch) 1px, transparent 1px, transparent 8px)`
         }}
       />
       

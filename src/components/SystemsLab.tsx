@@ -93,7 +93,7 @@ export default function SystemsLab({ onOpenModal }: SystemsLabProps) {
             {/* Metrics Grid */}
             <div className="grid grid-cols-2 gap-[1px] bg-border-strong border border-dashed border-border-strong mb-6">
               {project.metrics.map((metric, i) => (
-                <div key={i} className="bg-[rgba(253,253,251,0.95)] p-3">
+                <div key={i} className="bg-card p-3">
                   <div className="font-mono text-[11px] font-medium text-ink">
                     {metric.value}
                   </div>

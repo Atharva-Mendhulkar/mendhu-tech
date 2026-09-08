@@ -53,7 +53,7 @@ export const metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Atharva Mendhulkar | Systems Engineer & AI Researcher",
-    description: "Exploring the intersection of physics-informed machine learning and kernel-level infrastructure.",
+    description: "Exploring the intersection of Artificial Inteligence and kernel-level infrastructure.",
     creator: "@atharvarta",
     images: ["/og-image.png"],
   },
@@ -76,8 +76,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${ebGaramond.variable} ${jetbrainsMono.variable}`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${ebGaramond.variable} ${jetbrainsMono.variable}`}
+    >
       <body>
+        {/* Anti-FOUC: apply the saved theme before first paint (avoids a light flash). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(localStorage.getItem('theme')==='dark'){document.documentElement.classList.add('dark')}}catch(e){}",
+          }}
+        />
         <CustomCursor />
         <LogBarServer />
         <ToastProvider />

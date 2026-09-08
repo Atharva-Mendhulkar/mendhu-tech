@@ -91,7 +91,7 @@ export default function ProjectModal({ activeId, onClose, onMinimize, skipBoot }
 
   return (
     <div className={`fixed inset-0 z-[9999] flex items-center justify-center transition-opacity duration-400 ${activeId ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-      <div className="absolute inset-0 bg-[rgba(253,253,251,0.92)] backdrop-blur-[8px]" onClick={onClose} />
+      <div className="absolute inset-0 bg-paper/95 backdrop-blur-[8px]" onClick={onClose} />
 
       <div className={`relative w-full h-full md:w-[92vw] md:h-[85vh] bg-paper rounded-[2px] border border-dashed border-border-strong overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] flex flex-col ${modalState !== 'idle' ? 'animate-modal-enter' : 'opacity-0 scale-[0.96]'}`}>
         
@@ -281,7 +281,7 @@ export default function ProjectModal({ activeId, onClose, onMinimize, skipBoot }
               <span className="absolute bottom-4 left-4 font-mono text-[10px] text-ink-faint">+</span>
               <span className="absolute bottom-4 right-4 font-mono text-[10px] text-ink-faint">+</span>
 
-              <div className="relative border border-dashed border-border-strong bg-[rgba(0,71,255,0.01)] h-[240px] flex flex-col items-center justify-center p-8">
+              <div className="relative border border-dashed border-border-strong bg-accent/5 h-[240px] flex flex-col items-center justify-center p-8">
                 <div className="font-mono text-[10px] text-accent text-center uppercase tracking-widest mb-2 px-4 py-1 border border-dashed border-accent/20">
                   {project.features[activeFeatureIdx]?.heading || 'ANALYSIS'}
                 </div>
