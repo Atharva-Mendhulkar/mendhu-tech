@@ -64,7 +64,7 @@ export default async function BlogIndex({ searchParams }: PageProps) {
             pointerEvents: "none",
             zIndex: 0,
             backgroundColor: "var(--paper)",
-            backgroundImage: `repeating-linear-gradient(-45deg, rgba(0,0,0,0.055) 0px, rgba(0,0,0,0.055) 1px, transparent 1px, transparent 9px)`,
+            backgroundImage: `repeating-linear-gradient(-45deg, var(--hatch) 0px, var(--hatch) 1px, transparent 1px, transparent 9px)`,
           }}
         />
 

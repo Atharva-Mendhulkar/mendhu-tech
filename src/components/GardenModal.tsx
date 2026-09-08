@@ -230,7 +230,7 @@ const Toggle = ({ label, k, onToggle, settings, updateSetting }: ToggleProps) =>
       onClick={()=>{const nv=!settings[k];onToggle?onToggle(nv as boolean):updateSetting(k,nv);}}
       className={`w-9 h-5 rounded-full border border-dashed transition-all relative ${settings[k]?'bg-accent border-accent':'border-border-strong'}`}
     >
-      <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${settings[k]?'left-4':'left-0.5'}`}/>
+      <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-paper shadow transition-all ${settings[k]?'left-4':'left-0.5'}`}/>
     </button>
   </label>
 );
@@ -955,7 +955,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
 
               {/* Settings panel — visible when isMaxGraph AND isSettingsOpen */}
               {isMaxGraph && isSettingsOpen && (
-                <div className="absolute top-12 right-3 z-20 w-[240px] bg-[rgba(253,253,251,0.97)] border border-dashed border-border-strong shadow-lg">
+                <div className="absolute top-12 right-3 z-20 w-[240px] bg-card border border-dashed border-border-strong shadow-lg">
                   <div className="flex items-center gap-2 px-3 py-2 border-b border-dashed border-border-strong">
                     <Settings size={11} className="text-accent"/><span className="font-mono text-[9px] uppercase tracking-widest text-accent font-bold">Graph Controls</span>
                   </div>
@@ -978,7 +978,7 @@ export default function GardenModal({ isOpen, onClose, onMinimize, initialFileId
 
               {/* Dot grid overlay */}
               <div className="absolute inset-0 pointer-events-none opacity-40 z-0"
-                style={{backgroundImage:'radial-gradient(rgba(0,0,0,0.5) 1.2px,transparent 1.2px)',backgroundSize:'16px 16px'}}/>
+                style={{backgroundImage:'radial-gradient(var(--dot) 1.2px,transparent 1.2px)',backgroundSize:'16px 16px'}}/>
             </div>
           )}
         </div>

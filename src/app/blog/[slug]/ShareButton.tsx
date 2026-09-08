@@ -32,7 +32,7 @@ export default function ShareButton({ slug, title }: ShareButtonProps) {
 
       <button
         onClick={handleShare}
-        className="flex items-center gap-2 px-3 py-1.5 border border-dashed border-border-strong hover:border-solid hover:border-accent hover:text-accent rounded transition-all bg-[rgba(253,253,251,0.5)] cursor-pointer"
+        className="flex items-center gap-2 px-3 py-1.5 border border-dashed border-border-strong hover:border-solid hover:border-accent hover:text-accent rounded transition-all bg-card cursor-pointer"
         title="Copy article link"
       >
         <Share2 size={12} />

@@ -124,7 +124,7 @@ export default async function BlogPostPage({ params }: PageProps) {
             pointerEvents: "none",
             zIndex: 0,
             backgroundColor: "var(--paper)",
-            backgroundImage: `repeating-linear-gradient(-45deg, rgba(0,0,0,0.055) 0px, rgba(0,0,0,0.055) 1px, transparent 1px, transparent 9px)`,
+            backgroundImage: `repeating-linear-gradient(-45deg, var(--hatch) 0px, var(--hatch) 1px, transparent 1px, transparent 9px)`,
           }}
         />
 
@@ -235,7 +235,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                     <Link
                       key={p.slug}
                       href={`/blog/${p.slug}`}
-                      className="p-6 border border-dashed border-border-strong hover:border-solid hover:border-accent bg-[rgba(253,253,251,0.5)] transition-all flex flex-col justify-between group rounded-xl"
+                      className="p-6 border border-dashed border-border-strong hover:border-solid hover:border-accent bg-card transition-all flex flex-col justify-between group rounded-xl"
                     >
                       <div>
                         <div className="font-mono text-[9px] text-ink-faint mb-2">
@@ -260,7 +260,7 @@ export default async function BlogPostPage({ params }: PageProps) {
             <footer className="pt-12 pb-8 flex flex-col sm:flex-row items-center justify-between gap-6 font-mono text-[11px] text-ink-muted">
               <Link
                 href="/blog"
-                className="px-4 py-2 border border-dashed border-border-strong hover:border-solid hover:border-accent hover:text-accent rounded-lg transition-all bg-[rgba(253,253,251,0.5)] flex items-center gap-2 group"
+                className="px-4 py-2 border border-dashed border-border-strong hover:border-solid hover:border-accent hover:text-accent rounded-lg transition-all bg-card flex items-center gap-2 group"
               >
                 <span>← Return to all logs</span>
               </Link>
@@ -270,7 +270,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                   href={post.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-2 border border-dashed border-border-strong hover:border-solid hover:border-accent hover:text-accent rounded-lg transition-all bg-[rgba(253,253,251,0.5)] flex items-center gap-2 group"
+                  className="px-4 py-2 border border-dashed border-border-strong hover:border-solid hover:border-accent hover:text-accent rounded-lg transition-all bg-card flex items-center gap-2 group"
                 >
                   <span>View on Medium ↗</span>
                 </a>
@@ -278,7 +278,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                   href={`https://x.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(`https://www.mendhu.tech/blog/${post.slug}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-2 border border-dashed border-border-strong hover:border-solid hover:border-accent hover:text-accent rounded-lg transition-all bg-[rgba(253,253,251,0.5)] flex items-center gap-2 group font-mono text-[11px]"
+                  className="px-4 py-2 border border-dashed border-border-strong hover:border-solid hover:border-accent hover:text-accent rounded-lg transition-all bg-card flex items-center gap-2 group font-mono text-[11px]"
                 >
                   <span>Post on</span>
                   <svg className="w-2.5 h-2.5 fill-current group-hover:fill-accent transition-colors" viewBox="0 0 24 24">
