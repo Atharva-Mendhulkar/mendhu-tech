@@ -26,7 +26,7 @@ const GARDEN_FILES = rawResearchData.nodes.map((n: any) => ({
 const COMMANDS = [
   { id: "projects", name: "type projects",  desc: "View modular technical research labs" },
   { id: "garden",   name: "type garden",    desc: "Access the research knowledge garden" },
-  { id: "resume",   name: "open resume",    desc: "Download official credentials natively" },
+  { id: "resume",   name: "open resume",    desc: "Open official credentials in a new tab" },
   { id: "blog",     name: "open blog",      desc: "Read technical articles & engineering logs" },
   { id: "linkedin", name: "goto linkedin",  desc: "Redirect to standard network links" },
   { id: "github",   name: "goto github",    desc: "Explore active version control hubs" },
@@ -314,13 +314,8 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
       } else if (r.item.id === "projects") {
         setQuery("project");
       } else if (r.item.id === "resume") {
-        // Enforce Native PDF Download
-        const link = document.createElement('a');
-        link.href = '/Atharva%20Mendhulkar%20Resume.pdf';
-        link.download = 'Atharva_Mendhulkar_Resume.pdf';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        // Open Resume in a new tab (Google Drive)
+        window.open("https://drive.google.com/file/d/1W6dXtqmP6i3JEu6nGNrOWWpR-dUaT8wG/view?usp=sharing", "_blank");
         close_();
       } else if (r.item.id === "blog") {
         window.location.href = "/blog";

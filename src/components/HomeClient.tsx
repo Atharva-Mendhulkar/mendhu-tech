@@ -202,7 +202,7 @@ export default function HomeClient({ initialPosts }: { initialPosts: MediumPost[
                   <span>blogs ↗</span>
                 </button>
                 <a 
-                  href="https://drive.google.com/file/d/1fRhtpOOUqrIayHYB34IQtjnDG0x1sL3l/view?usp=sharing" 
+                  href="https://drive.google.com/file/d/1W6dXtqmP6i3JEu6nGNrOWWpR-dUaT8wG/view?usp=sharing" 
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group flex items-center gap-2 font-mono text-[11px] text-accent border border-dashed border-accent px-4 py-2 hover:bg-accent-light hover:border-solid transition-all"
