@@ -29,57 +29,57 @@ export interface Project {
 
 export const projects: Project[] = [
   {
-    id: "caps",
-    slug: "caps",
-    title: "CAPS",
-    subtitle: "Context-Aware Agentic Payment System",
-    category: "AI Systems",
-    status: "complete",
-    statusLabel: "Open Source · Research Prototype",
-    oneLiner: "A deterministic payment kernel designed to create a trust boundary between AI reasoning and payment execution.",
+    id: "floework",
+    slug: "floework",
+    title: "floework",
+    subtitle: "Enterprise-Grade, Human-Aware SaaS Execution Platform",
+    category: "SaaS",
+    status: "live",
+    statusLabel: "Live · AWS Certified",
+    oneLiner: "Enterprise-grade collaborative execution platform featuring zero-lock OCC, SQS FIFO workers, DAG dependency cycle detection, and decoupled Multi-AZ AWS infrastructure.",
     terminalBoot: [
-      "$ boot --target CAPS",
-      "Initializing Deterministic Control Plane...",
-      "Loading Policy & Risk Engine (Layers 1-4)...",
-      "Mounting Context Evaluator...",
-      "Binding Immutable Audit Ledger...",
-      "$ cat ./CAPS.md"
+      "$ boot --target FLOEWORK",
+      "Initializing Decoupled Multi-AZ AWS VPC...",
+      "Mounting Fastify Modular Monolith on ECS Fargate...",
+      "Binding RDS PostgreSQL 16 & SQS FIFO queues...",
+      "Verifying Zero-Lock OCC & DAG cycle detector...",
+      "$ cat ./README.md"
     ],
-    techStack: ["Python 3.10+", "FastAPI", "Ollama", "Gemini", "JWT", "SQLite"],
-    tags: ["Agentic Finance", "Security", "AI Governance", "Deterministic Systems"],
+    techStack: ["Fastify", "PostgreSQL 16", "AWS ECS", "Terraform", "SQS FIFO", "Docker", "React 18", "Bedrock"],
+    tags: ["SaaS", "AWS Multi-AZ", "Distributed Systems", "Cloud Architecture", "Real-Time"],
     metrics: [
-      { label: "Security gates", value: "4 layers" },
-      { label: "Latency", value: "Sub-50ms" },
-      { label: "Explainability", value: "Full audit trail" },
-      { label: "Decision Logic", value: "Deterministic" }
+      { label: "Cloud Infra", value: "Multi-AZ AWS" },
+      { label: "Automated Tests", value: "240 (100%)" },
+      { label: "Concurrency", value: "Zero-Lock OCC" },
+      { label: "Worker Latency", value: "< 15ms" }
     ],
     features: [
       {
-        id: "philosophy",
-        heading: "Trust Gradient & Fail-Closed",
-        body: "Trust decreases as data moves towards the LLM and increases as it moves towards the Ledger. The system defaults to a denial state for any ambiguity. The LLM is treated as an untrusted source, strictly decoupled from the control plane.",
-        media: { type: "diagram", label: "Trust Gradient Model" }
+        id: "occ",
+        heading: "Zero-Lock Optimistic Concurrency Control",
+        body: "Eliminates destructive database row locks during high-frequency collaborative sprint planning. Every task mutation enforces version sequencing, returning HTTP 409 Conflict (STALE_UPDATE) on race conditions with randomized jitter reconciliation (50–200ms) and structured audit logging.",
+        media: { type: "diagram", label: "OCC Conflict Reconciliation" }
       },
       {
-        id: "architecture",
-        heading: "Deterministic Control Plane",
-        body: "Includes Schema Validator, Context Evaluator, Policy Engine, Consent Manager, and Decision Router. This trust boundary ensures that no money moves unless all deterministic safety gates pass.",
-        media: { type: "diagram", label: "System Architecture" }
+        id: "cloud-architecture",
+        heading: "Decoupled Multi-AZ Cloud Infrastructure",
+        body: "Engineered according to the AWS Well-Architected Framework: Fastify modular monolith on ECS Fargate across private subnets, Amazon RDS PostgreSQL 16 Multi-AZ standby, DynamoDB-backed API Gateway WebSockets, and CloudFront CDN with Origin Access Control (OAC).",
+        media: { type: "diagram", label: "Target Cloud Architecture" }
       },
       {
-        id: "risk",
-        heading: "Multi-Layer Defense Model",
-        body: "Layer 1: Hard Invariants (Limits). Layer 2: Velocity & Temporal Logic. Layer 3: Agentic Threat Defense (Loop/Chain detection). Layer 4: Behavioral Analysis. Any violation results in an immediate DENY or ESCALATE state.",
-        media: { type: "diagram", label: "Policy Layers" }
+        id: "fifo-workers",
+        heading: "Asynchronous SQS FIFO & Worker Pools",
+        body: "Heavy operations (stability scoring, audit events, notifications) offload to Amazon SQS FIFO queues (focus-completion, audit-logs, notifications). Handlers respond immediately with HTTP 202 Accepted (< 15ms latency) while resilient workers leverage 20s long polling and automated DLQ routing after 3 retries.",
+        media: { type: "diagram", label: "SQS FIFO & DLQ Pipeline" }
       },
       {
-        id: "audit",
-        heading: "Immutable Audit Ledger",
-        body: "A write-only, hash-chained record of every action—approved or denied. This provides a forensic trail for post-incident analysis and ensures full accountability for autonomous agent behavior.",
-        media: { type: "diagram", label: "Audit Chain" }
+        id: "dag-intelligence",
+        heading: "DAG Cycle Detection & Execution Graph",
+        body: "Server-side 3-color topological DFS (UNVISITED, VISITING, VISITED) rejects self-loops and circular dependencies (A → B → C → A) with HTTP 400. Calculates real-time downstream blocker cascades, critical path analysis, and Amazon Bedrock (Claude 3.5 Sonnet) executive sprint synthesis.",
+        media: { type: "dashboard", label: "Execution Intelligence Graph" }
       }
     ],
-    links: { github: "https://github.com/Atharva-Mendhulkar/CAPS", paper: null, demo: null }
+    links: { github: "https://github.com/Atharva-Mendhulkar/floework", paper: null, demo: "https://floework.vercel.app" }
   },
   {
     id: "avara",
@@ -89,7 +89,7 @@ export const projects: Project[] = [
     category: "AI Systems",
     status: "complete",
     statusLabel: "Open Source · Production-Ready",
-    oneLiner: "Runtime security and governance layer for autonomous AI agents — enforces intent, permissions, provenance, and safety at execution time, not training time.",
+    oneLiner: "Always-on runtime control plane for autonomous AI agents — enforcing intent alignment, ephemeral IAM, provenance, and human-in-the-loop safety at execution time.",
     terminalBoot: [
       "$ boot --target AVARA",
       "Loading AVARA Runtime Authority...",
@@ -98,13 +98,13 @@ export const projects: Project[] = [
       "Wiring circuit breaker + audit ledger...",
       "$ cat ./AVARA.md"
     ],
-    techStack: ["FastAPI", "SQLite", "Docker", "Python", "LangChain"],
+    techStack: ["Python", "FastAPI", "Docker", "SQLite", "LangGraph", "LangChain"],
     tags: ["AI Security", "Agent Governance", "Runtime Safety", "LLM"],
     metrics: [
       { label: "Security layers", value: "8 guards" },
       { label: "Runtime overhead", value: "< 5ms" },
       { label: "Audit replayable", value: "100%" },
-      { label: "LangChain Integration", value: "3 lines" }
+      { label: "Integration", value: "3 lines" }
     ],
     features: [
       {
@@ -132,7 +132,7 @@ export const projects: Project[] = [
         media: { type: "code", label: "Integration Code" }
       }
     ],
-    links: { github: "https://github.com/Atharva-Mendhulkar", paper: null, demo: null }
+    links: { github: "https://github.com/Atharva-Mendhulkar/AVARA", paper: null, demo: null }
   },
   {
     id: "kphd",
@@ -142,7 +142,7 @@ export const projects: Project[] = [
     category: "Systems",
     status: "complete",
     statusLabel: "Linux Kernel · GPL v2",
-    oneLiner: "Embeds into the Linux scheduler hot-path to measure nanosecond-level process wait times and predict CPU starvation before applications hang.",
+    oneLiner: "Embeds into Linux scheduler hot-paths to measure nanosecond-level process wait times and predict CPU starvation before applications hang.",
     terminalBoot: [
       "$ boot --target K-PHD",
       "Loading kphd.ko kernel module...",
@@ -154,10 +154,10 @@ export const projects: Project[] = [
     techStack: ["C", "Linux Kernel", "Netlink", "EMA", "Makefile"],
     tags: ["Kernel Module", "Tracepoints", "Systems", "Predictive"],
     metrics: [
-      { label: "Granularity", value: "nanosecond" },
-      { label: "Hash buckets", value: "1,024 per-PID" },
-      { label: "Warn/Danger", value: "2ms / 5ms" },
-      { label: "License", value: "GPL v2" }
+      { label: "Precision", value: "94%" },
+      { label: "Lead time", value: "1.5s - 2.8s" },
+      { label: "Overhead", value: "< 0.5%" },
+      { label: "Ring-0 Memory", value: "< 2MB" }
     ],
     features: [
       {
@@ -182,57 +182,57 @@ export const projects: Project[] = [
     links: { github: "https://github.com/Atharva-Mendhulkar/K-PHD", paper: null, demo: null }
   },
   {
-    id: "floework",
-    slug: "floework",
-    title: "Floework",
-    subtitle: "Human-Aware Productivity & Team Collaboration Platform",
-    category: "SaaS",
-    status: "live",
-    statusLabel: "Live",
-    oneLiner: "Replaces time-tracking with behavioral signal analysis — models the causal chain Focus → Effort → Task Progress → Team Outcome.",
+    id: "stratarl",
+    slug: "stratarl",
+    title: "StrataRL",
+    subtitle: "Forensic-Grade GRPO for Multi-Domain Reasoning in SLMs",
+    category: "ML / AI Research",
+    status: "complete",
+    statusLabel: "Open Source · Research Framework",
+    oneLiner: "Forensic-grade GRPO infrastructure for Small Language Models, preventing cross-domain catastrophic forgetting via Stratified Advantage Normalization (SAN).",
     terminalBoot: [
-      "$ boot --target FLOEWORK",
-      "Connecting to Supabase PostgreSQL...",
-      "Initializing Socket.IO real-time layer...",
-      "Mounting execution intelligence engine...",
-      "Loading focus session state machine...",
-      "$ cat ./apps/web/README.md"
+      "$ boot --target StrataRL",
+      "Initializing UCB Curriculum Sampler...",
+      "Mounting Rollout Engine (vLLM / Qwen2.5-3B)...",
+      "Loading SAN Advantage Engine (Stratified Z-Norm)...",
+      "Binding SymPy Numeric & Regex Verifiers...",
+      "$ cat ./README.md"
     ],
-    techStack: ["React", "Node.js", "PostgreSQL", "Redis", "Socket.IO", "Stripe", "Supabase"],
-    tags: ["SaaS", "Productivity", "Real-Time", "Analytics"],
+    techStack: ["PyTorch", "Hugging Face", "TRL", "vLLM", "PEFT (QLoRA)", "Weights & Biases", "SymPy"],
+    tags: ["Reinforcement Learning", "GRPO", "Small Language Models", "Reasoning", "PyTorch"],
     metrics: [
-      { label: "Execution signals", value: "7 signals" },
-      { label: "Real-time", value: "WebSocket" },
-      { label: "Architecture", value: "Multi-tenant" },
-      { label: "Deployment", value: "Cloud-native" }
+      { label: "Target Model", value: "Qwen2.5-3B" },
+      { label: "VRAM Opt.", value: "1.8GB saved" },
+      { label: "Advantage Norm", value: "Per-Stratum Z" },
+      { label: "Verification", value: "Zero-PRM Regex" }
     ],
     features: [
       {
         id: "problem",
-        heading: "The Structural Gap in Productivity Tools",
-        body: "Every existing tool (Jira, Notion, Toggl) tracks that delays happen, not why. No platform models causality: Focus State → Effort Signals → Task Progress → Team Outcome. Floework tracks execution causality through 7 behavioral signals computed per user per sprint.",
-        media: { type: "diagram", label: "Causal Model of Work" }
+        heading: "Cross-Stratum Bias & Domain Collapse",
+        body: "Standard GRPO on mixed-domain reasoning creates cross-stratum bias: global advantage normalization compares rewards from easy domains (GSM8K) against hard domains (StrategyQA), giving valid hard-domain traces negative normalized advantages and causing catastrophic forgetting.",
+        media: { type: "diagram", label: "Cross-Stratum Advantage Degradation" }
       },
       {
-        id: "architecture",
-        heading: "Full-Stack SaaS Architecture",
-        body: "React + Redux + Tailwind + shadcn/ui frontend. Node.js + Express + Socket.IO + BullMQ async workers backend. Dual database: PostgreSQL (Supabase) as source of truth for tasks/sessions/billing + Redis for real-time focus session state and 15-min analytics cache. Stripe webhook billing with 3-tier plans.",
-        media: { type: "diagram", label: "System Architecture" }
+        id: "san",
+        heading: "Stratified Advantage Normalization (SAN)",
+        body: "Per-stratum Z-normalization evaluates rollouts strictly against peers in the same domain. Features zero-variance centering, low-variance dampening to avoid ghost-signal amplification, and ±5.0 advantage clipping.",
+        media: { type: "diagram", label: "SAN Normalization Flow" }
       },
       {
-        id: "intelligence",
-        heading: "7-Signal Execution Intelligence Engine",
-        body: "Effort Density (focus hours / estimated hours), Resume Rate (sessions per task — context-switch proxy), Blocker Risk (high effort + stalled status composite), Focus Stability Heatmap (7×24 peak cognitive window grid), Burnout Risk Trend (4-week rolling — penalizes fragmentation + after-hours), Predictive Delivery Engine (velocity vs sprint backlog), Context-Switch Audit (PR wait-time via GitHub webhook).",
-        media: { type: "dashboard", label: "Analytics Dashboard" }
+        id: "structural-rewards",
+        heading: "Zero-PRM Structural Rewards (ST-GRPO)",
+        body: "Encodes domain-specific reasoning tags (<decompose>, <compute>, <verify>, <recall>, <synthesize>) directly inside <think> tags. Verified via deterministic SymPy math evaluation, letter match, and regex templates without requiring expensive Process Reward Models.",
+        media: { type: "code", label: "Structural Template Verifier" }
       },
       {
-        id: "realtime",
-        heading: "Real-Time Collaboration Layer",
-        body: "Socket.IO WebSocket events propagate task state changes instantly. Team presence avatars show In Focus (pulsing blue ring), Available (green), Offline (grey) from live Redis session state. Task locking prevents concurrent edits. FlowBoard Kanban syncs without page refresh. All events logged to Execution Event timeline for replay.",
-        media: { type: "screen", label: "Live FlowBoard" }
+        id: "memory-opt",
+        heading: "π_ref = π_old & Adaptive Curriculum",
+        body: "Captures rollout logprobs on-the-fly to eliminate frozen reference models, saving 1.8GB VRAM to run G=8 rollouts on consumer GPUs. Pairs with an Upper Confidence Bound (UCB) curriculum sampler for dynamic domain scheduling.",
+        media: { type: "chart", label: "VRAM & Training Efficiency" }
       }
     ],
-    links: { github: "https://github.com/Atharva-Mendhulkar/floework", paper: null, demo: "https://floework.vercel.app" }
+    links: { github: "https://github.com/Atharva-Mendhulkar/StrataRL", paper: null, demo: null }
   }
 ];
 

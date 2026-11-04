@@ -14,25 +14,27 @@ export default function ThemeToggle() {
   // `dark` class on <html> in sync after mount.
   const [isDark, setIsDark] = React.useState(false);
 
-  // Sync from saved theme + keep <html>.dark in sync with state (client-only).
+  // Sync from saved theme + track <html>.dark mutations
   React.useEffect(() => {
+    const root = document.documentElement;
     let saved: string | null = null;
     try {
       saved = localStorage.getItem("theme");
     } catch {
       /* storage unavailable */
     }
-    const initial = saved === "dark" || document.documentElement.classList.contains("dark");
+    const initial = saved === "dark" || root.classList.contains("dark");
     setIsDark(initial);
-    document.documentElement.classList[initial ? "add" : "remove"]("dark");
+    root.classList[initial ? "add" : "remove"]("dark");
+
+    const sync = () => setIsDark(root.classList.contains("dark"));
+    const observer = new MutationObserver(sync);
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
   }, []);
 
-  React.useEffect(() => {
-    document.documentElement.classList[isDark ? "add" : "remove"]("dark");
-  }, [isDark]);
-
   const handleToggle = () => {
-    const next = !isDark;
+    const next = !document.documentElement.classList.contains("dark");
     // Mutate the class synchronously so the view-transition snapshots are correct.
     document.documentElement.classList[next ? "add" : "remove"]("dark");
     setIsDark(next);

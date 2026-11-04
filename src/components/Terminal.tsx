@@ -3,17 +3,18 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import {
   FolderOpen, BookOpen, Search,
-  Cpu, FlaskConical, Leaf, Layers, Terminal as TermIcon, FileText, X
+  Cpu, FlaskConical, Leaf, Layers, Terminal as TermIcon, FileText, X,
+  Sun, Moon
 } from "lucide-react";
 import rawResearchData from "@/data/research.json";
 
 // ── Data ──────────────────────────────────────────────────────────────────
 
 const PROJECTS = [
-  { id: "caps",     name: "CAPS",         desc: "CAPS",                                         tag: "ai agent", keywords: ["ml", "agentic ai", "agentic UPI", "fintech"] },
-  { id: "avara",    name: "AVARA",        desc: "Agent Runtime Security Authority",             tag: "systems",  keywords: ["agent", "security", "runtime", "llm"] },
-  { id: "kphd",     name: "K-PHD",        desc: "Kernel Predictive Hang Detector",              tag: "kernel",   keywords: ["linux", "kernel", "hang", "ema", "c"] },
-  { id: "floework", name: "Floework",     desc: "Human-Aware SaaS Productivity Platform",       tag: "saas",     keywords: ["saas", "productivity", "node", "socket"] },
+  { id: "floework", name: "floework",     desc: "Enterprise-Grade SaaS Execution Platform",     tag: "saas",     keywords: ["saas", "aws", "architecture", "fastify", "real-time"] },
+  { id: "avara",    name: "AVARA",        desc: "Agent Runtime Security Authority",             tag: "systems",  keywords: ["agent", "security", "runtime", "llm", "iam"] },
+  { id: "kphd",     name: "K-PHD",        desc: "Kernel Predictive Hang Detector",              tag: "kernel",   keywords: ["linux", "kernel", "hang", "ema", "c", "scheduler"] },
+  { id: "stratarl", name: "StrataRL",     desc: "Forensic GRPO for Multi-Domain Reasoning",     tag: "research", keywords: ["rl", "grpo", "slm", "pytorch", "reasoning"] },
 ];
 
 const GARDEN_FILES = rawResearchData.nodes.map((n: any) => ({
@@ -28,6 +29,7 @@ const COMMANDS = [
   { id: "garden",   name: "type garden",    desc: "Access the research knowledge garden" },
   { id: "resume",   name: "open resume",    desc: "Open official credentials in a new tab" },
   { id: "blog",     name: "open blog",      desc: "Read technical articles & engineering logs" },
+  { id: "theme",    name: "toggle theme",   desc: "Switch light / dark mode" },
   { id: "linkedin", name: "goto linkedin",  desc: "Redirect to standard network links" },
   { id: "github",   name: "goto github",    desc: "Explore active version control hubs" },
   { id: "twitter",  name: "goto twitter",   desc: "Follow research updates online" },
@@ -156,10 +158,68 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
   const placeholders = useMemo(() => [
     "type 'projects' to view build logs",
     "type 'blog' to read articles",
+    "type 'theme' to toggle dark mode",
     "type 'garden' to access maps",
     "type 'open resume' to download",
     "search physics pipelines",
   ], []);
+
+  // ── Dark Mode State & View Transition ─────────────────────────────────────
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const sync = () => setIsDark(root.classList.contains("dark"));
+    sync();
+    const observer = new MutationObserver(sync);
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
+  const toggleTheme = (e?: React.MouseEvent) => {
+    const root = document.documentElement;
+    const currentlyDark = root.classList.contains("dark");
+    const next = !currentlyDark;
+    const apply = () => {
+      root.classList[next ? "add" : "remove"]("dark");
+      try {
+        localStorage.setItem("theme", next ? "dark" : "light");
+      } catch {}
+      setIsDark(next);
+    };
+
+    if (!document.startViewTransition) {
+      apply();
+      return;
+    }
+
+    let x = e ? e.clientX : window.innerWidth / 2;
+    let y = e ? e.clientY : window.innerHeight / 2;
+    const anchor = document.querySelector("[data-porygon-anchor]");
+    if (anchor && !e) {
+      const r = anchor.getBoundingClientRect();
+      x = r.left + r.width / 2;
+      y = r.top + r.height / 2;
+    }
+    const targetTheme = currentlyDark ? "to-light" : "to-dark";
+    root.style.setProperty("--x", `${x}px`);
+    root.style.setProperty("--y", `${y}px`);
+    root.style.setProperty("--transition-speed", "0.9s");
+    root.style.setProperty("--transition-blur", "0px");
+    root.setAttribute("data-theme-transition", targetTheme);
+
+    try {
+      const transition = document.startViewTransition(() => {
+        apply();
+      });
+      transition.finished.finally(() => {
+        root.removeAttribute("data-theme-transition");
+      });
+    } catch {
+      apply();
+      root.removeAttribute("data-theme-transition");
+    }
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -320,6 +380,8 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
       } else if (r.item.id === "blog") {
         window.location.href = "/blog";
         close_();
+      } else if (r.item.id === "theme") {
+        toggleTheme();
       } else if (r.item.id === "linkedin") {
         window.open("https://linkedin.com/in/mendhu36/", "_blank");
         close_();
@@ -417,6 +479,16 @@ export default function Spotlight({ onOpenProject, onOpenGarden }: SpotlightProp
                   {results.length} hit{results.length !== 1 ? "s" : ""}
                 </span>
               )}
+
+              <button
+                type="button"
+                onClick={toggleTheme}
+                title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+                aria-label="Toggle theme"
+                className="p-1.5 text-ink-muted hover:text-accent border border-dashed border-border-strong hover:border-accent rounded transition-all cursor-pointer flex items-center justify-center shrink-0 hover:bg-accent-light"
+              >
+                {isDark ? <Sun size={13} strokeWidth={1.75} /> : <Moon size={13} strokeWidth={1.75} />}
+              </button>
             </div>
 
             {/* Body */}
