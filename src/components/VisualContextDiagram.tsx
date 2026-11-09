@@ -670,7 +670,7 @@ function renderDiagram(projectId: string, featureId: string, idx: number, marker
           {/* Layer 1: Data */}
           <rect x="6" y="14" width="74" height="52" rx="3" className="fill-card stroke-border-strong" />
           <text x="43" y="28" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">1. ACQUISITION</text>
-          <text x="43" y="39" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">Mach / /proc @ 100Hz</text>
+          <text x="43" y="39" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">{"Mach / /proc @ 100Hz"}</text>
           <text x="43" y="49" textAnchor="middle" className="font-mono text-[6px] fill-accent font-bold">20-Slot RingBuffer</text>
           <text x="43" y="58" textAnchor="middle" className="font-mono text-[5.5px] fill-ink-faint">Zero-Alloc Path</text>
 
@@ -679,7 +679,7 @@ function renderDiagram(projectId: string, featureId: string, idx: number, marker
           <text x="126" y="28" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">2. INTELLIGENCE</text>
           <text x="126" y="39" textAnchor="middle" className="font-mono text-[6.5px] fill-current">46D Feature Vector</text>
           <text x="126" y="49" textAnchor="middle" className="font-mono text-[6px] fill-accent font-bold">XGBoost CoreML</text>
-          <text x="126" y="58" textAnchor="middle" className="font-mono text-[5.5px] fill-ink-muted">Softmax P(Hang) &lt;5ms</text>
+          <text x="126" y="58" textAnchor="middle" className="font-mono text-[5.5px] fill-ink-muted">{"Softmax P(Hang) < 5ms"}</text>
 
           {/* Layer 3: Decision */}
           <rect x="172" y="14" width="76" height="52" rx="3" className="fill-card stroke-accent" />
@@ -711,21 +711,21 @@ function renderDiagram(projectId: string, featureId: string, idx: number, marker
         {/* Prior Art Column */}
         <rect x="10" y="14" width="150" height="58" rx="3" className="fill-card stroke-border-strong" />
         <text x="85" y="28" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">PRIOR ART (REACTIVE WATCHDOG)</text>
-        <text x="85" y="40" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">&bull; 4s&ndash;5s Delay (WindowServer Beachball)</text>
-        <text x="85" y="50" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">&bull; Destructive OOM / Force-Quit Data Loss</text>
-        <text x="85" y="60" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">&bull; Coarse System-Wide Aggregate Metrics</text>
+        <text x="85" y="40" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">• 4s–5s Delay (WindowServer Beachball)</text>
+        <text x="85" y="50" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">• Destructive OOM / Force-Quit Data Loss</text>
+        <text x="85" y="60" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">• Coarse System-Wide Aggregate Metrics</text>
 
         {/* UPRS Patent Column */}
         <rect x="175" y="14" width="155" height="58" rx="3" className="fill-card stroke-accent" />
         <text x="252" y="28" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">UPRS NOVELTY (PATENT-PENDING)</text>
-        <text x="252" y="40" textAnchor="middle" className="font-mono text-[6.5px] fill-current">&bull; 0.5s&ndash;5.0s Pre-Hang Predictive Window</text>
-        <text x="252" y="50" textAnchor="middle" className="font-mono text-[6.5px] fill-current">&bull; Cross-Signals: Contention = Lock &times; Queue</text>
-        <text x="252" y="60" textAnchor="middle" className="font-mono text-[6.5px] fill-accent font-bold">&bull; Non-Destructive Reversible Priority Shift</text>
+        <text x="252" y="40" textAnchor="middle" className="font-mono text-[6.5px] fill-current">• 0.5s–5.0s Pre-Hang Predictive Window</text>
+        <text x="252" y="50" textAnchor="middle" className="font-mono text-[6.5px] fill-current">• Cross-Signals: Contention = Lock × Queue</text>
+        <text x="252" y="60" textAnchor="middle" className="font-mono text-[6.5px] fill-accent font-bold">• Non-Destructive Reversible Priority Shift</text>
 
         <line x1="160" y1="43" x2="173" y2="43" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
 
-        <text x="170" y="93" textAnchor="middle" className="font-mono text-[7px] fill-accent font-bold">VALIDATED: 92.5% PRECISION &middot; 82% FREEZE REDUCTION &middot; &lt;0.5% CPU OVERHEAD</text>
-        <text x="170" y="105" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">INDIAN PATENT ACT 1970 &middot; TOCTOU IMMUNITY &middot; INTERVENTION-AWARE DRIFT GUARD</text>
+        <text x="170" y="93" textAnchor="middle" className="font-mono text-[7px] fill-accent font-bold">{"VALIDATED: 92.5% PRECISION · 82% FREEZE REDUCTION · <0.5% CPU OVERHEAD"}</text>
+        <text x="170" y="105" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">INDIAN PATENT ACT 1970 · TOCTOU IMMUNITY · INTERVENTION-AWARE DRIFT GUARD</text>
       </g>
     );
   }
@@ -852,8 +852,8 @@ function renderDiagram(projectId: string, featureId: string, idx: number, marker
 
           {/* Primary Net */}
           <rect x="94" y="8" width="114" height="34" rx="3" className="fill-card stroke-accent" />
-          <text x="151" y="21" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">AIRQUALITYNET (9 &times; 128)</text>
-          <text x="151" y="32" textAnchor="middle" className="font-mono text-[6.5px] fill-current">Tanh Activation &middot; C(x,y,t)</text>
+          <text x="151" y="21" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">AIRQUALITYNET (9 × 128)</text>
+          <text x="151" y="32" textAnchor="middle" className="font-mono text-[6.5px] fill-current">Tanh Activation · C(x,y,t)</text>
 
           {/* Diffusivity Net */}
           <rect x="94" y="48" width="114" height="34" rx="3" className="fill-card stroke-accent" />
@@ -863,7 +863,7 @@ function renderDiagram(projectId: string, featureId: string, idx: number, marker
           {/* Coupled Loss */}
           <rect x="220" y="12" width="114" height="66" rx="3" className="fill-card stroke-border-strong" />
           <text x="277" y="27" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">PDE LOSS GRAPH</text>
-          <text x="277" y="40" textAnchor="middle" className="font-mono text-[6.5px] fill-accent font-bold">&part;C/&part;t + u&middot;&nabla;C = &nabla;&middot;(K&nabla;C) + S</text>
+          <text x="277" y="40" textAnchor="middle" className="font-mono text-[6.5px] fill-accent font-bold">∂C/∂t + u·∇C = ∇·(K∇C) + S</text>
           <text x="277" y="52" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">Autograd Differentiation</text>
           <text x="277" y="64" textAnchor="middle" className="font-mono text-[6px] fill-accent font-medium">100% Mass Conserved</text>
 
@@ -892,17 +892,17 @@ function renderDiagram(projectId: string, featureId: string, idx: number, marker
         <text x="170" y="28" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">2. RA-BPINN PRIOR</text>
         <text x="170" y="40" textAnchor="middle" className="font-mono text-[6.5px] fill-current">Fisher Info Matrix</text>
         <text x="170" y="51" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">DFS Null-Space Guard</text>
-        <text x="170" y="62" textAnchor="middle" className="font-mono text-[6px] fill-accent font-bold">52.1% &rarr; 93.8% UQ</text>
+        <text x="170" y="62" textAnchor="middle" className="font-mono text-[6px] fill-accent font-bold">52.1% → 93.8% UQ</text>
 
         {/* Card 3 */}
         <rect x="232" y="14" width="102" height="60" rx="3" className="fill-card stroke-border-strong" />
         <text x="283" y="28" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">3. 7-YR BENCHMARK</text>
-        <text x="283" y="40" textAnchor="middle" className="font-mono text-[6.5px] fill-accent font-bold">Test R&sup2; = 0.926</text>
-        <text x="283" y="51" textAnchor="middle" className="font-mono text-[6px] fill-current">RMSE 21.05 &mu;g/m&sup3;</text>
-        <text x="283" y="62" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">p &lt; 1e-10 vs 19 MLs</text>
+        <text x="283" y="40" textAnchor="middle" className="font-mono text-[6.5px] fill-accent font-bold">Test R² = 0.926</text>
+        <text x="283" y="51" textAnchor="middle" className="font-mono text-[6px] fill-current">RMSE 21.05 µg/m³</text>
+        <text x="283" y="62" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">{"p < 1e-10 vs 19 MLs"}</text>
 
         <text x="170" y="93" textAnchor="middle" className="font-mono text-[7px] fill-accent font-bold">NOVELTY: ELIMINATES SPECTRAL BIAS &amp; ENFORCES CONTINUOUS HIGHER-ORDER PDEs</text>
-        <text x="170" y="105" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">223K HOURLY SAMPLES &middot; 100.0% MASS CONSERVATION &middot; INVERSE NULL-SPACE QUANTIFIED</text>
+        <text x="170" y="105" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">223K HOURLY SAMPLES · 100.0% MASS CONSERVATION · INVERSE NULL-SPACE QUANTIFIED</text>
       </g>
     );
   }
