@@ -355,6 +355,6 @@ export const projects: Project[] = [
   }
 ];
 
-export const standardProjects: any[] = [];
+export const standardProjects: Project[] = [];
 
 export const categories = ["all", "ML / AI Research", "AI Systems", "Systems", "SaaS"];

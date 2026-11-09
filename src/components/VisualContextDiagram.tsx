@@ -81,7 +81,7 @@ export default function VisualContextDiagram({ project, featureIndex }: VisualCo
 
       {/* Diagram Sub-Label / Legend */}
       <div className="flex items-center justify-between border-t border-dashed border-border-strong pt-1.5 mt-2 font-mono text-[7.5px] text-ink-muted uppercase tracking-wider">
-        <span>MOD_0{featureIndex + 1} // {feature.heading.slice(0, 28)}...</span>
+        <span>MOD_0{featureIndex + 1} {"//"} {feature.heading.slice(0, 28)}...</span>
         <span className="text-accent font-semibold">STATE: SYNCHRONIZED</span>
       </div>
     </div>
@@ -732,7 +732,7 @@ function renderDiagram(projectId: string, featureId: string, idx: number, marker
           <rect x="105" y="18" width="125" height="56" rx="3" className="fill-card stroke-accent" />
           <text x="167" y="34" textAnchor="middle" className="font-mono text-[8px] fill-accent font-bold">AIRQUALITYNET (9 &times; 128)</text>
           <text x="167" y="47" textAnchor="middle" className="font-mono text-[7px] fill-current">Tanh Activation Function</text>
-          <text x="167" y="58" textAnchor="middle" className="font-mono text-[6.5px] fill-accent font-bold">f''(x) &ne; 0 &middot; Smooth Laplacians</text>
+          <text x="167" y="58" textAnchor="middle" className="font-mono text-[6.5px] fill-accent font-bold">f&apos;&apos;(x) &ne; 0 &middot; Smooth Laplacians</text>
           <text x="167" y="67" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">Xavier Uniform Initialization</text>
 
           <rect x="250" y="28" width="80" height="38" rx="3" className="fill-card stroke-accent" />
