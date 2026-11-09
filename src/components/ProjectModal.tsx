@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { ExternalLink, Minus, X, Terminal, ChevronDown, ChevronUp, Layout } from 'lucide-react';
 import { projects, Project } from '@/data/projects';
+import VisualContextDiagram from '@/components/VisualContextDiagram';
 
 interface ProjectModalProps {
   activeId: string | null;
@@ -193,7 +194,7 @@ export default function ProjectModal({ activeId, onClose, onMinimize, skipBoot }
                 <div className="md:hidden mb-10 space-y-6 animate-modal-enter">
                   {/* Visualizer - swipe to change analysis independent of text scroll */}
                   <div 
-                    className="relative border border-dashed border-border-strong bg-[rgba(0,71,255,0.01)] h-[240px] flex flex-col items-center justify-center p-8 touch-pan-x cursor-ew-resize"
+                    className="relative border border-dashed border-border-strong bg-accent/5 min-h-[220px] flex flex-col justify-between p-4 touch-pan-x cursor-ew-resize"
                     onTouchStart={(e) => {
                       const touch = e.touches[0];
                       (e.currentTarget as any).startX = touch.clientX;
@@ -210,16 +211,9 @@ export default function ProjectModal({ activeId, onClose, onMinimize, skipBoot }
                       }
                     }}
                   >
-                    <div className="font-mono text-[10px] text-accent text-center uppercase tracking-widest mb-2 px-4 py-1 border border-dashed border-accent/20">
-                      {project.features[localFeatureIdx]?.heading || 'ANALYSIS'}
-                    </div>
-                    <div className="font-mono text-[9px] text-ink-faint uppercase tracking-tighter mt-4">
-                      Visual Context Generator v1.0
-                    </div>
-                    <div className="absolute inset-x-12 top-1/2 h-[1px] bg-border-strong/30" />
-                    <div className="absolute inset-y-12 left-1/2 w-[1px] bg-border-strong/30" />
+                    <VisualContextDiagram project={project} featureIndex={localFeatureIdx} />
                     
-                    <div className="absolute bottom-4 flex gap-1.5">
+                    <div className="flex justify-center gap-1.5 mt-2">
                       {project.features.map((_, i) => (
                         <div 
                           key={i} 
@@ -281,15 +275,8 @@ export default function ProjectModal({ activeId, onClose, onMinimize, skipBoot }
               <span className="absolute bottom-4 left-4 font-mono text-[10px] text-ink-faint">+</span>
               <span className="absolute bottom-4 right-4 font-mono text-[10px] text-ink-faint">+</span>
 
-              <div className="relative border border-dashed border-border-strong bg-accent/5 h-[240px] flex flex-col items-center justify-center p-8">
-                <div className="font-mono text-[10px] text-accent text-center uppercase tracking-widest mb-2 px-4 py-1 border border-dashed border-accent/20">
-                  {project.features[activeFeatureIdx]?.heading || 'ANALYSIS'}
-                </div>
-                <div className="font-mono text-[9px] text-ink-faint uppercase tracking-tighter mt-4">
-                  Visual Context Generator v1.0
-                </div>
-                <div className="absolute inset-x-12 top-1/2 h-[1px] bg-border-strong/30" />
-                <div className="absolute inset-y-12 left-1/2 w-[1px] bg-border-strong/30" />
+              <div className="relative border border-dashed border-border-strong bg-accent/5 min-h-[220px] flex flex-col justify-between p-4">
+                <VisualContextDiagram project={project} featureIndex={activeFeatureIdx} />
               </div>
 
               <div className="grid grid-cols-2 gap-px bg-border-strong border border-dashed border-border-strong">
