@@ -189,6 +189,18 @@ export const projects: Project[] = [
         heading: "Plan-Apply-Commit Reversible Mitigation",
         body: "Executes non-destructive OS scheduling interventions via setpriority() nice value shifts (+10) outside state locks to eliminate priority inversion. Anchors identity to a (PID, StartTime) tuple to neutralize TOCTOU PID-reuse attacks. Caches pre-mitigation state and automatically rolls back to original priority upon transition back to NORMAL, achieving an 82% reduction in user-visible freezes with zero application restarts or data loss.",
         media: { type: "diagram", label: "Plan-Apply-Commit Protocol" }
+      },
+      {
+        id: "uprs-architecture",
+        heading: "End-to-End Daemon System Architecture",
+        body: "UPRS operates as a 4-tier closed-loop daemon:\n• Tier 1 (Data Acquisition Layer): Queries Mach kernel task_info (macOS) and /proc (Linux) at 100Hz into an O(1) 20-sample RingBuffer with zero memory allocation on the measurement path.\n• Tier 2 (Intelligence Layer): Extracts 46-dimensional statistical moments and cross-signal interaction terms, passing the vector to an optimized CoreML XGBoost tree ensemble that outputs calibrated Softmax probabilities P(Hang) in <5ms.\n• Tier 3 (Decision Layer): Evaluates state transitions across NORMAL, PRE_HANG, and HANG_IMMINENT via asymmetric hysteresis thresholds (0.8 / 0.3) and passes candidates through the deterministic SafetyGate.\n• Tier 4 (Action & Mitigation Layer): Executes TOCTOU-safe Plan-Apply-Commit priority adjustments with transaction logging and automatic rollback upon state normalization.",
+        media: { type: "diagram", label: "End-to-End System Architecture" }
+      },
+      {
+        id: "uprs-novelty-points",
+        heading: "Core Patent Novelties & Technical Claims",
+        body: "Key patent claims under Indian Patent Act 1970:\n1. Predictive Lead-Time Window: Operates in the critical 0.5s–5.0s pre-hang window before the OS WindowServer manifests unresponsiveness (beachball/ANR).\n2. Cross-Signal Contention Analysis: Novel multi-variate metrics (Contention Index, Livelock Detector, I/O Thrashing) isolate lock contention from legitimate heavy compute.\n3. Non-Destructive Reversible Interventions: Modifies thread scheduling priority (+10 nice) with automatic restoration on recovery, avoiding destructive process termination.\n4. TOCTOU & PID-Reuse Neutralization: Binds target identity to a (PID, StartTime) cryptographic tuple, preventing race conditions from recycled process IDs.\n5. Deterministic Safety Gate: Zero-risk exclusion checks blocking interventions on UI Main Threads (TID 0), kernel lock holders, and system daemons (PID < 100).\n6. Intervention-Aware Feedback Neutralization: Downweights training telemetry gathered during active mitigations (0.7x factor) to prevent recursive feedback bias.",
+        media: { type: "diagram", label: "Patent Novelty & Breakthrough Matrix" }
       }
     ],
     links: { github: null, paper: null, demo: null }
@@ -300,6 +312,18 @@ export const projects: Project[] = [
         heading: "Recoverability-Aware Bayesian PINN (RA-BPINN)",
         body: "Addresses the fundamental observability limits in inverse source attribution (y = J_S·S + ε). Standard Bayesian PINNs suffer from spectral bias, hallucinating sources in the mathematical null-space of the observation Jacobian J_S (yielding only 52.1% credible interval coverage). RA-BPINN incorporates the Fisher Information Matrix I = J_S^T R^-1 J_S directly into the prior, quantifying Degrees of Freedom for Signal (DFS) across the Peclet (Pe) and Damköhler (Da) phase boundary to restore posterior coverage to 93.8%.",
         media: { type: "diagram", label: "Observability Null-Space Phase" }
+      },
+      {
+        id: "jointpinn-architecture",
+        heading: "End-to-End Dual-Network Computational Architecture",
+        body: "JointPINN couples two concurrent neural subnets within a unified PyTorch autograd loss graph:\n• Primary Network (AirQualityNet): 9-layer × 128-neuron deep MLP parameterized with Tanh activations, mapping 18-dim spatio-temporal inputs (coordinates, ERA5 meteorology, multi-hour autoregressive lags) to PM2.5 scalar concentration fields C(x, y, t).\n• Auxiliary Diffusivity Network (DiffusivityNet / K-Net): Parallel MLP learning turbulent mixing coefficients K(x, y, t) directly from atmospheric boundary layer physics (u10, v10, 2m temperature, boundary layer height blh).\n• Physics Loss Formulation: Coupled via autograd differentiation enforcing the Advection-Diffusion-Reaction PDE:\n  ∂C/∂t + u·∇C = ∇·(K∇C) + S\n• Joint Optimization: Minimizes L_total = L_data + λ_pde·L_pde + λ_reg·L_reg, ensuring 100.0% physical compliance across extreme winter inversion conditions.",
+        media: { type: "diagram", label: "Dual-Network PDE Architecture" }
+      },
+      {
+        id: "jointpinn-novelty-points",
+        heading: "Core Research Novelties & Breakthrough Points",
+        body: "Fundamental research innovations in physics-informed atmospheric modeling:\n1. Dynamic Diffusivity Field (K-Net): Replaces empirical, static dispersion coefficients with a secondary neural network learning continuous turbulent diffusivity tensors directly from boundary layer meteorology.\n2. Observability Null-Space Isolation (RA-BPINN): Eliminates the severe spectral bias of standard Bayesian PINNs by injecting the Fisher Information Matrix (I = J_S^T R^-1 J_S) into the prior, boosting credible interval coverage from 52.1% to 93.8%.\n3. Information-Theoretic DFS Metric: Formulates Degrees of Freedom for Signal to rigorously demarcate where the inverse source problem is mathematically well-posed across Peclet (Pe) and Damköhler (Da) regimes.\n4. Higher-Order Autograd Compatibility: Mathematically eliminates Laplacian gradient collapse (f''(x)=0 in ReLU) through deep Tanh activation surfaces that sustain second-order spatial diffusion operators.\n5. Inventory-Free Emission Inversion: Discovers unmetered point sources and industrial emission rates without reliance on static, outdated municipal bottom-up inventories.\n6. Multi-Year Empirical Validation: Validated on 7 years (223k samples) across UPPCB stations in Ghaziabad, achieving test R² = 0.926 and RMSE = 21.05 µg/m³, outperforming 19 classical ML baselines (p < 1e-10).",
+        media: { type: "diagram", label: "Research Novelty & Innovation Matrix" }
       }
     ],
     links: { github: null, paper: null, demo: null }

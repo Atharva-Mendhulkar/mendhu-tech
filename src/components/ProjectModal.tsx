@@ -259,7 +259,7 @@ export default function ProjectModal({ activeId, onClose, onMinimize, skipBoot }
                     <h2 className="font-serif text-[18px] md:text-[22px] text-ink font-medium mb-4 md:mb-6 italic">
                       {feature.heading}
                     </h2>
-                    <p className="font-mono text-[11px] md:text-[12px] text-ink-muted leading-[1.8] max-w-[520px]">
+                    <p className="font-mono text-[11px] md:text-[12px] text-ink-muted leading-[1.8] max-w-[520px] whitespace-pre-line">
                       {feature.body}
                     </p>
                   </div>
