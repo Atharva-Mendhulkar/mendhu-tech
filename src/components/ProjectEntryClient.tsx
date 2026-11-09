@@ -21,3 +21,4 @@ export default function ProjectEntryClient({ initialProjectId, initialPosts }: P
 
   return <HomeClient initialPosts={initialPosts} />;
 }
+
