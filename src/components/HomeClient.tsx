@@ -11,6 +11,7 @@ import MinimizedPill from "@/components/MinimizedPill";
 import DraggablePorygon from '@/components/DraggablePorygon';
 import ScrollProgressButtons from "@/components/ScrollProgressButtons";
 import { MediumPost } from "@/lib/medium";
+import { projects } from "@/data/projects";
 
 const GardenModal = dynamic(() => import('@/components/GardenModal'), { ssr: false });
 const ProjectModal = dynamic(() => import('@/components/ProjectModal'), { ssr: false });
@@ -34,12 +35,12 @@ export default function HomeClient({ initialPosts }: { initialPosts: MediumPost[
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Handle URL-based Garden opening (e.g. /garden/some-id rewritten to /?garden=some-id)
+  // Handle URL-based Garden and Project opening (e.g. /?garden=id or /?project=slug)
   useEffect(() => {
-    if (typeof window !== 'undefined' && !hasInitialGardenOpened) {
+    if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const gardenId = params.get('garden');
-      if (gardenId) {
+      if (gardenId && !hasInitialGardenOpened) {
         setActiveGardenFileId(gardenId);
         setIsGardenOpen(true);
         setHasInitialGardenOpened(true);
@@ -47,6 +48,24 @@ export default function HomeClient({ initialPosts }: { initialPosts: MediumPost[
         // Clean up URL to show the clean /garden/id path instead of query params
         const newUrl = `/garden/${gardenId}`;
         window.history.replaceState({}, '', newUrl);
+      }
+
+      const projectParam = params.get('project');
+      if (projectParam) {
+        const matched = projects.find(p => p.slug === projectParam || p.id === projectParam);
+        if (matched) {
+          setActiveModalId(matched.id);
+          const newUrl = `/project/${matched.slug}`;
+          window.history.replaceState({}, '', newUrl);
+        }
+      } else if (window.location.pathname.startsWith('/project/')) {
+        const pathSlug = window.location.pathname.replace('/project/', '').split('/')[0];
+        if (pathSlug) {
+          const matched = projects.find(p => p.slug === pathSlug || p.id === pathSlug);
+          if (matched) {
+            setActiveModalId(matched.id);
+          }
+        }
       }
     }
   }, [hasInitialGardenOpened]);
@@ -64,9 +83,33 @@ export default function HomeClient({ initialPosts }: { initialPosts: MediumPost[
     return () => window.removeEventListener("open-garden-file", handler);
   }, []);
 
+  // Listen for custom project open events (from ProjectEntryClient)
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const { projectId } = (e as CustomEvent<{ projectId: string }>).detail;
+      if (projectId) {
+        const matched = projects.find(p => p.slug === projectId || p.id === projectId);
+        if (matched) {
+          setActiveModalId(matched.id);
+        }
+      }
+    };
+    window.addEventListener("open-project-modal", handler);
+    return () => window.removeEventListener("open-project-modal", handler);
+  }, []);
+
   const handleMinimizeModal = (id: string, title: string, type: 'garden' | 'project') => {
-    if (type === 'garden') setIsGardenOpen(false);
-    else setActiveModalId(null);
+    if (type === 'garden') {
+      setIsGardenOpen(false);
+      if (typeof window !== 'undefined' && window.location.pathname.startsWith('/garden')) {
+        window.history.replaceState({}, '', '/');
+      }
+    } else {
+      setActiveModalId(null);
+      if (typeof window !== 'undefined' && window.location.pathname.startsWith('/project')) {
+        window.history.replaceState({}, '', '/');
+      }
+    }
     setRestoredId(null);
     
     if (!minimizedItems.find(item => item.id === id)) {
@@ -76,8 +119,18 @@ export default function HomeClient({ initialPosts }: { initialPosts: MediumPost[
 
   const handleRestoreModal = (id: string, type: 'garden' | 'project') => {
     setRestoredId(id);
-    if (type === 'garden') setIsGardenOpen(true);
-    else setActiveModalId(id);
+    if (type === 'garden') {
+      setIsGardenOpen(true);
+      if (typeof window !== 'undefined') {
+        window.history.replaceState({}, '', `/garden/${id}`);
+      }
+    } else {
+      setActiveModalId(id);
+      if (typeof window !== 'undefined') {
+        const matched = projects.find(item => item.id === id || item.slug === id);
+        if (matched) window.history.replaceState({}, '', `/project/${matched.slug}`);
+      }
+    }
     
     setMinimizedItems(prev => prev.filter(item => item.id !== id));
   };
@@ -260,7 +313,12 @@ export default function HomeClient({ initialPosts }: { initialPosts: MediumPost[
       />
       <ProjectModal 
         activeId={activeModalId} 
-        onClose={() => setActiveModalId(null)}
+        onClose={() => {
+          setActiveModalId(null);
+          if (typeof window !== 'undefined' && (window.location.pathname.startsWith('/project') || window.location.search.includes('project='))) {
+            window.history.replaceState({}, '', '/');
+          }
+        }}
         onMinimize={(id, title) => handleMinimizeModal(id, title, 'project')}
         skipBoot={restoredId === activeModalId}
       />

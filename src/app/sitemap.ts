@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { getMediumPosts } from '@/lib/medium';
+import { projects } from '@/data/projects';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.mendhu.tech';
@@ -11,6 +12,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: new Date(post.pubDate),
     changeFrequency: 'weekly' as const,
     priority: 0.8,
+  }));
+
+  const projectUrls = projects.map((project) => ({
+    url: `${baseUrl}/project/${project.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.85,
   }));
 
   return [
@@ -26,6 +34,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.9,
     },
+    ...projectUrls,
     ...blogUrls,
   ];
 }

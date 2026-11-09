@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from 'react';
-import { ExternalLink, Minus, X, Terminal, ChevronDown, ChevronUp, Layout } from 'lucide-react';
+import { ExternalLink, Minus, X, Terminal, ChevronDown, ChevronUp, Layout, Share2, Check } from 'lucide-react';
 import { projects, Project } from '@/data/projects';
 import VisualContextDiagram from '@/components/VisualContextDiagram';
 
@@ -20,6 +20,7 @@ export default function ProjectModal({ activeId, onClose, onMinimize, skipBoot }
   const [activeFeatureIdx, setActiveFeatureIdx] = useState(0);
   const [localFeatureIdx, setLocalFeatureIdx] = useState(0); // For mobile independent swiping
   const [showMetrics, setShowMetrics] = useState(false);
+  const [copied, setCopied] = useState(false);
   const project = projects.find(p => p.id === activeId);
   
   const featureRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -70,6 +71,44 @@ export default function ProjectModal({ activeId, onClose, onMinimize, skipBoot }
   useEffect(() => {
     setLocalFeatureIdx(activeFeatureIdx);
   }, [activeFeatureIdx]);
+
+  // Synchronize browser URL to /project/[slug] when modal is active in detail mode
+  useEffect(() => {
+    if (modalState === 'detail' && project && typeof window !== 'undefined') {
+      const expectedPath = `/project/${project.slug}`;
+      if (window.location.pathname !== expectedPath) {
+        window.history.replaceState({}, '', expectedPath);
+      }
+    }
+  }, [modalState, project]);
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!project) return;
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.mendhu.tech';
+    const shareUrl = `${origin}/project/${project.slug}`;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(shareUrl);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = shareUrl;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      window.dispatchEvent(
+        new CustomEvent("show-toast", {
+          detail: { message: `Link copied: /project/${project.slug}` }
+        })
+      );
+    } catch (err) {
+      console.error("Failed to copy link:", err);
+    }
+  };
 
   useEffect(() => {
     if (modalState !== 'detail') return;
@@ -132,6 +171,21 @@ export default function ProjectModal({ activeId, onClose, onMinimize, skipBoot }
               <Layout size={11} />
               <span>{showMetrics ? 'HIDE' : 'ANALYZE'}</span>
             </button>
+
+            <button 
+              onClick={handleShare}
+              title="Copy shareable link"
+              aria-label="Copy shareable project link"
+              className={`font-mono text-[9px] px-2.5 py-1.5 transition-all cursor-pointer flex items-center gap-1.5 shrink-0 border ${
+                copied 
+                  ? 'bg-green-500/10 text-green-600 border-green-500/40 border-solid' 
+                  : 'text-ink-muted hover:text-accent border-dashed border-border-strong hover:bg-accent-light hover:border-solid hover:border-accent'
+              }`}
+            >
+              {copied ? <Check size={11} className="text-green-600" /> : <Share2 size={11} />}
+              <span>{copied ? 'COPIED' : 'SHARE'}</span>
+            </button>
+
             {project.links.demo && (
               <a 
                 href={project.links.demo} 
