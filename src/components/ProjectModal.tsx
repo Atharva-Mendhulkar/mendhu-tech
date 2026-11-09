@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { ExternalLink, Minus, X, Terminal, ChevronDown, ChevronUp, Layout, Share2, Check } from 'lucide-react';
 import { projects, Project } from '@/data/projects';
 import VisualContextDiagram from '@/components/VisualContextDiagram';
+import MermaidBlock from '@/components/MermaidBlock';
 
 interface ProjectModalProps {
   activeId: string | null;
@@ -316,6 +317,13 @@ export default function ProjectModal({ activeId, onClose, onMinimize, skipBoot }
                     <p className="font-mono text-[11px] md:text-[12px] text-ink-muted leading-[1.8] max-w-[520px]">
                       {feature.body}
                     </p>
+
+                    {feature.mermaid && (
+                      <MermaidBlock 
+                        chart={feature.mermaid} 
+                        caption={`${feature.heading.toUpperCase()} // SYSTEM_GRAPH`}
+                      />
+                    )}
                   </div>
                 ))}
               </div>

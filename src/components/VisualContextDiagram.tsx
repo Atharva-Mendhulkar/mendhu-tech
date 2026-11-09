@@ -128,32 +128,30 @@ function renderDiagram(projectId: string, featureId: string, idx: number, marker
       return (
         <g>
           {/* Edge Perimeter */}
-          <rect x="10" y="35" width="75" height="42" rx="3" className="fill-card stroke-border-strong" strokeDasharray="2 2" />
-          <text x="47" y="52" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">EDGE INGRESS</text>
-          <text x="47" y="62" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">CloudFront + ALB</text>
-          <text x="47" y="71" textAnchor="middle" className="font-mono text-[6px] fill-accent">SigV4 + SSL</text>
+          <rect x="10" y="30" width="80" height="40" rx="3" className="fill-card stroke-border-strong" strokeDasharray="2 2" />
+          <text x="50" y="48" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">EDGE INGRESS</text>
+          <text x="50" y="59" textAnchor="middle" className="font-mono text-[6.5px] fill-accent font-medium">CloudFront + ALB</text>
 
           {/* VPC App Subnets */}
-          <rect x="115" y="20" width="105" height="68" rx="3" className="fill-card stroke-accent" />
-          <text x="167" y="34" textAnchor="middle" className="font-mono text-[8px] fill-accent font-bold">VPC PRIVATE SUBNETS</text>
-          <text x="167" y="47" textAnchor="middle" className="font-mono text-[7px] fill-current">ECS Fargate Cluster</text>
-          <text x="167" y="58" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">Multi-AZ (Task 1 &amp; 2)</text>
-          <text x="167" y="74" textAnchor="middle" className="font-mono text-[6px] fill-accent">Fastify Monolith :3000</text>
+          <rect x="115" y="24" width="105" height="52" rx="3" className="fill-card stroke-accent" />
+          <text x="167" y="44" textAnchor="middle" className="font-mono text-[8px] fill-accent font-bold">VPC FARGATE</text>
+          <text x="167" y="56" textAnchor="middle" className="font-mono text-[6.5px] fill-current">Fastify Monolith :3000</text>
+          <text x="167" y="66" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">Multi-AZ Subnets</text>
 
           {/* Isolated Data Tier */}
-          <rect x="250" y="15" width="80" height="34" rx="3" className="fill-card stroke-border-strong" />
-          <text x="290" y="29" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">RDS POSTGRES 16</text>
-          <text x="290" y="40" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">Multi-AZ Standby</text>
+          <rect x="245" y="18" width="85" height="30" rx="3" className="fill-card stroke-border-strong" />
+          <text x="287" y="32" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">RDS POSTGRES</text>
+          <text x="287" y="41" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">Multi-AZ Standby</text>
 
-          <rect x="250" y="60" width="80" height="34" rx="3" className="fill-card stroke-border-strong" strokeDasharray="2 2" />
-          <text x="290" y="74" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">DYNAMODB</text>
-          <text x="290" y="85" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">WS Connection TTL</text>
+          <rect x="245" y="54" width="85" height="30" rx="3" className="fill-card stroke-border-strong" strokeDasharray="2 2" />
+          <text x="287" y="68" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">DYNAMODB</text>
+          <text x="287" y="77" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">WebSocket Registry</text>
 
           {/* Arrows */}
-          <line x1="85" y1="56" x2="113" y2="56" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
-          <line x1="220" y1="42" x2="248" y2="32" className="stroke-accent" markerEnd={`url(#${markerId}-accent)`} />
-          <line x1="220" y1="62" x2="248" y2="72" className="stroke-border-strong" markerEnd={`url(#${markerId})`} />
-          <text x="167" y="106" textAnchor="middle" className="font-mono text-[7px] fill-ink-muted">10.0.0.0/16 &middot; ZERO PUBLIC DATA ACCESS</text>
+          <line x1="90" y1="50" x2="113" y2="50" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
+          <line x1="220" y1="42" x2="243" y2="33" className="stroke-accent" markerEnd={`url(#${markerId}-accent)`} />
+          <line x1="220" y1="58" x2="243" y2="69" className="stroke-border-strong" markerEnd={`url(#${markerId})`} />
+          <text x="170" y="98" textAnchor="middle" className="font-mono text-[7px] fill-ink-muted">DECOUPLED MULTI-AZ AWS INFRASTRUCTURE</text>
         </g>
       );
     }
@@ -169,23 +167,23 @@ function renderDiagram(projectId: string, featureId: string, idx: number, marker
           {/* SQS FIFO */}
           <rect x="115" y="30" width="95" height="36" rx="3" className="fill-card stroke-accent" />
           <text x="162" y="46" textAnchor="middle" className="font-mono text-[8px] fill-accent font-bold">SQS FIFO QUEUE</text>
-          <text x="162" y="57" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">focus-completion.fifo</text>
+          <text x="162" y="57" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">Strict Ordering</text>
 
           {/* Worker Pool */}
           <rect x="240" y="15" width="90" height="32" rx="3" className="fill-card stroke-border-strong" />
           <text x="285" y="29" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">WORKER POOL</text>
-          <text x="285" y="39" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">20s Long Polling</text>
+          <text x="285" y="39" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">Long Polling</text>
 
           {/* DLQ */}
           <rect x="240" y="65" width="90" height="32" rx="3" className="fill-card stroke-border-strong" strokeDasharray="3 2" />
           <text x="285" y="79" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">DEAD-LETTER (DLQ)</text>
-          <text x="285" y="89" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-faint">Fail &gt; 3 &middot; 14d Retain</text>
+          <text x="285" y="89" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-faint">Fail &gt; 3 Retries</text>
 
           {/* Connectors */}
           <line x1="90" y1="48" x2="113" y2="48" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
           <line x1="210" y1="40" x2="238" y2="31" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
           <line x1="210" y1="56" x2="238" y2="76" className="stroke-border-strong" strokeDasharray="2 2" markerEnd={`url(#${markerId})`} />
-          <text x="165" y="112" textAnchor="middle" className="font-mono text-[7px] fill-ink-muted">GUARANTEED ORDERING + AT-LEAST-ONCE DLQ</text>
+          <text x="165" y="104" textAnchor="middle" className="font-mono text-[7px] fill-ink-muted">ASYNC FIFO QUEUE &amp; DLQ ISOLATION</text>
         </g>
       );
     }
@@ -203,23 +201,23 @@ function renderDiagram(projectId: string, featureId: string, idx: number, marker
         <line x1="49" y1="35" x2="69" y2="35" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
 
         {/* 3-Color Engine */}
-        <rect x="125" y="15" width="105" height="58" rx="3" className="fill-card stroke-accent" />
-        <text x="177" y="30" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">3-COLOR DFS ENGINE</text>
-        <text x="177" y="44" textAnchor="middle" className="font-mono text-[6.5px] fill-current">VISITING &rarr; Back Edge?</text>
-        <text x="177" y="58" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">Detects Cycles (A&rarr;B&rarr;A)</text>
+        <rect x="125" y="18" width="105" height="52" rx="3" className="fill-card stroke-accent" />
+        <text x="177" y="35" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">3-COLOR DFS</text>
+        <text x="177" y="47" textAnchor="middle" className="font-mono text-[6.5px] fill-current">Cycle Detection</text>
+        <text x="177" y="58" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">Topological Sort</text>
 
         {/* Verdicts */}
-        <rect x="250" y="15" width="80" height="26" rx="3" className="fill-card stroke-accent" />
-        <text x="290" y="31" textAnchor="middle" className="font-mono text-[7px] fill-accent font-bold">ACYCLIC // OK</text>
+        <rect x="250" y="18" width="80" height="24" rx="3" className="fill-card stroke-accent" />
+        <text x="290" y="34" textAnchor="middle" className="font-mono text-[7px] fill-accent font-bold">ACYCLIC // OK</text>
 
-        <rect x="250" y="50" width="80" height="26" rx="3" className="fill-card stroke-border-strong" strokeDasharray="2 2" />
-        <text x="290" y="66" textAnchor="middle" className="font-mono text-[7px] fill-current">CYCLE &rarr; 400 ERR</text>
+        <rect x="250" y="48" width="80" height="24" rx="3" className="fill-card stroke-border-strong" strokeDasharray="2 2" />
+        <text x="290" y="64" textAnchor="middle" className="font-mono text-[7px] fill-current">CYCLE &rarr; 400</text>
 
         <line x1="99" y1="35" x2="123" y2="35" className="stroke-accent" markerEnd={`url(#${markerId}-accent)`} />
         <line x1="230" y1="30" x2="248" y2="28" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
         <line x1="230" y1="52" x2="248" y2="60" className="stroke-border-strong" markerEnd={`url(#${markerId})`} />
         
-        <text x="170" y="102" textAnchor="middle" className="font-mono text-[7px] fill-ink-muted">TOPOLOGICAL CRITICAL PATH + BEDROCK NARRATIVE</text>
+        <text x="170" y="98" textAnchor="middle" className="font-mono text-[7px] fill-ink-muted">DIRECTED ACYCLIC GRAPH VALIDATION</text>
       </g>
     );
   }
@@ -500,28 +498,25 @@ function renderDiagram(projectId: string, featureId: string, idx: number, marker
       return (
         <g>
           {/* Output text */}
-          <rect x="10" y="25" width="80" height="42" rx="3" className="fill-card stroke-border-strong" />
-          <text x="50" y="41" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">MODEL OUTPUT</text>
-          <text x="50" y="52" textAnchor="middle" className="font-mono text-[6px] fill-accent">&lt;think&gt; ... &lt;/think&gt;</text>
-          <text x="50" y="60" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">&lt;answer&gt; ... &lt;/answer&gt;</text>
+          <rect x="10" y="28" width="80" height="36" rx="3" className="fill-card stroke-border-strong" />
+          <text x="50" y="44" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">MODEL TRACE</text>
+          <text x="50" y="54" textAnchor="middle" className="font-mono text-[6.5px] fill-accent">&lt;think&gt; ... &lt;/think&gt;</text>
 
           {/* Regex & SymPy */}
-          <rect x="115" y="15" width="115" height="62" rx="3" className="fill-card stroke-accent" />
-          <text x="172" y="31" textAnchor="middle" className="font-mono text-[8px] fill-accent font-bold">ZERO-PRM VERIFIERS</text>
-          <text x="172" y="44" textAnchor="middle" className="font-mono text-[6.5px] fill-current">R_struct: XML Tag Regex</text>
-          <text x="172" y="54" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">&lt;decompose&gt; &lt;compute&gt;</text>
-          <text x="172" y="66" textAnchor="middle" className="font-mono text-[6.5px] fill-accent font-medium">R_outcome: SymPy Numeric</text>
+          <rect x="115" y="20" width="115" height="52" rx="3" className="fill-card stroke-accent" />
+          <text x="172" y="36" textAnchor="middle" className="font-mono text-[8px] fill-accent font-bold">ZERO-PRM VERIFIERS</text>
+          <text x="172" y="48" textAnchor="middle" className="font-mono text-[6.5px] fill-current">XML Structural Regex</text>
+          <text x="172" y="58" textAnchor="middle" className="font-mono text-[6.5px] fill-accent font-medium">SymPy Numeric Check</text>
 
           {/* Composite Reward */}
-          <rect x="250" y="25" width="80" height="42" rx="3" className="fill-card stroke-accent" />
-          <text x="290" y="41" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">COMPOSITE REWARD</text>
-          <text x="290" y="52" textAnchor="middle" className="font-mono text-[6.5px] fill-current">R &isin; [&minus;2.0, 2.0]</text>
-          <text x="290" y="60" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">GDPO Annealed Noise</text>
+          <rect x="250" y="28" width="80" height="36" rx="3" className="fill-card stroke-accent" />
+          <text x="290" y="44" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">REWARD</text>
+          <text x="290" y="54" textAnchor="middle" className="font-mono text-[6.5px] fill-current">R &isin; [&minus;2.0, 2.0]</text>
 
           <line x1="90" y1="46" x2="113" y2="46" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
           <line x1="230" y1="46" x2="248" y2="46" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
 
-          <text x="170" y="105" textAnchor="middle" className="font-mono text-[7px] fill-ink-muted">NO EXPENSIVE REWARD MODELS &middot; STRICT FORMAL VERIFICATION</text>
+          <text x="170" y="98" textAnchor="middle" className="font-mono text-[7px] fill-ink-muted">DETERMINISTIC FORMAL VERIFICATION</text>
         </g>
       );
     }
@@ -530,23 +525,22 @@ function renderDiagram(projectId: string, featureId: string, idx: number, marker
     return (
       <g>
         <rect x="10" y="30" width="75" height="36" rx="3" className="fill-card stroke-border-strong" />
-        <text x="47" y="46" textAnchor="middle" className="font-mono text-[7px] fill-current font-bold">ROLLOUT STEP</text>
+        <text x="47" y="46" textAnchor="middle" className="font-mono text-[7px] fill-current font-bold">ROLLOUT</text>
         <text x="47" y="56" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">Capture Logprobs</text>
 
-        <rect x="110" y="20" width="115" height="56" rx="3" className="fill-card stroke-accent" />
-        <text x="167" y="36" textAnchor="middle" className="font-mono text-[8px] fill-accent font-bold">&pi;_ref = &pi;_old DESIGN</text>
-        <text x="167" y="49" textAnchor="middle" className="font-mono text-[6.5px] fill-current">Eliminate Frozen Reference</text>
-        <text x="167" y="59" textAnchor="middle" className="font-mono text-[7px] fill-accent font-bold">&minus;1.8 GB VRAM SAVED</text>
-        <text x="167" y="68" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">Exact KL Divergence Alignment</text>
+        <rect x="110" y="24" width="115" height="48" rx="3" className="fill-card stroke-accent" />
+        <text x="167" y="40" textAnchor="middle" className="font-mono text-[8px] fill-accent font-bold">&pi;_ref = &pi;_old</text>
+        <text x="167" y="52" textAnchor="middle" className="font-mono text-[7px] fill-accent font-bold">&minus;1.8 GB VRAM SAVED</text>
+        <text x="167" y="62" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">No Frozen Reference</text>
 
         <rect x="245" y="30" width="85" height="36" rx="3" className="fill-card stroke-accent" />
-        <text x="287" y="46" textAnchor="middle" className="font-mono text-[7px] fill-accent font-bold">G=8 ON CONSUMER GPU</text>
-        <text x="287" y="56" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">P100 / T4 / M4 Unified</text>
+        <text x="287" y="46" textAnchor="middle" className="font-mono text-[7px] fill-accent font-bold">G=8 ROLLOUTS</text>
+        <text x="287" y="56" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">Consumer GPU</text>
 
         <line x1="85" y1="48" x2="108" y2="48" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
         <line x1="225" y1="48" x2="243" y2="48" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
 
-        <text x="170" y="105" textAnchor="middle" className="font-mono text-[7px] fill-ink-muted">DEDICATED FORWARD PASS PREVENTS KL-DRIFT DRIFT BUGS</text>
+        <text x="170" y="98" textAnchor="middle" className="font-mono text-[7px] fill-ink-muted">ONLINE REFERENCE-FREE POLICY GRADIENTS</text>
       </g>
     );
   }
@@ -668,39 +662,31 @@ function renderDiagram(projectId: string, featureId: string, idx: number, marker
       return (
         <g>
           {/* Layer 1: Data */}
-          <rect x="6" y="14" width="74" height="52" rx="3" className="fill-card stroke-border-strong" />
-          <text x="43" y="28" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">1. ACQUISITION</text>
-          <text x="43" y="39" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">{"Mach / /proc @ 100Hz"}</text>
-          <text x="43" y="49" textAnchor="middle" className="font-mono text-[6px] fill-accent font-bold">20-Slot RingBuffer</text>
-          <text x="43" y="58" textAnchor="middle" className="font-mono text-[5.5px] fill-ink-faint">Zero-Alloc Path</text>
+          <rect x="6" y="20" width="74" height="44" rx="3" className="fill-card stroke-border-strong" />
+          <text x="43" y="38" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">1. INGEST</text>
+          <text x="43" y="50" textAnchor="middle" className="font-mono text-[6.5px] fill-accent font-medium">Mach 100Hz</text>
 
           {/* Layer 2: Intelligence */}
-          <rect x="88" y="14" width="76" height="52" rx="3" className="fill-card stroke-accent" />
-          <text x="126" y="28" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">2. INTELLIGENCE</text>
-          <text x="126" y="39" textAnchor="middle" className="font-mono text-[6.5px] fill-current">46D Feature Vector</text>
-          <text x="126" y="49" textAnchor="middle" className="font-mono text-[6px] fill-accent font-bold">XGBoost CoreML</text>
-          <text x="126" y="58" textAnchor="middle" className="font-mono text-[5.5px] fill-ink-muted">{"Softmax P(Hang) < 5ms"}</text>
+          <rect x="88" y="20" width="76" height="44" rx="3" className="fill-card stroke-accent" />
+          <text x="126" y="38" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">2. XGBOOST</text>
+          <text x="126" y="50" textAnchor="middle" className="font-mono text-[6.5px] fill-current">P(Hang) &lt; 5ms</text>
 
           {/* Layer 3: Decision */}
-          <rect x="172" y="14" width="76" height="52" rx="3" className="fill-card stroke-accent" />
-          <text x="210" y="28" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">3. DECISION</text>
-          <text x="210" y="39" textAnchor="middle" className="font-mono text-[6.5px] fill-current">Hysteresis (0.8 / 0.3)</text>
-          <text x="210" y="49" textAnchor="middle" className="font-mono text-[6px] fill-accent font-bold">SafetyGate Filter</text>
-          <text x="210" y="58" textAnchor="middle" className="font-mono text-[5.5px] fill-ink-muted">TID 0 / Lock Guard</text>
+          <rect x="172" y="20" width="76" height="44" rx="3" className="fill-card stroke-accent" />
+          <text x="210" y="38" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">3. SAFETY</text>
+          <text x="210" y="50" textAnchor="middle" className="font-mono text-[6.5px] fill-current">TID 0 Filter</text>
 
           {/* Layer 4: Action */}
-          <rect x="256" y="14" width="78" height="52" rx="3" className="fill-card stroke-border-strong" />
-          <text x="295" y="28" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">4. ACTION LAYER</text>
-          <text x="295" y="39" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">Plan-Apply-Commit</text>
-          <text x="295" y="49" textAnchor="middle" className="font-mono text-[6px] fill-accent font-bold">Nice +10 Shift</text>
-          <text x="295" y="58" textAnchor="middle" className="font-mono text-[5.5px] fill-ink-faint">Auto-Rollback Bus</text>
+          <rect x="256" y="20" width="78" height="44" rx="3" className="fill-card stroke-border-strong" />
+          <text x="295" y="38" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">4. ACTION</text>
+          <text x="295" y="50" textAnchor="middle" className="font-mono text-[6.5px] fill-accent font-bold">Nice +10 Shift</text>
 
-          <line x1="80" y1="40" x2="86" y2="40" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
-          <line x1="164" y1="40" x2="170" y2="40" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
-          <line x1="248" y1="40" x2="254" y2="40" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
-          <path d="M 295 68 L 295 86 L 43 86 L 43 68" className="stroke-border-strong anim-flow" fill="none" strokeDasharray="3 3" markerEnd={`url(#${markerId})`} />
+          <line x1="80" y1="42" x2="86" y2="42" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
+          <line x1="164" y1="42" x2="170" y2="42" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
+          <line x1="248" y1="42" x2="254" y2="42" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
+          <path d="M 295 64 L 295 80 L 43 80 L 43 64" className="stroke-border-strong anim-flow" fill="none" strokeDasharray="3 3" markerEnd={`url(#${markerId})`} />
 
-          <text x="170" y="105" textAnchor="middle" className="font-mono text-[7px] fill-ink-muted">CLOSED-LOOP ARCHITECTURE: 4-TIER DAEMON WITH PREDICTIVE LEAD &amp; ZERO DATA LOSS</text>
+          <text x="170" y="98" textAnchor="middle" className="font-mono text-[7px] fill-ink-muted">CLOSED-LOOP PREDICTIVE MITIGATION DAEMON</text>
         </g>
       );
     }
@@ -709,23 +695,18 @@ function renderDiagram(projectId: string, featureId: string, idx: number, marker
     return (
       <g>
         {/* Prior Art Column */}
-        <rect x="10" y="14" width="150" height="58" rx="3" className="fill-card stroke-border-strong" />
-        <text x="85" y="28" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">PRIOR ART (REACTIVE WATCHDOG)</text>
-        <text x="85" y="40" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">• 4s–5s Delay (WindowServer Beachball)</text>
-        <text x="85" y="50" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">• Destructive OOM / Force-Quit Data Loss</text>
-        <text x="85" y="60" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">• Coarse System-Wide Aggregate Metrics</text>
+        <rect x="15" y="22" width="145" height="48" rx="3" className="fill-card stroke-border-strong" />
+        <text x="87" y="38" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">PRIOR ART (REACTIVE)</text>
+        <text x="87" y="50" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">4s-5s Delay · Destructive Kill</text>
 
         {/* UPRS Patent Column */}
-        <rect x="175" y="14" width="155" height="58" rx="3" className="fill-card stroke-accent" />
-        <text x="252" y="28" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">UPRS NOVELTY (PATENT-PENDING)</text>
-        <text x="252" y="40" textAnchor="middle" className="font-mono text-[6.5px] fill-current">• 0.5s–5.0s Pre-Hang Predictive Window</text>
-        <text x="252" y="50" textAnchor="middle" className="font-mono text-[6.5px] fill-current">• Cross-Signals: Contention = Lock × Queue</text>
-        <text x="252" y="60" textAnchor="middle" className="font-mono text-[6.5px] fill-accent font-bold">• Non-Destructive Reversible Priority Shift</text>
+        <rect x="180" y="22" width="145" height="48" rx="3" className="fill-card stroke-accent" />
+        <text x="252" y="38" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">UPRS NOVELTY (PATENT)</text>
+        <text x="252" y="50" textAnchor="middle" className="font-mono text-[6.5px] fill-current">0.5-5.0s Lead · Reversible Shift</text>
 
-        <line x1="160" y1="43" x2="173" y2="43" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
+        <line x1="160" y1="46" x2="178" y2="46" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
 
-        <text x="170" y="93" textAnchor="middle" className="font-mono text-[7px] fill-accent font-bold">{"VALIDATED: 92.5% PRECISION · 82% FREEZE REDUCTION · <0.5% CPU OVERHEAD"}</text>
-        <text x="170" y="105" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">INDIAN PATENT ACT 1970 · TOCTOU IMMUNITY · INTERVENTION-AWARE DRIFT GUARD</text>
+        <text x="170" y="94" textAnchor="middle" className="font-mono text-[7px] fill-accent font-bold">92.5% PRECISION · 82% FREEZE REDUCTION</text>
       </g>
     );
   }
@@ -844,35 +825,31 @@ function renderDiagram(projectId: string, featureId: string, idx: number, marker
       return (
         <g>
           {/* Inputs Box */}
-          <rect x="6" y="18" width="76" height="54" rx="3" className="fill-card stroke-border-strong" />
-          <text x="44" y="32" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">18-DIM INPUTS</text>
-          <text x="44" y="43" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">(x, y, t) Spatio-Temporal</text>
-          <text x="44" y="53" textAnchor="middle" className="font-mono text-[6px] fill-accent font-bold">ERA5 Reanalysis</text>
-          <text x="44" y="63" textAnchor="middle" className="font-mono text-[5.5px] fill-ink-faint">AR Lags (1h, 6h, 24h)</text>
+          <rect x="10" y="25" width="70" height="42" rx="3" className="fill-card stroke-border-strong" />
+          <text x="45" y="42" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">18D INPUTS</text>
+          <text x="45" y="53" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">ERA5 Weather</text>
 
           {/* Primary Net */}
-          <rect x="94" y="8" width="114" height="34" rx="3" className="fill-card stroke-accent" />
-          <text x="151" y="21" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">AIRQUALITYNET (9 × 128)</text>
-          <text x="151" y="32" textAnchor="middle" className="font-mono text-[6.5px] fill-current">Tanh Activation · C(x,y,t)</text>
+          <rect x="95" y="14" width="115" height="30" rx="3" className="fill-card stroke-accent" />
+          <text x="152" y="28" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">AIRQUALITYNET</text>
+          <text x="152" y="37" textAnchor="middle" className="font-mono text-[6px] fill-current">9x128 Tanh (Smooth ∇²)</text>
 
           {/* Diffusivity Net */}
-          <rect x="94" y="48" width="114" height="34" rx="3" className="fill-card stroke-accent" />
-          <text x="151" y="61" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">DIFFUSIVITYNET (K-NET)</text>
-          <text x="151" y="72" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">Turbulent Tensor K(x,y,t)</text>
+          <rect x="95" y="48" width="115" height="30" rx="3" className="fill-card stroke-accent" />
+          <text x="152" y="62" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">K-NET DIFFUSIVITY</text>
+          <text x="152" y="71" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">Dynamic Mixing Tensor</text>
 
           {/* Coupled Loss */}
-          <rect x="220" y="12" width="114" height="66" rx="3" className="fill-card stroke-border-strong" />
-          <text x="277" y="27" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">PDE LOSS GRAPH</text>
-          <text x="277" y="40" textAnchor="middle" className="font-mono text-[6.5px] fill-accent font-bold">∂C/∂t + u·∇C = ∇·(K∇C) + S</text>
-          <text x="277" y="52" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">Autograd Differentiation</text>
-          <text x="277" y="64" textAnchor="middle" className="font-mono text-[6px] fill-accent font-medium">100% Mass Conserved</text>
+          <rect x="225" y="25" width="105" height="42" rx="3" className="fill-card stroke-border-strong" />
+          <text x="277" y="42" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">AUTOGRAD PDE</text>
+          <text x="277" y="53" textAnchor="middle" className="font-mono text-[6.5px] fill-accent font-bold">100% Mass Conserved</text>
 
-          <line x1="82" y1="36" x2="92" y2="25" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
-          <line x1="82" y1="52" x2="92" y2="65" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
-          <line x1="208" y1="25" x2="218" y2="36" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
-          <line x1="208" y1="65" x2="218" y2="52" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
+          <line x1="80" y1="38" x2="93" y2="28" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
+          <line x1="80" y1="54" x2="93" y2="63" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
+          <line x1="210" y1="28" x2="223" y2="38" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
+          <line x1="210" y1="63" x2="223" y2="54" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
 
-          <text x="170" y="105" textAnchor="middle" className="font-mono text-[7px] fill-ink-muted">DUAL-NETWORK CONVERGENCE: AIRQUALITYNET &amp; K-NET IN UNIFIED AUTOGRAD GRAPH</text>
+          <text x="170" y="98" textAnchor="middle" className="font-mono text-[7px] fill-ink-muted">DUAL-NETWORK AUTOGRAD PDE CONVERGENCE</text>
         </g>
       );
     }
@@ -881,28 +858,21 @@ function renderDiagram(projectId: string, featureId: string, idx: number, marker
     return (
       <g>
         {/* Card 1 */}
-        <rect x="6" y="14" width="102" height="60" rx="3" className="fill-card stroke-accent" />
-        <text x="57" y="28" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">1. DYNAMIC K-NET</text>
-        <text x="57" y="40" textAnchor="middle" className="font-mono text-[6.5px] fill-current">Learned Dispersion</text>
-        <text x="57" y="51" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">Inventory-Free Source</text>
-        <text x="57" y="62" textAnchor="middle" className="font-mono text-[6px] fill-accent font-medium">Replaces Static K</text>
+        <rect x="12" y="20" width="98" height="48" rx="3" className="fill-card stroke-accent" />
+        <text x="61" y="38" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">1. DYNAMIC K-NET</text>
+        <text x="61" y="51" textAnchor="middle" className="font-mono text-[6.5px] fill-current">Learned Mixing</text>
 
         {/* Card 2 */}
-        <rect x="118" y="14" width="104" height="60" rx="3" className="fill-card stroke-accent" />
-        <text x="170" y="28" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">2. RA-BPINN PRIOR</text>
-        <text x="170" y="40" textAnchor="middle" className="font-mono text-[6.5px] fill-current">Fisher Info Matrix</text>
-        <text x="170" y="51" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">DFS Null-Space Guard</text>
-        <text x="170" y="62" textAnchor="middle" className="font-mono text-[6px] fill-accent font-bold">52.1% → 93.8% UQ</text>
+        <rect x="121" y="20" width="98" height="48" rx="3" className="fill-card stroke-accent" />
+        <text x="170" y="38" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">2. RA-BPINN</text>
+        <text x="170" y="51" textAnchor="middle" className="font-mono text-[6.5px] fill-current">93.8% UQ Coverage</text>
 
         {/* Card 3 */}
-        <rect x="232" y="14" width="102" height="60" rx="3" className="fill-card stroke-border-strong" />
-        <text x="283" y="28" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">3. 7-YR BENCHMARK</text>
-        <text x="283" y="40" textAnchor="middle" className="font-mono text-[6.5px] fill-accent font-bold">Test R² = 0.926</text>
-        <text x="283" y="51" textAnchor="middle" className="font-mono text-[6px] fill-current">RMSE 21.05 µg/m³</text>
-        <text x="283" y="62" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">{"p < 1e-10 vs 19 MLs"}</text>
+        <rect x="230" y="20" width="98" height="48" rx="3" className="fill-card stroke-border-strong" />
+        <text x="279" y="38" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">3. 7-YR BENCHMARK</text>
+        <text x="279" y="51" textAnchor="middle" className="font-mono text-[6.5px] fill-accent font-bold">R² = 0.926</text>
 
-        <text x="170" y="93" textAnchor="middle" className="font-mono text-[7px] fill-accent font-bold">NOVELTY: ELIMINATES SPECTRAL BIAS &amp; ENFORCES CONTINUOUS HIGHER-ORDER PDEs</text>
-        <text x="170" y="105" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">223K HOURLY SAMPLES · 100.0% MASS CONSERVATION · INVERSE NULL-SPACE QUANTIFIED</text>
+        <text x="170" y="94" textAnchor="middle" className="font-mono text-[7px] fill-accent font-bold">CONTINUOUS HIGHER-ORDER PDE SOURCE ATTRIBUTION</text>
       </g>
     );
   }

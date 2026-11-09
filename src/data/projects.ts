@@ -3,6 +3,7 @@ export interface Feature {
   heading: string;
   body: string;
   media: { type: string; label: string };
+  mermaid?: string;
 }
 
 export interface Metric {
@@ -59,13 +60,50 @@ export const projects: Project[] = [
         id: "occ",
         heading: "Zero-Lock Optimistic Concurrency Control",
         body: "Eliminates destructive database row locks during high-frequency collaborative sprint planning. Every task mutation enforces version sequencing, returning HTTP 409 Conflict (STALE_UPDATE) on race conditions with randomized jitter reconciliation (50–200ms) and structured audit logging.",
-        media: { type: "diagram", label: "OCC Conflict Reconciliation" }
+        media: { type: "diagram", label: "OCC Conflict Reconciliation" },
+        mermaid: `flowchart LR
+    Client["Client Write (v=1)"] --> Gate{"OCC Version Gate\\nv == v_db ?"}
+    Gate -->|Match| Commit["Commit v=2\\n200 OK Broadcast"]
+    Gate -->|Mismatch| Conflict["HTTP 409 Conflict\\nSTALE_UPDATE"]
+    Conflict --> Jitter["Reconciliation Loop\\nJitter 50-200ms"]
+    Jitter --> Client`
       },
       {
         id: "cloud-architecture",
         heading: "Decoupled Multi-AZ Cloud Infrastructure",
         body: "Engineered according to the AWS Well-Architected Framework: Fastify modular monolith on ECS Fargate across private subnets, Amazon RDS PostgreSQL 16 Multi-AZ standby, DynamoDB-backed API Gateway WebSockets, and CloudFront CDN with Origin Access Control (OAC).",
-        media: { type: "diagram", label: "Target Cloud Architecture" }
+        media: { type: "diagram", label: "Target Cloud Architecture" },
+        mermaid: `flowchart TD
+    subgraph Edge ["AWS Edge Perimeter"]
+        CF["CloudFront CDN + OAC"]
+        ALB["Application Load Balancer (ALB)"]
+        APIGW["API Gateway WebSockets"]
+    end
+    subgraph VPC ["Amazon VPC (Multi-AZ 10.0.0.0/16)"]
+        subgraph AppSubnets ["Private App Subnets"]
+            ECS["ECS Fargate Tasks (Port 3000)\\nFastify Modular Monolith"]
+            Workers["SQS Background Worker Pool"]
+        end
+        subgraph DataSubnets ["Isolated Data Subnets"]
+            RDS[("RDS PostgreSQL 16\\nMulti-AZ Standby gp3")]
+            DDB[("DynamoDB WS Registry")]
+        end
+    end
+    subgraph Managed ["Managed Cloud Services"]
+        SQS["SQS FIFO Queues"]
+        DLQ["Dead-Letter Queues (DLQs)"]
+        Bedrock["Amazon Bedrock (Claude 3.5)"]
+    end
+
+    CF --> ALB
+    ALB --> ECS
+    APIGW --> DDB
+    ECS --> RDS
+    ECS --> SQS
+    SQS --> Workers
+    Workers --> RDS
+    Workers -. Failure > 3 .-> DLQ
+    ECS --> Bedrock`
       },
       {
         id: "fifo-workers",
@@ -120,7 +158,18 @@ export const projects: Project[] = [
         id: "architecture",
         heading: "8-Layer Guard Architecture",
         body: "Intent Validator (semantic drift detection) → RAG Provenance Firewall (ACL + injection scanning) → Tool & MCP Guard (explicit registration) → Circuit Breaker (human-approval webhooks) → Context Governor (token budget) → Anomaly Detector (behavioral heuristics, auto-revoke) → Agent IAM (ephemeral identity, TTL) → Audit Ledger (full replayable trace).",
-        media: { type: "diagram", label: "AVARA System Architecture" }
+        media: { type: "diagram", label: "AVARA System Architecture" },
+        mermaid: `flowchart TD
+    Agent["Autonomous Agent\\n(LangGraph / CrewAI)"] --> Gateway["AVARA Control Gateway\\n(<5ms Execution Guard)"]
+    subgraph Guards ["8-Layer Security Perimeter"]
+        IV["Intent Validator\\nSemantic Drift"]
+        RF["RAG Provenance Firewall\\nACL & Prompt Injection"]
+        TG["Tool & MCP Guard\\nSchema Validation"]
+        CB["Circuit Breaker\\nHuman-in-the-Loop"]
+    end
+    Gateway --> Guards
+    Guards --> Audit[("Tamper-Evident\\nAudit Ledger")]
+    Guards --> External["Target Environment\\n(APIs / Tools / DBs)"]`
       },
       {
         id: "circuitbreaker",
@@ -194,13 +243,43 @@ export const projects: Project[] = [
         id: "uprs-architecture",
         heading: "End-to-End Daemon System Architecture",
         body: "Operates as a 4-tier closed-loop daemon: 1. Data Acquisition Layer (queries Mach task_info and /proc at 100Hz into an O(1) 20-slot RingBuffer with zero allocation on the measurement path) → 2. Intelligence Layer (extracts 46-dimensional statistical moments and cross-signal interaction terms, evaluated by CoreML XGBoost to output calibrated Softmax probabilities P(Hang) in <5ms) → 3. Decision Layer (evaluates state transitions across NORMAL, PRE_HANG, and HANG_IMMINENT via 0.8/0.3 hysteresis thresholds and SafetyGate deterministic checks) → 4. Action & Mitigation Layer (executes TOCTOU-safe Plan-Apply-Commit priority adjustments with transaction logging and automatic rollback upon state normalization).",
-        media: { type: "diagram", label: "End-to-End System Architecture" }
+        media: { type: "diagram", label: "End-to-End System Architecture" },
+        mermaid: `flowchart TD
+    subgraph L1 ["1. Data Acquisition Layer"]
+        Mach["Mach task_info & /proc\\n100Hz Non-Blocking Polling"] --> Ring["O(1) 20-Slot RingBuffer\\nZero-Alloc Sliding Window"]
+    end
+    subgraph L2 ["2. Intelligence Layer"]
+        Ring --> Feat["46-Dim Features\\nMoments & Cross-Signals"]
+        Feat --> XGB["XGBoost CoreML Engine\\nSoftmax P(Hang) < 5ms"]
+    end
+    subgraph L3 ["3. Decision Layer"]
+        XGB --> Hyst["Hysteresis State Machine\\n(0.8 Imminent / 0.3 Normal)"]
+        Hyst --> Safety["SafetyGate Deterministic Filter\\nMain Thread TID 0 & Kernel Lock Guard"]
+    end
+    subgraph L4 ["4. Action & Mitigation Layer"]
+        Safety --> PAC["Plan-Apply-Commit Protocol\\n(PID, StartTime) Anti-TOCTOU"]
+        PAC --> Nice["setpriority(nice + 10)\\nNon-Destructive Priority Shift"]
+        Nice -. State Normalized .-> Rollback["Auto-Rollback\\nZero Data Loss"]
+    end`
       },
       {
         id: "uprs-novelty-points",
         heading: "Core Patent Novelties & Technical Claims",
         body: "Key patent claims under Indian Patent Act 1970: [1] Predictive Lead-Time Window — operates proactively in the 0.5s–5.0s pre-hang window before the OS WindowServer manifests unresponsiveness. [2] Cross-Signal Contention Analysis — novel multi-variate metrics (Contention Index, Livelock Detector, I/O Thrashing) isolate lock contention from legitimate heavy compute. [3] Non-Destructive Reversible Interventions — modifies thread scheduling priority (+10 nice) with automatic zero-data-loss rollback upon state recovery. [4] TOCTOU Neutralization — binds target identity to a (PID, StartTime) cryptographic tuple, preventing PID recycling race conditions. [5] Deterministic Safety Gate — zero-risk exclusion blocking interventions on UI Main Threads (TID 0), kernel lock holders, and system daemons. [6] Intervention-Aware Drift Guard — downweights mitigation feedback (0.7x factor) to prevent recursive model bias.",
-        media: { type: "diagram", label: "Patent Novelty & Breakthrough Matrix" }
+        media: { type: "diagram", label: "Patent Novelty & Breakthrough Matrix" },
+        mermaid: `flowchart LR
+    subgraph Reactive ["Prior Art: Reactive OS Watchdogs"]
+        P1["4s-5s Delay\\nWindowServer Beachball"]
+        P2["Destructive Force-Quit\\nUnsaved Data Loss"]
+        P3["Coarse Global Metrics\\nNo Contention Isolation"]
+    end
+    subgraph Predictive ["UPRS Patent Novelties (Section 3(k))"]
+        N1["0.5s-5.0s Predictive Lead Window\\nProactive Intervention"]
+        N2["Cross-Signal Contention Engine\\nContention = Lock × Queue"]
+        N3["Reversible +10 Nice Priority Shift\\nZero Data Loss Rollback"]
+        N4["TOCTOU-Safe Identity Binding\\nCryptographic (PID, StartTime)"]
+    end
+    Reactive -. Replaced By .-> Predictive`
       }
     ],
     links: { github: null, paper: null, demo: null }
@@ -243,7 +322,27 @@ export const projects: Project[] = [
         id: "san",
         heading: "Stratified Advantage Normalization (SAN)",
         body: "Per-stratum Z-normalization evaluates rollouts strictly against peers in the same domain. Features zero-variance centering, low-variance dampening to avoid ghost-signal amplification, and ±5.0 advantage clipping.",
-        media: { type: "diagram", label: "SAN Normalization Flow" }
+        media: { type: "diagram", label: "SAN Normalization Flow" },
+        mermaid: `flowchart TD
+    subgraph Rollout ["Rollout Generation (vLLM)"]
+        Batch["Mixed-Domain Batch (G=8)\\n(GSM8K Math + StrategyQA Reasoning)"]
+    end
+    subgraph Stratification ["Stratum Partitioning & SAN"]
+        S1["Stratum 1 (GSM8K)"]
+        S2["Stratum 2 (StrategyQA)"]
+        Z1["Per-Stratum Z-Score (μ_1, σ_1)\\nZero-Variance Centering"]
+        Z2["Per-Stratum Z-Score (μ_2, σ_2)\\nZero-Variance Centering"]
+    end
+    subgraph PolicyUpdate ["GRPO Gradient Optimization"]
+        Verify["Deterministic SymPy & Regex Verifiers"]
+        Loss["Policy Gradient Step\\nπ_ref = π_old (-1.8GB VRAM)"]
+    end
+
+    Batch --> S1 & S2
+    S1 --> Z1
+    S2 --> Z2
+    Z1 & Z2 --> Loss
+    Verify --> Loss`
       },
       {
         id: "structural-rewards",
@@ -317,13 +416,47 @@ export const projects: Project[] = [
         id: "jointpinn-architecture",
         heading: "End-to-End Dual-Network Computational Architecture",
         body: "Couples two concurrent neural subnets within a unified PyTorch autograd loss graph: Primary Network (AirQualityNet: 9-layer × 128-neuron deep MLP parameterized with Tanh activations, mapping 18-dim spatio-temporal coordinates, ERA5 meteorology, and autoregressive lags to scalar PM2.5 fields C(x, y, t)) coupled with an Auxiliary Diffusivity Network (DiffusivityNet / K-Net: parallel MLP learning continuous turbulent mixing tensors K(x, y, t) directly from boundary layer physics). Both networks feed forward through autograd differentiation enforcing the Advection-Diffusion-Reaction PDE: ∂C/∂t + u·∇C = ∇·(K∇C) + S, jointly minimizing L_total = L_data + λ_pde·L_pde + λ_reg·L_reg to strictly conserve pollutant mass across winter inversion layers.",
-        media: { type: "diagram", label: "Dual-Network PDE Architecture" }
+        media: { type: "diagram", label: "Dual-Network PDE Architecture" },
+        mermaid: `flowchart TD
+    subgraph Inputs ["Spatio-Temporal & Meteorological Inputs"]
+        Coords["(x, y, t) Coordinates"]
+        Met["ERA5 Weather (u10, v10, t2m, blh)"]
+        AR["Autoregressive Lags (1h, 6h, 24h)"]
+    end
+    subgraph DualNets ["Coupled Neural Networks"]
+        AQNet["AirQualityNet (9x128 Tanh)\\nSmooth Laplacians ∇²C"]
+        KNet["DiffusivityNet (K-Net)\\nDynamic Mixing Tensor K(x,y,t)"]
+    end
+    subgraph AutogradPDE ["PyTorch Autograd PDE Engine"]
+        PDE["Transport PDE: ∂C/∂t + u·∇C = ∇·(K∇C) + S"]
+        Loss["L_total = L_data + λ_pde·L_pde\\n100.0% Mass Conserved"]
+    end
+    subgraph UQ ["Bayesian Source Inversion"]
+        RA["RA-BPINN Null-Space Guard\\nFisher Information Prior (93.8% Coverage)"]
+    end
+
+    Inputs --> DualNets
+    DualNets --> AutogradPDE
+    AutogradPDE --> UQ`
       },
       {
         id: "jointpinn-novelty-points",
         heading: "Core Research Novelties & Breakthrough Points",
         body: "Fundamental research innovations in physics-informed atmospheric modeling: [1] Dynamic Diffusivity Field (K-Net) — replaces empirical static dispersion constants with a secondary neural subnet learning continuous turbulent diffusivity tensors directly from boundary layer meteorology. [2] Observability Null-Space Isolation (RA-BPINN) — injects the Fisher Information Matrix (I = J_S^T R^-1 J_S) into the prior, eliminating standard B-PINN spectral bias and boosting credible interval coverage from 52.1% to 93.8%. [3] Degrees of Freedom for Signal (DFS) Metric — information-theoretic diagnostic rigorously demarcating where inverse source attribution is mathematically well-posed across Peclet and Damköhler regimes. [4] Higher-Order Autograd Compatibility — mathematically eliminates Laplacian second-derivative vanishing (f''(x)=0 in ReLU) through deep Tanh activation surfaces. [5] Inventory-Free Emission Inversion — discovers unmetered industrial emission rates without reliance on static municipal inventories. [6] 7-Year Empirical Benchmark — validated across 223k samples, achieving test R² = 0.926 and RMSE = 21.05 µg/m³, outperforming 19 classical ML baselines (p < 1e-10).",
-        media: { type: "diagram", label: "Research Novelty & Innovation Matrix" }
+        media: { type: "diagram", label: "Research Novelty & Innovation Matrix" },
+        mermaid: `flowchart LR
+    subgraph Classical ["Classical Baselines & Standard PINNs"]
+        C1["Static Dispersion Coefficients"]
+        C2["Spectral Bias & Null-Space Hallucination"]
+        C3["ReLU Vanishing 2nd Derivatives (f''=0)"]
+    end
+    subgraph Innovations ["JointPINN Breakthrough Novelties"]
+        I1["Dynamic K-Net Diffusivity Tensor"]
+        I2["RA-BPINN Fisher Prior (93.8% Coverage)"]
+        I3["Deep Tanh Continuous Spatial ∇²"]
+        I4["Inventory-Free Emission Discovery"]
+    end
+    Classical -. Transcended By .-> Innovations`
       }
     ],
     links: { github: null, paper: null, demo: null }
@@ -366,7 +499,23 @@ export const projects: Project[] = [
         id: "architecture",
         heading: "3-Layer Kernel Architecture",
         body: "Layer 1 (Kernel Module): sched_wakeup + sched_switch tracepoints, 1,024-bucket hash table per-PID, spin_lock_irqsave() for multi-core safety, Netlink alerts when latency > 1ms. Layer 2 (IPC Bridge): /proc/kphd_stats for snapshots + Netlink multicast for real-time. Layer 3 (EMA Daemon): α=0.3, three severity levels.",
-        media: { type: "diagram", label: "K-PHD Architecture" }
+        media: { type: "diagram", label: "K-PHD Architecture" },
+        mermaid: `flowchart TD
+    subgraph KernelSpace ["Layer 1: Linux Kernel Module (Ring 0)"]
+        Trace["sched_wakeup & sched_switch Tracepoints"] --> Hash["1,024-Bucket Per-PID Hash Table"]
+        Hash --> Spin["spin_lock_irqsave() SMP Concurrency"]
+    end
+    subgraph IPCBridge ["Layer 2: IPC Bridge"]
+        Netlink["GENL Netlink Socket (Latency > 1ms)"]
+        Proc["/proc/kphd_stats Fast Snapshot Ring"]
+    end
+    subgraph UserSpace ["Layer 3: Userspace EMA Daemon"]
+        EMA["EMA Engine (α=0.3)\\nEarly Starvation Detection"]
+        Alert["Kernel Pre-Hang Alarm (1.5s - 2.8s Lead Time)"]
+    end
+
+    KernelSpace --> IPCBridge
+    IPCBridge --> UserSpace`
       },
       {
         id: "prediction",
