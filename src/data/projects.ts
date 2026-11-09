@@ -28,6 +28,7 @@ export interface Project {
 }
 
 export const projects: Project[] = [
+  // 1st: floework
   {
     id: "floework",
     slug: "floework",
@@ -81,6 +82,8 @@ export const projects: Project[] = [
     ],
     links: { github: "https://github.com/Atharva-Mendhulkar/floework", paper: null, demo: "https://floework.vercel.app" }
   },
+
+  // 2nd: AVARA
   {
     id: "avara",
     slug: "avara",
@@ -134,53 +137,8 @@ export const projects: Project[] = [
     ],
     links: { github: "https://github.com/Atharva-Mendhulkar/AVARA", paper: null, demo: null }
   },
-  {
-    id: "kphd",
-    slug: "kphd",
-    title: "K-PHD",
-    subtitle: "Kernel-level Predictive Hang Detector",
-    category: "Systems",
-    status: "complete",
-    statusLabel: "Linux Kernel · GPL v2",
-    oneLiner: "Embeds into Linux scheduler hot-paths to measure nanosecond-level process wait times and predict CPU starvation before applications hang.",
-    terminalBoot: [
-      "$ boot --target K-PHD",
-      "Loading kphd.ko kernel module...",
-      "Registering sched_wakeup tracepoint...",
-      "Registering sched_switch tracepoint...",
-      "Binding Netlink socket GENL...",
-      "$ sudo kphd monitor"
-    ],
-    techStack: ["C", "Linux Kernel", "Netlink", "EMA", "Makefile"],
-    tags: ["Kernel Module", "Tracepoints", "Systems", "Predictive"],
-    metrics: [
-      { label: "Precision", value: "94%" },
-      { label: "Lead time", value: "1.5s - 2.8s" },
-      { label: "Overhead", value: "< 0.5%" },
-      { label: "Ring-0 Memory", value: "< 2MB" }
-    ],
-    features: [
-      {
-        id: "problem",
-        heading: "Hangs Are Invisible Until They Happen",
-        body: "Application hangs from CPU starvation are only detectable after the fact — when a user reports a frozen UI or a watchdog kills a process. K-PHD moves detection upstream: measuring scheduler wait latency at nanosecond resolution inside the kernel, predicting starvation seconds before it causes a user-visible hang.",
-        media: { type: "diagram", label: "Detection Timeline" }
-      },
-      {
-        id: "architecture",
-        heading: "3-Layer Kernel Architecture",
-        body: "Layer 1 (Kernel Module): sched_wakeup + sched_switch tracepoints, 1,024-bucket hash table per-PID, spin_lock_irqsave() for multi-core safety, Netlink alerts when latency > 1ms. Layer 2 (IPC Bridge): /proc/kphd_stats for snapshots + Netlink multicast for real-time. Layer 3 (EMA Daemon): α=0.3, three severity levels.",
-        media: { type: "diagram", label: "K-PHD Architecture" }
-      },
-      {
-        id: "prediction",
-        heading: "EMA Predictive Model",
-        body: "EMA_t = α·L_t + (1−α)·EMA_{t−1} with α=0.3. Warning at EMA > 2ms. Danger at EMA > 5ms. 3+ consecutive danger alerts = CPU starvation imminent. EMA computed in userspace daemon to keep floating-point math out of the kernel hot-path — kernel only does integer timestamp subtraction.",
-        media: { type: "chart", label: "EMA Latency Model" }
-      }
-    ],
-    links: { github: "https://github.com/Atharva-Mendhulkar/K-PHD", paper: null, demo: null }
-  },
+
+  // 3rd: UPRS
   {
     id: "uprs",
     slug: "uprs",
@@ -189,7 +147,7 @@ export const projects: Project[] = [
     category: "Systems",
     status: "patent-pending",
     statusLabel: "Patent Published · Indian Patent Act 1970",
-    oneLiner: "Proactive OS daemon operating in the 0.5–5.0s pre-hang window, using 46-dim cross-signal kernel telemetry and XGBoost to apply reversible scheduling mitigations before UI freeze.",
+    oneLiner: "Proactive OS-level daemon operating in the 0.5–5.0s pre-hang window, using 46-dimensional cross-signal kernel telemetry and XGBoost to apply reversible scheduling mitigations before user-visible freeze.",
     terminalBoot: [
       "$ boot --target UPRS",
       "Interfacing XNU/Linux Kernel Telemetry (14 raw metrics @ 100Hz)...",
@@ -210,31 +168,33 @@ export const projects: Project[] = [
     features: [
       {
         id: "telemetry-cross-signal",
-        heading: "46-Dim Cross-Signal Telemetry",
-        body: "Queries kernel APIs at 100Hz for 14 metrics into an O(1) circular RingBuffer. Synthesizes novel cross-signal indicators (Contention Index, Livelock Detector = IPC Latency × CPU, I/O Thrashing Index) to differentiate legitimate high compute from pathological lock contention.",
+        heading: "14-Metric Kernel Abstraction & Cross-Signals",
+        body: "Queries kernel APIs (Mach task_info on macOS, /proc on Linux) at 100Hz for 14 raw metrics into an O(1) circular RingBuffer (20 samples, 2.0s window). Synthesizes novel cross-signal indicators that isolate pathological contention from heavy legitimate compute: Contention Index = (lock_wait > 5ms) × (run_queue_delay > 50ms), Livelock Detector = (ipc_latency > 100µs) × (cpu_usage > 90%), and I/O Thrashing Index = (page_faults > 50/s) × (memory_pressure > 70%).",
         media: { type: "diagram", label: "Cross-Signal Telemetry Matrix" }
       },
       {
         id: "xgboost-inference",
-        heading: "Calibrated XGBoost Softmax Inference",
-        body: "Extracts statistical aggregates and cross-signals across a 2.0s sliding window into a 46-dimensional vector. Evaluated by a CoreML-wrapped XGBoost model (100 estimators, max depth 6) with Softmax probability normalization P(Hang) in under 5ms.",
+        heading: "Calibrated Softmax XGBoost Inference",
+        body: "Derives statistical moments (mean, std dev, min, max, linear trend slope) and cross-signal interactions into a 46-dimensional vector evaluated by an optimized CoreML XGBoost ensemble (100 estimators, max depth 6, SMOTE balanced). Applies Softmax probability normalization: P(class_i) = exp(z_i) / Σ exp(z_j) in <5ms, achieving 92.5% precision (PRE_HANG) with <1% false positive rate.",
         media: { type: "chart", label: "Inference & Hysteresis Pipeline" }
       },
       {
         id: "policy-safety-gate",
         heading: "Hysteresis State Machine & SafetyGate",
-        body: "A 3-state machine (NORMAL, PRE_HANG, HANG_IMMINENT) with asymmetric thresholds (0.8 trigger, 0.3 recovery) filters noise. SafetyGate performs strict deterministic checks: rejects interventions on UI Main Thread (TID 0), kernel mutex holders, and system daemons (PID < 100).",
+        body: "Filters transient noise using a 3-state machine (NORMAL, PRE_HANG, HANG_IMMINENT) with asymmetric hysteresis thresholds: escalation at P > 0.8, de-escalation at P < 0.3. Prior to executing mitigation, SafetyGate applies deterministic validation: aborts if target thread is the UI Main Thread (TID 0), if the thread holds kernel mutexes (preventing system-wide lock cascades), or if the process is a root daemon (PID < 100).",
         media: { type: "diagram", label: "SafetyGate Decision Engine" }
       },
       {
         id: "reversible-mitigation",
         heading: "Plan-Apply-Commit Reversible Mitigation",
-        body: "Applies non-destructive scheduling interventions via setpriority() nice value shifts outside state locks, paired with PID+StartTime TOCTOU identity validation. Automatically reverts to original priority once normal state is re-established, preserving user data.",
+        body: "Executes non-destructive OS scheduling interventions via setpriority() nice value shifts (+10) outside state locks to eliminate priority inversion. Anchors identity to a (PID, StartTime) tuple to neutralize TOCTOU PID-reuse attacks. Caches pre-mitigation state and automatically rolls back to original priority upon transition back to NORMAL, achieving an 82% reduction in user-visible freezes with zero application restarts or data loss.",
         media: { type: "diagram", label: "Plan-Apply-Commit Protocol" }
       }
     ],
     links: { github: null, paper: null, demo: null }
   },
+
+  // 4th: StrataRL
   {
     id: "stratarl",
     slug: "stratarl",
@@ -288,6 +248,8 @@ export const projects: Project[] = [
     ],
     links: { github: "https://github.com/Atharva-Mendhulkar/StrataRL", paper: null, demo: null }
   },
+
+  // 5th: JointPINN
   {
     id: "jointpinn",
     slug: "jointpinn",
@@ -296,7 +258,7 @@ export const projects: Project[] = [
     category: "ML / AI Research",
     status: "complete",
     statusLabel: "Research · PyTorch 2.5",
-    oneLiner: "Embeds atmospheric advection-diffusion-reaction PDEs and a learned dynamic diffusivity field (K-Net) to model urban PM2.5 dispersion and inverse source attribution across 7 years of telemetry.",
+    oneLiner: "Physics-Informed Neural Network with dynamic turbulent diffusivity (K-Net) embedding advection-diffusion-reaction PDEs and Bayesian null-space analysis to model urban PM2.5 transport and inverse source attribution.",
     terminalBoot: [
       "$ boot --target JointPINN",
       "Loading 7-Year CAAQMS + ERA5 Reanalysis Telemetry (223k samples)...",
@@ -317,30 +279,79 @@ export const projects: Project[] = [
     features: [
       {
         id: "pde-transport",
-        heading: "Advection-Diffusion-Reaction PDE",
-        body: "Bridges purely data-driven ML and atmospheric fluid dynamics by embedding the governing transport PDE: ∂C/∂t + u·∇C = ∇·(K∇C) + S directly into the PyTorch autograd loss graph. Enforces physical mass conservation during extreme winter meteorological inversions.",
+        heading: "Governing Transport PDE & Physics Loss",
+        body: "Embeds the continuous atmospheric advection-diffusion-reaction Partial Differential Equation directly into the PyTorch autograd loss graph: ∂C/∂t + u·∇C = ∇·(K∇C) + S, where u=(u,v) represents ERA5 horizontal wind vectors, K is turbulent diffusivity, and S represents emission sources/sinks. Reaches a 100.0% PDE physical compliance pass rate, strictly conserving mass during shallow nocturnal winter inversions (Boundary Layer Height < 150m) where pure ML models extrapolate catastrophically.",
         media: { type: "diagram", label: "Transport PDE Loss Graph" }
       },
       {
         id: "k-net-diffusivity",
-        heading: "Learned Dynamic Diffusivity (K-Net)",
-        body: "Replaces static empirical diffusivity with DiffusivityNet (K-Net), a secondary neural network tied to the autograd graph that dynamically learns the continuous spatio-temporal turbulent diffusivity field K(x, y, t) directly from ERA5 wind vectors, 2m temperature, and Planetary Boundary Layer Height (BLH).",
+        heading: "Learned Dynamic Diffusivity Field (K-Net)",
+        body: "Transcends static empirical dispersion coefficients through a dual-network JointPINN architecture. Parameterizes the turbulent diffusivity field K via DiffusivityNet (K-Net), a secondary neural network coupled to the PDE computational graph that dynamically learns continuous spatio-temporal diffusivity tensors K(x, y, t) directly from raw ERA5 meteorology (u10, v10, 2m temperature, and boundary layer height blh), discovering unmetered urban emissions inventory-free.",
         media: { type: "chart", label: "Dynamic Diffusivity Field" }
       },
       {
         id: "deep-tanh-architecture",
         heading: "Smooth Higher-Order Gradient Architecture",
-        body: "AirQualityNet utilizes a deep, narrow 9-layer × 128-neuron MLP with Xavier Uniform initialization and Tanh activations. Unlike ReLU which zeroes out second-order derivatives, Tanh provides smooth, non-zero spatial Laplacians (∇²C) essential for diffusion physics backpropagation.",
+        body: "AirQualityNet is engineered as a deep, narrow 9-layer × 128-neuron MLP with Xavier Uniform initialization. The architecture mathematically mandates Tanh activation functions: standard activations like ReLU have zero second derivatives (f''(x)=0), which destroys the spatial Laplacian diffusion operator ∇²C. Tanh provides continuous, non-zero higher-order spatial derivatives, achieving test R² of 0.926 and RMSE of 21.05 µg/m³ across 223,493 hourly samples from 2019–2025.",
         media: { type: "diagram", label: "Higher-Order Autograd MLP" }
       },
       {
         id: "ra-bpinn-nullspace",
         heading: "Recoverability-Aware Bayesian PINN (RA-BPINN)",
-        body: "Solves spectral bias and overconfidence in inverse source identification. Quantifies Degrees of Freedom for Signal (DFS) across the Peclet (Pe) and Damköhler (Da) phase boundary, projecting unobservable modes into null-space uncertainty and achieving 93.8% credible interval coverage.",
+        body: "Addresses the fundamental observability limits in inverse source attribution (y = J_S·S + ε). Standard Bayesian PINNs suffer from spectral bias, hallucinating sources in the mathematical null-space of the observation Jacobian J_S (yielding only 52.1% credible interval coverage). RA-BPINN incorporates the Fisher Information Matrix I = J_S^T R^-1 J_S directly into the prior, quantifying Degrees of Freedom for Signal (DFS) across the Peclet (Pe) and Damköhler (Da) phase boundary to restore posterior coverage to 93.8%.",
         media: { type: "diagram", label: "Observability Null-Space Phase" }
       }
     ],
     links: { github: null, paper: null, demo: null }
+  },
+
+  // 6th: K-PHD
+  {
+    id: "kphd",
+    slug: "kphd",
+    title: "K-PHD",
+    subtitle: "Kernel-level Predictive Hang Detector",
+    category: "Systems",
+    status: "complete",
+    statusLabel: "Linux Kernel · GPL v2",
+    oneLiner: "Embeds into Linux scheduler hot-paths to measure nanosecond-level process wait times and predict CPU starvation before applications hang.",
+    terminalBoot: [
+      "$ boot --target K-PHD",
+      "Loading kphd.ko kernel module...",
+      "Registering sched_wakeup tracepoint...",
+      "Registering sched_switch tracepoint...",
+      "Binding Netlink socket GENL...",
+      "$ sudo kphd monitor"
+    ],
+    techStack: ["C", "Linux Kernel", "Netlink", "EMA", "Makefile"],
+    tags: ["Kernel Module", "Tracepoints", "Systems", "Predictive"],
+    metrics: [
+      { label: "Precision", value: "94%" },
+      { label: "Lead time", value: "1.5s - 2.8s" },
+      { label: "Overhead", value: "< 0.5%" },
+      { label: "Ring-0 Memory", value: "< 2MB" }
+    ],
+    features: [
+      {
+        id: "problem",
+        heading: "Hangs Are Invisible Until They Happen",
+        body: "Application hangs from CPU starvation are only detectable after the fact — when a user reports a frozen UI or a watchdog kills a process. K-PHD moves detection upstream: measuring scheduler wait latency at nanosecond resolution inside the kernel, predicting starvation seconds before it causes a user-visible hang.",
+        media: { type: "diagram", label: "Detection Timeline" }
+      },
+      {
+        id: "architecture",
+        heading: "3-Layer Kernel Architecture",
+        body: "Layer 1 (Kernel Module): sched_wakeup + sched_switch tracepoints, 1,024-bucket hash table per-PID, spin_lock_irqsave() for multi-core safety, Netlink alerts when latency > 1ms. Layer 2 (IPC Bridge): /proc/kphd_stats for snapshots + Netlink multicast for real-time. Layer 3 (EMA Daemon): α=0.3, three severity levels.",
+        media: { type: "diagram", label: "K-PHD Architecture" }
+      },
+      {
+        id: "prediction",
+        heading: "EMA Predictive Model",
+        body: "EMA_t = α·L_t + (1−α)·EMA_{t−1} with α=0.3. Warning at EMA > 2ms. Danger at EMA > 5ms. 3+ consecutive danger alerts = CPU starvation imminent. EMA computed in userspace daemon to keep floating-point math out of the kernel hot-path — kernel only does integer timestamp subtraction.",
+        media: { type: "chart", label: "EMA Latency Model" }
+      }
+    ],
+    links: { github: "https://github.com/Atharva-Mendhulkar/K-PHD", paper: null, demo: null }
   }
 ];
 

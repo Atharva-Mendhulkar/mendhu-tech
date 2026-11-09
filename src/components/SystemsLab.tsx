@@ -13,10 +13,15 @@ interface SystemsLabProps {
 
 export default function SystemsLab({ onOpenModal }: SystemsLabProps) {
   const [activeFilter, setActiveFilter] = useState("all");
+  const [showAll, setShowAll] = useState(false);
 
   const filteredProjects = activeFilter === "all" 
     ? projects 
     : projects.filter(p => p.category === activeFilter);
+
+  const displayedProjects = (showAll || activeFilter !== "all")
+    ? filteredProjects
+    : filteredProjects.slice(0, 4);
 
   return (
     <section className="pt-8 pb-10 relative z-10">
@@ -30,7 +35,10 @@ export default function SystemsLab({ onOpenModal }: SystemsLabProps) {
         {categories.map(cat => (
           <button
             key={cat}
-            onClick={() => setActiveFilter(cat)}
+            onClick={() => {
+              setActiveFilter(cat);
+              if (cat !== "all") setShowAll(true);
+            }}
             className={`font-mono text-[9.5px] px-4 py-1.5 border border-dashed transition-all cursor-pointer rounded-[2px] ${
               activeFilter === cat 
                 ? "border-solid border-accent text-accent bg-accent-light" 
@@ -44,7 +52,7 @@ export default function SystemsLab({ onOpenModal }: SystemsLabProps) {
 
       {/* Project Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-[10px]">
-        {filteredProjects.map((project) => (
+        {displayedProjects.map((project) => (
           <div 
             key={project.id}
             onClick={() => onOpenModal(project.id)}
@@ -125,6 +133,21 @@ export default function SystemsLab({ onOpenModal }: SystemsLabProps) {
           </div>
         ))}
       </div>
+
+      {/* See All Projects Button */}
+      {activeFilter === "all" && filteredProjects.length > 4 && (
+        <div className="flex justify-center mt-8">
+          <button
+            onClick={() => setShowAll(prev => !prev)}
+            className="group font-mono text-[10px] text-accent border border-dashed border-accent hover:border-solid hover:bg-accent hover:text-white px-6 py-2.5 rounded-[2px] transition-all flex items-center gap-2 cursor-pointer shadow-sm tracking-widest uppercase"
+          >
+            <span>{showAll ? "COLLAPSE TO TOP 4" : `SEE ALL PROJECTS (${filteredProjects.length})`}</span>
+            <span className="transition-transform duration-200 group-hover:translate-y-0.5 font-bold">
+              {showAll ? "↑" : "↓"}
+            </span>
+          </button>
+        </div>
+      )}
     </section>
   );
 }

@@ -195,10 +195,10 @@ function renderDiagram(projectId: string, featureId: string, idx: number, marker
       <g>
         {/* Graph Input */}
         <circle cx="35" cy="35" r="14" className="fill-card stroke-border-strong" />
-        <text x="35" y="38" textAnchor="middle" className="font-mono text-[8px] fill-current">Task A</text>
+        <text x="35" y="38" textAnchor="middle" className="font-mono text-[8px] fill-current">TaskA</text>
         
         <circle cx="85" cy="35" r="14" className="fill-card stroke-accent" />
-        <text x="85" y="38" textAnchor="middle" className="font-mono text-[8px] fill-accent font-bold">Task B</text>
+        <text x="85" y="38" textAnchor="middle" className="font-mono text-[8px] fill-accent font-bold">TaskB</text>
 
         <line x1="49" y1="35" x2="69" y2="35" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
 
@@ -294,7 +294,7 @@ function renderDiagram(projectId: string, featureId: string, idx: number, marker
           {/* Action */}
           <rect x="10" y="30" width="75" height="34" rx="3" className="fill-card stroke-border-strong" />
           <text x="47" y="46" textAnchor="middle" className="font-mono text-[7px] fill-current font-bold">DESTRUCTIVE OP</text>
-          <text x="47" y="56" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">e.g. Delete/Transfer</text>
+          <text x="47" y="56" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">eg. Delete/Transfer</text>
 
           {/* Intercept & Halt */}
           <rect x="110" y="30" width="95" height="34" rx="3" className="fill-card stroke-accent" />
