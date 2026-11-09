@@ -155,7 +155,7 @@ export default function HomeClient({ initialPosts }: { initialPosts: MediumPost[
               
               <div className="fade-in">
                 <p className="font-mono text-[14px] text-ink-muted tracking-[0.01em] mb-8 max-w-[480px] leading-relaxed">
-                  Systems Engineer & AI Researcher. Exploring the intersection of physics-informed machine learning and kernel-level infrastructure.
+                  Systems Engineer & AI Researcher.
                 </p>
               </div>
 

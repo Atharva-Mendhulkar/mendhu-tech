@@ -551,6 +551,229 @@ function renderDiagram(projectId: string, featureId: string, idx: number, marker
     );
   }
 
+  // ── UPRS DIAGRAMS ──────────────────────────────────────────
+  if (projectId === "uprs") {
+    if (featureId === "telemetry-cross-signal" || idx === 0) {
+      return (
+        <g>
+          {/* Kernel Telemetry */}
+          <rect x="10" y="25" width="85" height="42" rx="3" className="fill-card stroke-border-strong" />
+          <text x="52" y="41" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">KERNEL TELEMETRY</text>
+          <text x="52" y="52" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">14 Metrics @ 100Hz</text>
+          <text x="52" y="61" textAnchor="middle" className="font-mono text-[6px] fill-accent">task_info / /proc</text>
+
+          {/* RingBuffer */}
+          <rect x="115" y="25" width="95" height="42" rx="3" className="fill-card stroke-accent" />
+          <text x="162" y="41" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">RING BUFFER (N=20)</text>
+          <text x="162" y="52" textAnchor="middle" className="font-mono text-[6.5px] fill-current">2.0s Sliding Window</text>
+          <text x="162" y="61" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">O(1) Circular Array</text>
+
+          {/* Cross-Signals */}
+          <rect x="230" y="15" width="100" height="58" rx="3" className="fill-card stroke-accent" />
+          <text x="280" y="30" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">CROSS-SIGNALS</text>
+          <text x="280" y="42" textAnchor="middle" className="font-mono text-[6px] fill-current">Livelock = IPC &times; CPU</text>
+          <text x="280" y="53" textAnchor="middle" className="font-mono text-[6px] fill-current">Contention = Lock &times; Queue</text>
+          <text x="280" y="64" textAnchor="middle" className="font-mono text-[6px] fill-accent font-medium">46-Dim Feature Vector</text>
+
+          <line x1="95" y1="46" x2="113" y2="46" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
+          <line x1="210" y1="46" x2="228" y2="46" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
+
+          <text x="170" y="105" textAnchor="middle" className="font-mono text-[7px] fill-ink-muted">NOVEL CROSS-SIGNAL CORRELATION DISTINGUISHES BUSY FROM HANG</text>
+        </g>
+      );
+    }
+
+    if (featureId === "xgboost-inference" || idx === 1) {
+      return (
+        <g>
+          <rect x="10" y="25" width="85" height="40" rx="3" className="fill-card stroke-border-strong" />
+          <text x="52" y="41" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">46-DIM VECTOR</text>
+          <text x="52" y="52" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">Aggregates + Trends</text>
+
+          <rect x="115" y="20" width="105" height="48" rx="3" className="fill-card stroke-accent" />
+          <text x="167" y="36" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">XGBOOST COREML</text>
+          <text x="167" y="47" textAnchor="middle" className="font-mono text-[6.5px] fill-current">100 Trees &middot; Depth 6</text>
+          <text x="167" y="57" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">Logits [z_ok, z_pre, z_hang]</text>
+
+          <rect x="240" y="25" width="90" height="40" rx="3" className="fill-card stroke-accent" />
+          <text x="285" y="41" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">SOFTMAX PROB</text>
+          <text x="285" y="52" textAnchor="middle" className="font-mono text-[6.5px] fill-current">P(Hang) &isin; [0, 1] &lt;5ms</text>
+
+          <line x1="95" y1="45" x2="113" y2="45" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
+          <line x1="220" y1="45" x2="238" y2="45" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
+
+          <text x="170" y="105" textAnchor="middle" className="font-mono text-[7px] fill-ink-muted">SMOTE CLASS BALANCING &middot; 92.5% PRE_HANG PRECISION (&lt;1% FP)</text>
+        </g>
+      );
+    }
+
+    if (featureId === "policy-safety-gate" || idx === 2) {
+      return (
+        <g>
+          {/* Policy */}
+          <rect x="10" y="20" width="95" height="52" rx="3" className="fill-card stroke-border-strong" />
+          <text x="57" y="35" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">POLICY ENGINE</text>
+          <text x="57" y="47" textAnchor="middle" className="font-mono text-[6.5px] fill-accent font-bold">P &gt; 0.8 &rarr; IMMINENT</text>
+          <text x="57" y="58" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">P &lt; 0.3 &rarr; NORMAL</text>
+          <text x="57" y="66" textAnchor="middle" className="font-mono text-[6px] fill-ink-faint">Hysteresis Anti-Noise</text>
+
+          {/* Safety Gate */}
+          <rect x="125" y="15" width="105" height="60" rx="3" className="fill-card stroke-accent" />
+          <text x="177" y="30" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">SAFETY GATE</text>
+          <text x="177" y="42" textAnchor="middle" className="font-mono text-[6px] fill-current">Main Thread (TID 0)? REJECT</text>
+          <text x="177" y="52" textAnchor="middle" className="font-mono text-[6px] fill-current">Kernel Lock Held? REJECT</text>
+          <text x="177" y="62" textAnchor="middle" className="font-mono text-[6px] fill-current">Daemon (PID&lt;100)? REJECT</text>
+
+          {/* Action Approval */}
+          <rect x="250" y="25" width="80" height="40" rx="3" className="fill-card stroke-accent" />
+          <text x="290" y="42" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">MITIGATION</text>
+          <text x="290" y="53" textAnchor="middle" className="font-mono text-[6.5px] fill-current">APPROVED</text>
+
+          <line x1="105" y1="46" x2="123" y2="46" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
+          <line x1="230" y1="46" x2="248" y2="46" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
+
+          <text x="170" y="105" textAnchor="middle" className="font-mono text-[7px] fill-ink-muted">DETERMINISTIC VALIDATION PREVENTS ACCIDENTAL SYSTEM LOCKUPS</text>
+        </g>
+      );
+    }
+
+    // Default UPRS: reversible-mitigation
+    return (
+      <g>
+        <rect x="10" y="20" width="85" height="42" rx="3" className="fill-card stroke-border-strong" />
+        <text x="52" y="36" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">PLAN &amp; SNAPSHOT</text>
+        <text x="52" y="47" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">Read Nice Priority</text>
+        <text x="52" y="56" textAnchor="middle" className="font-mono text-[6px] fill-accent">PID + StartTime Tuple</text>
+
+        <rect x="115" y="20" width="95" height="42" rx="3" className="fill-card stroke-accent" />
+        <text x="162" y="36" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">APPLY (TOCTOU SAFE)</text>
+        <text x="162" y="47" textAnchor="middle" className="font-mono text-[6.5px] fill-current">Re-query StartTime</text>
+        <text x="162" y="56" textAnchor="middle" className="font-mono text-[6px] fill-accent font-medium">setpriority(nice + 10)</text>
+
+        <rect x="235" y="20" width="95" height="42" rx="3" className="fill-card stroke-accent" />
+        <text x="282" y="36" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">AUTO ROLLBACK</text>
+        <text x="282" y="47" textAnchor="middle" className="font-mono text-[6.5px] fill-current">Restore on NORMAL</text>
+        <text x="282" y="56" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">Zero User Data Loss</text>
+
+        <line x1="95" y1="41" x2="113" y2="41" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
+        <line x1="210" y1="41" x2="233" y2="41" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
+        <path d="M 282 64 L 282 85 L 52 85 L 52 64" className="stroke-border-strong anim-flow" fill="none" strokeDasharray="3 3" markerEnd={`url(#${markerId})`} />
+
+        <text x="170" y="105" textAnchor="middle" className="font-mono text-[7px] fill-ink-muted">PLAN-APPLY-COMMIT PROTOCOL PREVENTS RECYCLED PID ATTACKS</text>
+      </g>
+    );
+  }
+
+  // ── JOINTPINN DIAGRAMS ──────────────────────────────────────────
+  if (projectId === "jointpinn") {
+    if (featureId === "pde-transport" || idx === 0) {
+      return (
+        <g>
+          {/* PDE Equation Banner */}
+          <rect x="25" y="10" width="290" height="22" rx="2" className="fill-card stroke-border-strong" strokeDasharray="2 2" />
+          <text x="170" y="24" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">&part;C/&part;t + u&middot;&nabla;C = &nabla;&middot;(K&nabla;C) + S</text>
+
+          {/* Advection */}
+          <rect x="15" y="42" width="90" height="34" rx="3" className="fill-card stroke-border-strong" />
+          <text x="60" y="56" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">ADVECTION</text>
+          <text x="60" y="66" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">ERA5 Wind (u10, v10)</text>
+
+          {/* Diffusion */}
+          <rect x="120" y="42" width="100" height="34" rx="3" className="fill-card stroke-border-strong" />
+          <text x="170" y="56" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">DIFFUSION &nabla;&sup2;C</text>
+          <text x="170" y="66" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">Turbulent Mixing K-Net</text>
+
+          {/* Loss graph */}
+          <rect x="235" y="42" width="95" height="34" rx="3" className="fill-card stroke-accent" />
+          <text x="282" y="56" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">PDE LOSS GRAPH</text>
+          <text x="282" y="66" textAnchor="middle" className="font-mono text-[6.5px] fill-accent font-medium">100.0% Pass Rate</text>
+
+          <line x1="105" y1="59" x2="118" y2="59" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
+          <line x1="220" y1="59" x2="233" y2="59" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
+
+          <text x="170" y="105" textAnchor="middle" className="font-mono text-[7px] fill-ink-muted">CONSERVES PM2.5 MASS DURING SEVERE WINTER INVERSION LAYERS</text>
+        </g>
+      );
+    }
+
+    if (featureId === "k-net-diffusivity" || idx === 1) {
+      return (
+        <g>
+          <rect x="10" y="25" width="85" height="42" rx="3" className="fill-card stroke-border-strong" />
+          <text x="52" y="41" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">ERA5 METEOROLOGY</text>
+          <text x="52" y="52" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">u10, v10, t2m, blh</text>
+          <text x="52" y="61" textAnchor="middle" className="font-mono text-[6px] fill-ink-faint">Boundary Layer Depth</text>
+
+          <rect x="115" y="20" width="105" height="52" rx="3" className="fill-card stroke-accent" />
+          <text x="167" y="36" textAnchor="middle" className="font-mono text-[8px] fill-accent font-bold">DIFFUSIVITYNET (K-NET)</text>
+          <text x="167" y="48" textAnchor="middle" className="font-mono text-[7px] fill-current">Secondary MLP Subnet</text>
+          <text x="167" y="59" textAnchor="middle" className="font-mono text-[6px] fill-accent font-medium">Coupled to Autograd Graph</text>
+
+          <rect x="240" y="25" width="90" height="42" rx="3" className="fill-card stroke-accent" />
+          <text x="285" y="41" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">DYNAMIC TENSOR</text>
+          <text x="285" y="52" textAnchor="middle" className="font-mono text-[6.5px] fill-current">K(x, y, t) m&sup2;/s</text>
+          <text x="285" y="61" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">Inventory-Free</text>
+
+          <line x1="95" y1="46" x2="113" y2="46" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
+          <line x1="220" y1="46" x2="238" y2="46" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
+
+          <text x="170" y="105" textAnchor="middle" className="font-mono text-[7px] fill-ink-muted">DYNAMICALLY PARAMETERIZES TURBULENT MIXING WITHOUT STATIC INVENTORIES</text>
+        </g>
+      );
+    }
+
+    if (featureId === "deep-tanh-architecture" || idx === 2) {
+      return (
+        <g>
+          <rect x="10" y="28" width="75" height="38" rx="3" className="fill-card stroke-border-strong" />
+          <text x="47" y="44" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">18-DIM INPUT</text>
+          <text x="47" y="54" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">x, y, t, Lags, GIS</text>
+
+          <rect x="105" y="18" width="125" height="56" rx="3" className="fill-card stroke-accent" />
+          <text x="167" y="34" textAnchor="middle" className="font-mono text-[8px] fill-accent font-bold">AIRQUALITYNET (9 &times; 128)</text>
+          <text x="167" y="47" textAnchor="middle" className="font-mono text-[7px] fill-current">Tanh Activation Function</text>
+          <text x="167" y="58" textAnchor="middle" className="font-mono text-[6.5px] fill-accent font-bold">f''(x) &ne; 0 &middot; Smooth Laplacians</text>
+          <text x="167" y="67" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">Xavier Uniform Initialization</text>
+
+          <rect x="250" y="28" width="80" height="38" rx="3" className="fill-card stroke-accent" />
+          <text x="290" y="44" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">TEST R&sup2; = 0.926</text>
+          <text x="290" y="54" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">RMSE 21.05 &mu;g/m&sup3;</text>
+
+          <line x1="85" y1="47" x2="103" y2="47" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
+          <line x1="230" y1="47" x2="248" y2="47" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
+
+          <text x="170" y="105" textAnchor="middle" className="font-mono text-[7px] fill-ink-muted">RELU DIES AT 2ND DERIVATIVES &middot; TANH SUSTAINS HIGHER-ORDER PDE AUTOGRAD</text>
+        </g>
+      );
+    }
+
+    // Default JointPINN: ra-bpinn-nullspace
+    return (
+      <g>
+        <rect x="10" y="25" width="85" height="42" rx="3" className="fill-card stroke-border-strong" />
+        <text x="52" y="41" textAnchor="middle" className="font-mono text-[7.5px] fill-current font-bold">INVERSE SOURCE</text>
+        <text x="52" y="51" textAnchor="middle" className="font-mono text-[6.5px] fill-ink-muted">y = J_s S + &epsilon;</text>
+        <text x="52" y="60" textAnchor="middle" className="font-mono text-[6px] fill-ink-faint">Sparse Sensors</text>
+
+        <rect x="115" y="18" width="110" height="54" rx="3" className="fill-card stroke-accent" />
+        <text x="170" y="33" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">Pe - Da PHASE BOUNDARY</text>
+        <text x="170" y="45" textAnchor="middle" className="font-mono text-[6.5px] fill-current">Degrees of Freedom (DFS)</text>
+        <text x="170" y="56" textAnchor="middle" className="font-mono text-[6.5px] fill-accent font-bold">Fisher Info in Prior</text>
+        <text x="170" y="65" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">Isolates Null-Space Modes</text>
+
+        <rect x="245" y="25" width="85" height="42" rx="3" className="fill-card stroke-accent" />
+        <text x="287" y="41" textAnchor="middle" className="font-mono text-[7.5px] fill-accent font-bold">RA-BPINN UQ</text>
+        <text x="287" y="51" textAnchor="middle" className="font-mono text-[6.5px] fill-accent font-bold">93.8% Coverage</text>
+        <text x="287" y="60" textAnchor="middle" className="font-mono text-[6px] fill-ink-muted">Std B-PINN: 52.1%</text>
+
+        <line x1="95" y1="46" x2="113" y2="46" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
+        <line x1="225" y1="46" x2="243" y2="46" className="stroke-accent anim-flow" markerEnd={`url(#${markerId}-accent)`} />
+
+        <text x="170" y="105" textAnchor="middle" className="font-mono text-[7px] fill-ink-muted">PREVENTS ARTIFICIAL AI HALLUCINATION IN UNOBSERVABLE ATMOSPHERIC REGIONS</text>
+      </g>
+    );
+  }
+
   // Fallback generic schematic
   return (
     <g>

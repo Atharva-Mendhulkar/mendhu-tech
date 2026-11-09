@@ -182,6 +182,60 @@ export const projects: Project[] = [
     links: { github: "https://github.com/Atharva-Mendhulkar/K-PHD", paper: null, demo: null }
   },
   {
+    id: "uprs",
+    slug: "uprs",
+    title: "UPRS",
+    subtitle: "Universal Process Responsiveness System",
+    category: "Systems",
+    status: "patent-pending",
+    statusLabel: "Patent Published · Indian Patent Act 1970",
+    oneLiner: "Proactive OS daemon operating in the 0.5–5.0s pre-hang window, using 46-dim cross-signal kernel telemetry and XGBoost to apply reversible scheduling mitigations before UI freeze.",
+    terminalBoot: [
+      "$ boot --target UPRS",
+      "Interfacing XNU/Linux Kernel Telemetry (14 raw metrics @ 100Hz)...",
+      "Mounting Sliding-Window RingBuffer (O(1) allocation)...",
+      "Extracting 46-dim Cross-Signal Vectors (Contention / Livelock)...",
+      "Loading XGBoost Softmax Inference Engine (P-Hang calibrated)...",
+      "Arming SafetyGate & Reversible MitigationExecutor (Plan-Apply-Commit)...",
+      "$ cat ./PATENT_SPEC_FORM_2.md"
+    ],
+    techStack: ["Swift", "C Bridge", "XNU / Mach Kernel", "Linux /proc", "CoreML", "XGBoost", "POSIX"],
+    tags: ["Operating Systems", "Kernel Telemetry", "Patent", "Machine Learning", "Reliability"],
+    metrics: [
+      { label: "Predictive Lead", value: "0.5s – 5.0s" },
+      { label: "Hang Precision", value: "92.5%" },
+      { label: "Freeze Reduction", value: "82% fewer hangs" },
+      { label: "Daemon Overhead", value: "< 0.5% CPU" }
+    ],
+    features: [
+      {
+        id: "telemetry-cross-signal",
+        heading: "46-Dim Cross-Signal Telemetry",
+        body: "Queries kernel APIs at 100Hz for 14 metrics into an O(1) circular RingBuffer. Synthesizes novel cross-signal indicators (Contention Index, Livelock Detector = IPC Latency × CPU, I/O Thrashing Index) to differentiate legitimate high compute from pathological lock contention.",
+        media: { type: "diagram", label: "Cross-Signal Telemetry Matrix" }
+      },
+      {
+        id: "xgboost-inference",
+        heading: "Calibrated XGBoost Softmax Inference",
+        body: "Extracts statistical aggregates and cross-signals across a 2.0s sliding window into a 46-dimensional vector. Evaluated by a CoreML-wrapped XGBoost model (100 estimators, max depth 6) with Softmax probability normalization P(Hang) in under 5ms.",
+        media: { type: "chart", label: "Inference & Hysteresis Pipeline" }
+      },
+      {
+        id: "policy-safety-gate",
+        heading: "Hysteresis State Machine & SafetyGate",
+        body: "A 3-state machine (NORMAL, PRE_HANG, HANG_IMMINENT) with asymmetric thresholds (0.8 trigger, 0.3 recovery) filters noise. SafetyGate performs strict deterministic checks: rejects interventions on UI Main Thread (TID 0), kernel mutex holders, and system daemons (PID < 100).",
+        media: { type: "diagram", label: "SafetyGate Decision Engine" }
+      },
+      {
+        id: "reversible-mitigation",
+        heading: "Plan-Apply-Commit Reversible Mitigation",
+        body: "Applies non-destructive scheduling interventions via setpriority() nice value shifts outside state locks, paired with PID+StartTime TOCTOU identity validation. Automatically reverts to original priority once normal state is re-established, preserving user data.",
+        media: { type: "diagram", label: "Plan-Apply-Commit Protocol" }
+      }
+    ],
+    links: { github: null, paper: null, demo: null }
+  },
+  {
     id: "stratarl",
     slug: "stratarl",
     title: "StrataRL",
@@ -233,6 +287,60 @@ export const projects: Project[] = [
       }
     ],
     links: { github: "https://github.com/Atharva-Mendhulkar/StrataRL", paper: null, demo: null }
+  },
+  {
+    id: "jointpinn",
+    slug: "jointpinn",
+    title: "JointPINN",
+    subtitle: "Physics-Informed Neural Networks for Atmospheric Transport & Source Inversion",
+    category: "ML / AI Research",
+    status: "complete",
+    statusLabel: "Research · PyTorch 2.5",
+    oneLiner: "Embeds atmospheric advection-diffusion-reaction PDEs and a learned dynamic diffusivity field (K-Net) to model urban PM2.5 dispersion and inverse source attribution across 7 years of telemetry.",
+    terminalBoot: [
+      "$ boot --target JointPINN",
+      "Loading 7-Year CAAQMS + ERA5 Reanalysis Telemetry (223k samples)...",
+      "Formulating Advection-Diffusion-Reaction PDE Loss Graph...",
+      "Mounting DiffusivityNet (K-Net Dynamic Turbulent Diffusivity)...",
+      "Initializing 9-layer Tanh MLP (AirQualityNet) & Xavier Uniform...",
+      "Executing Inverse Null-Space Recoverability-Aware Bayesian Analysis...",
+      "$ cat ./README.md"
+    ],
+    techStack: ["PyTorch 2.5", "Physics-Informed ML", "ERA5 Meteorology", "Autograd PDEs", "Bayesian UQ", "Python 3.10+"],
+    tags: ["PINN", "Atmospheric Physics", "Fluid Dynamics", "Inverse Problems", "Deep Learning"],
+    metrics: [
+      { label: "Test R² (2025)", value: "0.926" },
+      { label: "PDE Pass Rate", value: "100.0%" },
+      { label: "Test RMSE", value: "21.05 µg/m³" },
+      { label: "Telemetry History", value: "7 Yrs (223k hrs)" }
+    ],
+    features: [
+      {
+        id: "pde-transport",
+        heading: "Advection-Diffusion-Reaction PDE",
+        body: "Bridges purely data-driven ML and atmospheric fluid dynamics by embedding the governing transport PDE: ∂C/∂t + u·∇C = ∇·(K∇C) + S directly into the PyTorch autograd loss graph. Enforces physical mass conservation during extreme winter meteorological inversions.",
+        media: { type: "diagram", label: "Transport PDE Loss Graph" }
+      },
+      {
+        id: "k-net-diffusivity",
+        heading: "Learned Dynamic Diffusivity (K-Net)",
+        body: "Replaces static empirical diffusivity with DiffusivityNet (K-Net), a secondary neural network tied to the autograd graph that dynamically learns the continuous spatio-temporal turbulent diffusivity field K(x, y, t) directly from ERA5 wind vectors, 2m temperature, and Planetary Boundary Layer Height (BLH).",
+        media: { type: "chart", label: "Dynamic Diffusivity Field" }
+      },
+      {
+        id: "deep-tanh-architecture",
+        heading: "Smooth Higher-Order Gradient Architecture",
+        body: "AirQualityNet utilizes a deep, narrow 9-layer × 128-neuron MLP with Xavier Uniform initialization and Tanh activations. Unlike ReLU which zeroes out second-order derivatives, Tanh provides smooth, non-zero spatial Laplacians (∇²C) essential for diffusion physics backpropagation.",
+        media: { type: "diagram", label: "Higher-Order Autograd MLP" }
+      },
+      {
+        id: "ra-bpinn-nullspace",
+        heading: "Recoverability-Aware Bayesian PINN (RA-BPINN)",
+        body: "Solves spectral bias and overconfidence in inverse source identification. Quantifies Degrees of Freedom for Signal (DFS) across the Peclet (Pe) and Damköhler (Da) phase boundary, projecting unobservable modes into null-space uncertainty and achieving 93.8% credible interval coverage.",
+        media: { type: "diagram", label: "Observability Null-Space Phase" }
+      }
+    ],
+    links: { github: null, paper: null, demo: null }
   }
 ];
 

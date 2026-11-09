@@ -11,10 +11,12 @@ import rawResearchData from "@/data/research.json";
 // ── Data ──────────────────────────────────────────────────────────────────
 
 const PROJECTS = [
-  { id: "floework", name: "floework",     desc: "Enterprise-Grade SaaS Execution Platform",     tag: "saas",     keywords: ["saas", "aws", "architecture", "fastify", "real-time"] },
-  { id: "avara",    name: "AVARA",        desc: "Agent Runtime Security Authority",             tag: "systems",  keywords: ["agent", "security", "runtime", "llm", "iam"] },
-  { id: "kphd",     name: "K-PHD",        desc: "Kernel Predictive Hang Detector",              tag: "kernel",   keywords: ["linux", "kernel", "hang", "ema", "c", "scheduler"] },
-  { id: "stratarl", name: "StrataRL",     desc: "Forensic GRPO for Multi-Domain Reasoning",     tag: "research", keywords: ["rl", "grpo", "slm", "pytorch", "reasoning"] },
+  { id: "floework",  name: "floework",     desc: "Enterprise-Grade SaaS Execution Platform",     tag: "saas",     keywords: ["saas", "aws", "architecture", "fastify", "real-time"] },
+  { id: "avara",     name: "AVARA",        desc: "Agent Runtime Security Authority",             tag: "systems",  keywords: ["agent", "security", "runtime", "llm", "iam"] },
+  { id: "kphd",      name: "K-PHD",        desc: "Kernel Predictive Hang Detector",              tag: "kernel",   keywords: ["linux", "kernel", "hang", "ema", "c", "scheduler"] },
+  { id: "uprs",      name: "UPRS",         desc: "Universal Process Responsiveness System",      tag: "kernel",   keywords: ["patent", "hang", "telemetry", "xgboost", "os", "mac", "linux"] },
+  { id: "stratarl",  name: "StrataRL",     desc: "Forensic GRPO for Multi-Domain Reasoning",     tag: "research", keywords: ["rl", "grpo", "slm", "pytorch", "reasoning"] },
+  { id: "jointpinn", name: "JointPINN",    desc: "Physics-Informed NN for Atmospheric Transport", tag: "research", keywords: ["pinn", "physics", "pde", "air quality", "pytorch", "fluid"] },
 ];
 
 const GARDEN_FILES = rawResearchData.nodes.map((n: any) => ({
